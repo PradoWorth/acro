@@ -1,0 +1,15 @@
+Coloque aqui as fotos reais do site (hero, sobre, empresas, investidores,
+aquisição e construção). Depois, em src/content/site.py, bloco IMAGES,
+troque o None do slot correspondente pelo caminho relativo do arquivo,
+por exemplo:
+
+    "hero": "assets/img/hero.jpg",
+
+Rode "python3 build.py" de novo. Enquanto um slot ficar None, a página
+continua usando a arte SVG institucional no lugar — nada fica quebrado
+ou vazio.
+
+Formato recomendado: JPG ou WebP, até ~300 KB depois de comprimido,
+proporção 4:3 (empresas/sobre/investidores/aquisição) ou bem panorâmica
+(hero). Ver README.md, seção "Briefing de fotografia", para o que buscar
+em cada uma.

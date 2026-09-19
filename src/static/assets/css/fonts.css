@@ -1,0 +1,39 @@
+/* Inter e Manrope, auto-hospedadas (SIL Open Font License).
+   Servidas do próprio domínio: sem requisição a terceiros e sem exceção de
+   font-src na Content-Security-Policy.
+
+   São 2 arquivos, não 10 (ver gerar_fontes.py e README, item 119):
+
+   - Inter VARIÁVEL: um arquivo só, com o eixo de peso 100-900, que atende
+     os 4 pesos usados no site (400, 500, 600 e 700). Antes eram 4 arquivos
+     estáticos de ~24 KB cada (mais 4 de latin-ext); o navegador precisava
+     de todos para pintar o texto no peso certo, e era isso que segurava o
+     LCP das páginas — medido, não suposto.
+   - Manrope 700 estática: é o único peso dessa família no site, e a
+     variável dela pesaria quase o dobro de uma estática de um peso só.
+
+   Os dois são reduzidos aos caracteres que o site usa (ASCII + Latin-1
+   completo — todo o português — mais a pontuação tipográfica: travessão,
+   aspas curvas, reticências, seta, visto e euro). Total: 46 KB, contra
+   108 KB só das faces "latin" do formato anterior.
+
+   font-display:swap continua: o texto aparece imediatamente na fonte do
+   sistema e troca quando a real chega. Com os 2 arquivos pré-carregados
+   (ver font_head, em build.py) essa troca acontece antes da primeira
+   pintura na prática — CLS medido: 0. */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/inter-var.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/manrope-700.woff2") format("woff2");
+}

@@ -1,0 +1,27 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+
+# As fontes nunca mudam de conteúdo sob o mesmo nome de arquivo: cache
+# máximo. CSS/JS/imagens/arte podem ser republicados a qualquer deploy,
+# então ficam com um teto mais curto e revalidação, em vez de correr o
+# risco de o navegador prender uma versão velha por um ano.
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/css/*
+  Cache-Control: public, max-age=3600, must-revalidate
+/assets/js/*
+  Cache-Control: public, max-age=3600, must-revalidate
+/assets/img/*
+  Cache-Control: public, max-age=604800, must-revalidate
+/assets/art/*
+  Cache-Control: public, max-age=604800, must-revalidate
+/assets/icons/*
+  Cache-Control: public, max-age=604800, must-revalidate
