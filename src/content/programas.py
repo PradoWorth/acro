@@ -186,6 +186,12 @@ function acrSimInit() {
     prazoSel.innerHTML = opts.map(function (n) {
       return '<option value="' + n + '"' + (n === rule.prazo_max ? ' selected' : '') + '>' + n + ' meses</option>';
     }).join('');
+    // Reescrever innerHTML não dispara 'change' no <select> — mas é esse
+    // evento que o select customizado (site.js) escuta para redesenhar seu
+    // botão/lista visíveis (.cs-trigger/.cs-menu). Sem isto, o <select>
+    // real fica com as opções certas, porém o widget visível continua
+    // mostrando o conteúdo antigo (ou vazio, na primeira carga da página).
+    prazoSel.dispatchEvent(new Event('change'));
   }
 
   progSel.addEventListener('change', fillPrazoOptions);

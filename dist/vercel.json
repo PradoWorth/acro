@@ -39,7 +39,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'sha256-9J+5/avUisMns3+SXQQBxKt4WdrwnVFdzAE326YXcwc=' 'sha256-YKoSdA8KtTcBz+83LgxIr+Z33i0aI+dLX+ahXv67Mxk=' 'sha256-ZgJ/9cZvBcopPujC0dNkNBIADm61KxmwQn3caGhA6m0=' 'sha256-cA29pBtuopubMls7hq4BWGuSlYD3m3lEVzvV7Cy9hxk=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-g8y7bQ6Lk2/NCOi+6nkksJl50yoCVQ2Prchys1HUkqI=' 'sha256-jHxSW8+VFbvqVcgsTzpB7Q7rtbFD9DZcUh7QWWB/q0I=' 'sha256-sd37R0kod+x8mG/i2DxLUHT5rQqrRIOx2o5kahUhEk4=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s='; connect-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'sha256-/oTAEMP4pWUqhGFaW5bE14faRkb/Iav+4eLbkn0pPI8=' 'sha256-JyEMmQUSQrduJBWNIeArEEP6dlLUukwsRn/uqt0Sn2A=' 'sha256-ZgJ/9cZvBcopPujC0dNkNBIADm61KxmwQn3caGhA6m0=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-dIHk586z6AJ76tNZMQi9fSFRhMLfvMMrQT/RPWaDC5E=' 'sha256-jHxSW8+VFbvqVcgsTzpB7Q7rtbFD9DZcUh7QWWB/q0I=' 'sha256-qIZAb5gC5ilC6hVf0Trqk0BwIUTLuyBL8ukbMlv2SvE=' 'sha256-sd37R0kod+x8mG/i2DxLUHT5rQqrRIOx2o5kahUhEk4=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s='; connect-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
         }
       ]
     },

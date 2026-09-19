@@ -7983,3 +7983,56 @@ reempacotado (58 rotas) e `bundle_full_sim.py` com 3 passagens, tudo
 zerado. Lighthouse mobile reexecutado em 6 páginas (home, Soluções,
 Programas, institucional, Conteúdos) confirmando a auditoria de entrega
 de imagem em 0 KB de desperdício em todas.
+
+## 155. Campo "Prazo desejado" do simulador (Programas) aparentando vazio/bugado após trocar o Programa
+
+A cliente reportou, com captura de tela, que o campo "Prazo desejado" do
+simulador em `programas.html` "está dando erro" — e, quando eu respondi
+que uma primeira checagem não achou problema, insistiu, corretamente, que
+o campo "está realmente bugado" e pediu investigação mais a fundo.
+
+**Por que a primeira checagem enganou.** Testei o `<select id="sim-prazo">`
+de verdade (via JavaScript, direto no DOM) e ele estava perfeito: 8
+opções, prazo máximo do programa selecionado, tudo certo. O problema é
+que esse `<select>` não é o que a cliente vê — o site usa um select
+customizado (`.cs-trigger`/`.cs-menu`, em `site.css`/`site.js`) porque o
+navegador não deixa estilizar o menu nativo; o `<select>` real fica
+escondido (classe `.sr`) só para manter acessibilidade e leitura de tela.
+Ou seja: testei o elemento certo da forma errada — o invisível, não o que
+aparece na tela.
+
+**A causa real.** Em `site.js`, o widget customizado só se redesenha
+quando o `<select>` real dispara o evento `change`:
+
+    sel.addEventListener('change', render);
+    render();
+
+Mas a função que monta as opções de prazo, `fillPrazoOptions()` (em
+`content/programas.py`), troca o conteúdo do `<select>` inteiro de uma vez
+(`prazoSel.innerHTML = ...`) toda vez que a cliente muda o "Programa" —
+e reescrever `innerHTML` não dispara `change`. Resultado: o `<select>`
+real fica com as opções certas, mas o botão visível e a lista suspensa do
+widget customizado continuam mostrando o conteúdo de antes (ou vazio, na
+primeiríssima montagem da página) — exatamente o "campo vazio" da captura
+de tela.
+
+**Correção**, em `content/programas.py`, dentro de `fillPrazoOptions()`:
+depois de reescrever as opções, disparo manualmente o evento que faltava:
+
+    prazoSel.dispatchEvent(new Event('change'));
+
+Isso é suficiente para o `render()` do widget (já existente em `site.js`)
+recalcular o rótulo do botão e reconstruir a lista de opções — sem
+precisar mexer em `site.js` nem no CSS.
+
+**Verificação.** Rebuild completo, `preflight.py` (nenhuma pendência),
+`audit.py` (nenhuma ocorrência), `audit_deep.py` (0 apontamentos),
+`design_audit.py` ("sistema consistente"), `test_ui.py` inteiro passando.
+Além disso, escrevi um teste dirigido com Playwright reproduzindo
+exatamente o cenário da cliente: abrir `programas.html`, trocar o
+"Programa" de Pronampe para Procred 360 e conferir o widget visível do
+"Prazo desejado" — antes da correção o rótulo/lista ficavam presos nas
+opções do programa anterior; depois da correção, o rótulo passou de
+"96 meses" para "60 meses" e a lista de opções visível passou a mostrar
+exatamente as 5 opções (12 a 60 meses) do novo programa, em sincronia com
+o `<select>` real. Pacote navegável reempacotado (58 rotas).
