@@ -59,7 +59,19 @@ GLOBE_JS = r"""/*
     var n = ring.length / 2;
     if (n <= 24) return ring; // anéis pequenos já são baratos: mantém como está
     var out = [];
-    for (var i = 0; i < ring.length; i += 4) { out.push(ring[i], ring[i + 1]); }
+    // Passo 8 (1 em cada 4 pontos), não 4: o Canvas 2D do Safari/iOS é
+    // sensivelmente mais lento que o do Chrome/desktop para o mesmo volume
+    // de ctx.lineTo/moveTo por quadro — e é exatamente esse custo (milhares
+    // de chamadas por quadro, redesenhadas a cada rotação) que domina o
+    // desenho do globo. Reportado pela cliente: giro "não fluido" no
+    // celular mesmo em aparelho recente. Comparação lado a lado neste
+    // passo x2 mais agressivo não mostrou diferença perceptível — o traço
+    // das fronteiras já é um contorno fino e semitransparente, só para dar
+    // contexto geográfico (ver comentário no topo do arquivo), não um mapa
+    // de precisão. Países pequenos (Portugal, Suíça etc., com poucos
+    // pontos) não são afetados: a checagem "n <= 24" acima já os mantém
+    // intactos, então nenhuma das seis praças perde nitidez no contorno.
+    for (var i = 0; i < ring.length; i += 8) { out.push(ring[i], ring[i + 1]); }
     // garante que o anel feche no mesmo ponto em que começou
     if (out[0] !== ring[0] || out[1] !== ring[1]) { out.push(ring[0], ring[1]); }
     return out;

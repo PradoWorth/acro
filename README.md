@@ -8036,3 +8036,53 @@ opções do programa anterior; depois da correção, o rótulo passou de
 "96 meses" para "60 meses" e a lista de opções visível passou a mostrar
 exatamente as 5 opções (12 a 60 meses) do novo programa, em sincronia com
 o `<select>` real. Pacote navegável reempacotado (58 rotas).
+
+## 156. Giro do globo "não fluido" no mobile (relatado num iPhone recente)
+
+A cliente reportou, num iPhone de última geração, que o globo da home gira
+com menos fluidez no celular do que no computador.
+
+**Investigação.** O globo já tinha um sistema de meta de quadro adaptativa
+(ver comentários em `content/globe.py`): ele mede a cadência real de
+entrega de quadros e, quando o aparelho não acompanha, relaxa sozinho até
+um piso de ~12fps em vez de travar a página — ou seja, o código já esperava
+que aparelhos mais fracos precisassem ceder. Não consegui reproduzir
+travamento simulando um iPhone no Chrome (mobile + limitação de CPU, dentro
+e fora de rolagem): a meta adaptativa segurou 60fps estável em todos os
+cenários testados. Isso é evidência a favor de uma causa específica do
+motor do Safari/iOS (que não dá para simular por aqui, pois este ambiente
+não tem acesso a um iPhone real nem ao motor do Safari) — mais
+especificamente, o Canvas 2D do Safari é conhecidamente mais lento que o do
+Chrome para desenhar muitos traços por quadro (`ctx.lineTo`/`moveTo`), e é
+exatamente esse tipo de operação — milhares de pontos das fronteiras dos
+países, redesenhados a cada rotação — que domina o custo do globo.
+
+**Otimização aplicada, independente da causa exata**: o globo já reduzia
+os pontos dos contornos de país maiores (`decimate()`, em `globe.py`)
+para baratear o desenho; aumentei essa redução (mantendo os países
+pequenos — incluindo as 6 praças da empresa — intocados, já que só afeta
+anéis com mais de 24 pontos). Comparação lado a lado (screenshots, com e
+sem a redução extra, incluindo um giro até a Europa/América do Sul) não
+mostrou diferença perceptível — o traço das fronteiras já é fino e
+semitransparente, só para dar contexto geográfico. Simulando um aparelho
+bem mais lento (CPU 6x mais devagar, via DevTools), a versão com menos
+pontos manteve mais quadros por segundo e não precisou relaxar a meta,
+enquanto a versão original relaxava — sinal de que a mudança ajuda de
+verdade, não é só teórica.
+
+**O que ainda pode estar em jogo, do lado do aparelho.** Duas
+configurações do próprio iPhone afetam diretamente a fluidez de qualquer
+animação em Canvas, e vale a cliente checar: "Reduzir Movimento"
+(Ajustes > Acessibilidade > Movimento) e o Modo de Baixo Consumo — os dois
+fazem o Safari desenhar com menos frequência de propósito.
+
+**Verificação.** Rebuild completo, `preflight.py` (nenhuma pendência),
+`audit.py` (nenhuma ocorrência), `audit_deep.py` (0 apontamentos),
+`design_audit.py` ("sistema consistente"), `test_ui.py` inteiro passando.
+Pacote navegável reempacotado (58 rotas).
+
+**Se o giro continuar "travando" depois desta atualização**, o próximo
+passo é pedir um vídeo curto da tela do celular durante o giro — sem poder
+testar num iPhone de verdade a partir daqui, uma gravação é o jeito mais
+direto de ver o padrão exato do engasgo (se é constante, só durante
+rolagem, ou só nos primeiros segundos) e mirar a causa com mais precisão.
