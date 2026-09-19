@@ -63,37 +63,37 @@
   },
   "typography": {
     "t-display": {
-      "value": "36px"
+      "value": "40px"
     },
     "t-h1": {
-      "value": "28px"
+      "value": "30px"
     },
     "t-h2": {
-      "value": "24px"
+      "value": "26px"
     },
     "t-h3": {
-      "value": "18px"
+      "value": "20px"
     },
     "t-h4": {
-      "value": "18px"
+      "value": "20px"
     },
     "t-lead": {
-      "value": "18px"
+      "value": "20px"
     },
     "t-body": {
-      "value": "16px"
+      "value": "18px"
     },
     "t-sm": {
-      "value": "14px"
+      "value": "16px"
     },
     "t-xs": {
-      "value": "14px"
+      "value": "16px"
     },
     "t-micro": {
-      "value": "12px"
+      "value": "13px"
     },
     "t-nano": {
-      "value": "11px"
+      "value": "12px"
     },
     "track-display": {
       "value": "-.016em"

@@ -470,10 +470,10 @@ _CSS = """
 .pronampe-conditions__bg::after { content:""; position:absolute; inset:0;
   background: linear-gradient(100deg, rgba(6,16,30,.96) 5%, rgba(10,50,68,.87) 45%, rgba(11,80,76,.74) 100%); }
 .pronampe-conditions__inner { position:relative; z-index:1; }
-.pronampe-hero__copy h1 { font-family:var(--display); font-size:32px; line-height:1.15; font-weight:700;
+.pronampe-hero__copy h1 { font-family:var(--display); font-size:34px; line-height:1.15; font-weight:700;
   letter-spacing:var(--track-h1); margin:0 0 16px; }
-@media (min-width: 48rem) { .pronampe-hero__copy h1 { font-size:36px; } }
-@media (min-width: 75rem) { .pronampe-hero__copy h1 { font-size:40px; } }
+@media (min-width: 48rem) { .pronampe-hero__copy h1 { font-size:40px; } }
+@media (min-width: 75rem) { .pronampe-hero__copy h1 { font-size:44px; } }
 .pronampe-hero__lead { font-size:var(--t-body); line-height:1.6; color:var(--slate-1); max-width:42rem; margin:0 0 24px; }
 .pronampe-checks { list-style:none; margin:0 0 20px; padding:0; display:grid; gap:10px; }
 .pronampe-checks li { display:flex; align-items:center; gap:8px; font-weight:600; font-size:var(--t-body); }

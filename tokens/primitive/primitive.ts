@@ -18,6 +18,7 @@ export const primitive = {
   cobaltInk: '#255caa',
   softIrisInk: '#186582',
   sans: '"Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  display: '"Manrope", ui-sans-serif, "Segoe UI", Roboto, system-ui, sans-serif',
   petrol: 'var(--iris)',
   petrolSoft: 'var(--soft-iris)',
   brass: 'var(--iris)',

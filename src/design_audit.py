@@ -24,8 +24,10 @@ PORT = 8910
 
 VIEWPORTS = [("desktop", 1440, 900), ("tablet", 768, 1024), ("mobile", 390, 844)]
 
-# Escala tipográfica do sistema, em px
-FONT_SIZES = {11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 56, 64}
+# Escala tipográfica do sistema, em px (item 157: textos maiores em todo o
+# site — nano/micro/sm/xs/body/lead/h3/h4 subiram, h1/h2/display ganharam um
+# degrau extra por faixa; ver :root em site.css)
+FONT_SIZES = {12, 13, 16, 18, 20, 22, 24, 26, 30, 32, 34, 40, 44, 48, 60}
 
 # Grade de 8px, mais os meios-passos aceitos (4px) e valores de controle
 SPACING_OK = {0, 1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 32, 40, 48, 56, 64, 72, 80,

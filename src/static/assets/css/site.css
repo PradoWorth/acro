@@ -85,17 +85,17 @@
   /* Escala em degraus fixos, não fluida. Um clamp() produz valores
      intermediários em larguras intermediárias (22,4px, 33,89px...), o que
      quebra a padronização. Com degraus, toda largura cai num passo da escala. */
-  --t-display: 36px;
-  --t-h1:      28px;
-  --t-h2:      24px;
-  --t-h3:      18px;
-  --t-h4:      18px;
-  --t-lead:    18px;
-  --t-body:    16px;
-  --t-sm:      14px;
-  --t-xs:      14px;
-  --t-micro:   12px;
-  --t-nano:    11px;
+  --t-display: 40px;
+  --t-h1:      30px;
+  --t-h2:      26px;
+  --t-h3:      20px;
+  --t-h4:      20px;
+  --t-lead:    20px;
+  --t-body:    18px;
+  --t-sm:      16px;
+  --t-xs:      16px;
+  --t-micro:   13px;
+  --t-nano:    12px;
 
   --track-display: -.016em;
   --track-h1:      -.021em;
@@ -180,19 +180,19 @@
    da escala, sem interpolação. */
 @media (min-width: 48rem) {          /* 768px */
   :root {
-    --t-display: 44px;
-    --t-h1:      36px;
-    --t-h2:      28px;
+    --t-display: 48px;
+    --t-h1:      40px;
+    --t-h2:      30px;
     --gut:       32px;
     --band:      80px;
   }
 }
 @media (min-width: 75rem) {          /* 1200px */
   :root {
-    --t-display: 56px;
-    --t-h1:      40px;
-    --t-h2:      32px;
-    --t-h3:      20px;
+    --t-display: 60px;
+    --t-h1:      44px;
+    --t-h2:      34px;
+    --t-h3:      22px;
     --gut:       40px;
   }
 }
@@ -1004,7 +1004,7 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
      do hero é uma fração estreita da viewport (a arte ocupa a outra
      metade), então os degraus "de tela larga" da escala geral sempre
      ficam grandes demais aqui e derrubam o título em várias linhas. */
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 700; /* Manrope negrito, ver justificativa do peso junto de h1/h2 acima */
   letter-spacing: var(--track-h1); /* ver justificativa do tracking junto de h1/h2 acima */
   max-width: 17ch;
@@ -1012,8 +1012,8 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
   margin-bottom: var(--sp-4);
   color: var(--white);
 }
-@media (min-width: 48rem) { .hero h1 { font-size: 36px; } }
-@media (min-width: 75rem) { .hero h1 { font-size: 40px; } }
+@media (min-width: 48rem) { .hero h1 { font-size: 40px; } }
+@media (min-width: 75rem) { .hero h1 { font-size: 44px; } }
 .hero__sub { font-size: var(--t-body); color: var(--slate-1); max-width: 46ch; margin-bottom: var(--sp-3); }
 .hero .btn-row { margin-bottom: 0; }
 
@@ -1096,7 +1096,7 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
    não como corte de conteúdo — por isso a query combina largura e altura. */
 @media (min-width: 900px) and (max-height: 750px) {
   .hero__inner { padding-block: var(--sp-4) var(--sp-3); }
-  .hero h1 { font-size: 30px; margin-bottom: var(--sp-2); }
+  .hero h1 { font-size: 32px; margin-bottom: var(--sp-2); }
   .hero__sub { margin-bottom: var(--sp-2); }
   .factrail__cell { padding-block: 1.25rem; }
   .factrail__l { margin-top: .5rem; }
@@ -1145,7 +1145,7 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
 .pagehead__media { position: relative; min-height: 11rem; background: var(--ink-soft); }
 .pagehead__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .pagehead h1 { max-width: 20ch; margin-top: 1.5rem; }
-@media (min-width: 56.25rem) and (max-width: 74.99rem) { .pagehead h1 { font-size: 28px; } }
+@media (min-width: 56.25rem) and (max-width: 74.99rem) { .pagehead h1 { font-size: 30px; } }
 .pagehead .lead { color: var(--slate-1); margin-top: 1rem; }
 .pagehead__meta { margin-top: 2.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; border-top: 1px solid var(--rule-dark-soft); padding-top: 1.5rem; }
 .pagehead__meta div { min-width: 10rem; }
@@ -2185,7 +2185,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
    resolve seu próprio alvo de toque acima, com min-height em telas de
    toque, e não deve herdar este padding por cima daquele. */
 .foot__top ul a, .foot__legal nav a { display: inline-block; padding-block: .5rem; margin-block: -.5rem; }
-.foot__disclaimer { font-size: 10px; color: var(--graphite); line-height: 1.75; margin-top: 1rem; }
+.foot__disclaimer { font-size: 11px; color: var(--graphite); line-height: 1.75; margin-top: 1rem; }
 .foot__legal { border-top: 1px solid var(--rule-dark-soft); padding-block: 2rem 4.5rem; display: grid; gap: 1rem; }
 @media (min-width: 820px) { .foot__legal { grid-template-columns: 1fr auto; align-items: start; } }
 .foot__legal p { font-size: var(--t-micro); color: var(--graphite); line-height: 1.75; max-width: 78ch; }
@@ -2378,7 +2378,7 @@ button.tlink {
    manda é a regra do mobile logo acima. */
 @media (max-height: 800px) {
   .leadmodal__body { padding: var(--sp-3) var(--sp-3) var(--sp-2); }
-  .leadmodal__title { font-size: 22px; }
+  .leadmodal__title { font-size: 24px; }
   .leadmodal__body .form { margin-top: .5rem; }
   .leadmodal__body .fgrid { gap: .875rem; }
   .leadmodal__body .field { gap: .25rem; }

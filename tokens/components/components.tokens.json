@@ -1,10 +1,10 @@
 {
   "color": {
     "cta-grad": {
-      "value": "linear-gradient(90deg, #1c585d, #149d88)"
+      "value": "linear-gradient(90deg, #1c585d, #118372)"
     },
     "cta-hover": {
-      "value": "linear-gradient(90deg, #4b9b19, #90ae1f)"
+      "value": "linear-gradient(90deg, #408415, #687d16)"
     }
   },
   "space": {

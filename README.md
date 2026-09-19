@@ -8086,3 +8086,57 @@ passo é pedir um vídeo curto da tela do celular durante o giro — sem poder
 testar num iPhone de verdade a partir daqui, uma gravação é o jeito mais
 direto de ver o padrão exato do engasgo (se é constante, só durante
 rolagem, ou só nos primeiros segundos) e mirar a causa com mais precisão.
+
+## 157. Textos maiores em todo o site (PC, tablet e mobile)
+
+Pedido da cliente: deixar os textos "um pouco maiores", em qualquer
+aparelho, sem perder a estética.
+
+**O que mudou.** A escala tipográfica do site inteira vive em variáveis
+CSS (`:root`, em `site.css`), com um degrau por faixa de tela (mobile,
+≥768px, ≥1200px) — então a mudança concentra-se ali. Todos os tamanhos
+subiram entre 7% e 14%:
+
+- Texto de corpo (`--t-body`): 16px → 18px (o valor que praticamente todo
+  parágrafo do site usa, em qualquer tela — antes ele nem crescia do
+  celular para o desktop).
+- Textos pequenos e legendas (`--t-sm`/`--t-xs`): 14px → 16px.
+- Nano/micro (rodapé, tags): 11-12px → 12-13px.
+- Subtítulos (`--t-lead`, `--t-h3`, `--t-h4`): 18px → 20px (22px no
+  desktop, para o h3).
+- Títulos: h2 24/28/32px → 26/30/34px; h1 28/36/40px → 30/40/44px;
+  display 36/44/56px → 40/48/60px (mobile/tablet/desktop).
+- O título do hero da home e o do Pronampe (que têm escala própria, à
+  parte da geral, por causa da coluna estreita ao lado da arte) seguiram a
+  mesma progressão: 32/36/40px → 34/40/44px.
+- Alguns tamanhos "presos" fora do sistema de tokens também subiram um
+  pouco, para não ficarem para trás: o aviso legal do rodapé (10px→11px) e
+  o título do modal de contato quando a tela é baixa (22px→24px).
+
+**Por que não mexi em mais nada.** O ritmo vertical (`--sp-*`, em rem) e
+os breakpoints continuam exatamente como estavam — só o texto cresce, não
+o espaçamento nem a grade. Isso é o que mantém a "estética agradável"
+pedida: os títulos continuam proporcionalmente maiores que os parágrafos,
+os parágrafos continuam maiores que as legendas, na mesma hierarquia de
+antes, só que com uma folga geral maior para leitura.
+
+**Efeitos colaterais aceitos.** Com texto maior, dois lugares específicos
+mudaram de forma sutil e esperada: a lista de metadados no topo de páginas
+como Agronegócio agora quebra o valor em duas linhas em telas estreitas
+(conferido visualmente, continua limpo); e o menu nativo do `<select>` do
+formulário de contato ficou com o padding interno do navegador um pouco
+maior (é o próprio navegador quem desenha essa lista, não o CSS do site).
+Nenhum dos dois é uma quebra de layout — só o texto ocupando mais espaço,
+como pedido.
+
+**Verificação.** Atualizei também a lista de tamanhos esperados pelo
+próprio `design_audit.py` (item 154 tinha fixado a escala antiga como
+referência de consistência) — sem isso, a auditoria acusaria a mudança
+pedida como inconsistência. Rebuild completo, `gerar_tokens.py`
+reexecutado (os 5 formatos de token exportados ficam em sincronia com o
+CSS), `preflight.py` (nenhuma pendência), `audit.py` (nenhuma ocorrência),
+`audit_deep.py` (0 apontamentos), `design_audit.py` (0 tamanhos fora da
+escala), `test_ui.py` inteiro passando. Conferi visualmente home,
+Programas e a lista de metadados em desktop e mobile — texto maior, mesma
+hierarquia, sem quebra de layout. Pacote navegável reempacotado (58
+rotas).
