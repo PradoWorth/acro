@@ -1212,7 +1212,11 @@ def footer(path):
   </div>
 </footer>
 <a class="rail" href="{rel(path, 'contato.html') if is_placeholder(SITE['whatsapp_href']) else SITE['whatsapp_href']}" data-show="false"{'' if is_placeholder(SITE['whatsapp_href']) else ' data-lead-modal'} aria-label="Falar com um especialista">
-  <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.4A6.55 6.55 0 002.3 11.3L1.5 14.5l3.3-.85A6.55 6.55 0 108 1.4zm0 1.3a5.25 5.25 0 11-2.7 9.75l-.2-.12-1.95.5.52-1.9-.13-.2A5.25 5.25 0 018 2.7z"/></svg>
+  <picture>
+    <source type="image/avif" srcset="{rel(path, 'assets/img/rail/foto-lucas.avif')}">
+    <source type="image/webp" srcset="{rel(path, 'assets/img/rail/foto-lucas.webp')}">
+    <img src="{rel(path, 'assets/img/rail/foto-lucas.png')}" width="208" height="208" decoding="async" loading="lazy" alt="">
+  </picture>
 </a>"""
 
 

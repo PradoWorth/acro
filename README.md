@@ -8140,3 +8140,50 @@ escala), `test_ui.py` inteiro passando. Conferi visualmente home,
 Programas e a lista de metadados em desktop e mobile — texto maior, mesma
 hierarquia, sem quebra de layout. Pacote navegável reempacotado (58
 rotas).
+
+## 158. Botão flutuante de contato com a foto da fundadora
+
+Pedido da cliente: usar a foto enviada (retrato circular com anel azul,
+fundo preto) no lugar do ícone genérico de balão de conversa no botão
+flutuante — com o preto virando transparente.
+
+**O que fiz.** Recortei a foto num círculo (máscara circular, já que o
+anel azul está inscrito exatamente no quadrado da imagem original) e
+exportei em AVIF/WebP/PNG (mesma técnica de sempre, `assets/img/rail/`),
+seguindo o mesmo tratamento manual já usado para as mãozinhas do kanban —
+imagem com transparência, fora do pipeline automático de `.jpg`. Troquei
+o ícone SVG do botão (`.rail`, em `build.py`) pela foto, e ajustei o CSS:
+saiu o preenchimento em degradê e a troca de cor no hover (não fazem mais
+sentido com uma foto), entrou `overflow: hidden` para a foto ficar
+recortada certinha no círculo do botão, e o hover agora só intensifica a
+sombra (mais discreto, sem competir com a foto). O nome acessível do botão
+continua vindo só do `aria-label` do link — a foto entra com `alt=""` para
+não duplicar a leitura em leitor de tela.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`
+sem apontamentos, `design_audit.py` sem novidade, `test_ui.py` inteiro
+passando. Conferi visualmente o botão (ampliado 4x): sem nenhum resquício
+preto nos cantos, foto preenchendo o círculo. Pacote navegável reempacotado.
+
+## 159. Novo favicon (marca "A")
+
+Pedido da cliente: usar a imagem enviada (a letra "A" da marca, em cinza
+claro sobre fundo transparente) como favicon.
+
+**O que fiz.** A imagem chegou só com a forma da letra (sem cor de fundo
+própria) — usar exatamente como veio deixaria o ícone quase invisível a
+16px, o tamanho em que o favicon normalmente aparece (aba do navegador).
+Para o ícone continuar reconhecível nesse tamanho, apliquei o mesmo par de
+cores que o favicon anterior já usava (fundo `#030b12`, o azul-petróleo
+escuro da marca; símbolo em `#EFEEE9`, o creme claro) — mesma paleta,
+símbolo novo. Gerei todos os tamanhos que o site já referencia
+(`favicon-16/32/48.png`, `icon-192/512.png`, `apple-touch-icon.png`, mais
+o `favicon.svg` que os navegadores modernos preferem) a partir da mesma
+arte, com uma margem em volta do "A" para não ficar colado na borda.
+Nenhum destes arquivos mudou de nome ou de caminho — só o desenho dentro
+deles —, então nenhuma página precisou de alteração.
+
+**Verificação.** Rebuild completo, suíte de auditoria inteira sem
+apontamentos novos, `test_ui.py` passando. Conferi o favicon ampliado em
+16px e 32px: o "A" continua legível mesmo no tamanho mínimo. Pacote
+navegável reempacotado (a arte do favicon vai embutida nele também).
