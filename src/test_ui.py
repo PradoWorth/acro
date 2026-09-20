@@ -312,6 +312,15 @@ def run():
         check("NÃO mostra a taxa ao ano em lugar nenhum (pedido explícito do cliente)",
               "ao ano" not in taxa_row, taxa_row)
 
+        print("\n[simulador de página individual: campo \"valor\" não fica órfão na grade]")
+        pg.goto(f"{BASE}/programas/pronampe.html", wait_until="networkidle")
+        check("campo \"valor que você gostaria de captar\" ocupa a linha inteira (sem gerar buraco do lado)",
+              "field--full" in pg.eval_on_selector("#sim-valor", "el => el.closest('.field').className"))
+        valor_w = pg.eval_on_selector("#sim-valor", "el => el.closest('.field').getBoundingClientRect().width")
+        form_w = pg.eval_on_selector(".fgrid", "el => el.getBoundingClientRect().width")
+        check("largura do campo bate com a largura do formulário (realmente cheio, não só a classe)",
+              abs(valor_w - form_w) < 2, f"{valor_w} vs {form_w}")
+
         print("\n[teclado e foco]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")
         pg.keyboard.press("Tab")

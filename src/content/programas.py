@@ -464,7 +464,7 @@ def _simulator_section(path, slugs=None):
               <label for="sim-faturamento">Faturamento anual da empresa</label>
               <input type="text" inputmode="numeric" id="sim-faturamento" name="faturamento" data-mask="currency" placeholder="R$ 0" required>
             </div>
-            <div class="field">
+            <div class="field{' field--full' if len(slugs) == 1 else ''}">
               <label for="sim-valor">Valor que você gostaria de captar</label>
               <input type="text" inputmode="numeric" id="sim-valor" name="valor" data-mask="currency" placeholder="R$ 0 (opcional, deixe em branco para ver o teto)">
             </div>

@@ -8681,3 +8681,43 @@ ganhou 2 checagens confirmando que a taxa ao mês aparece e que a taxa
 ao ano não aparece em lugar nenhum do resultado — suíte inteira
 passando. Conferi visualmente com captura de tela do resultado do
 Pronampe: aparece só "1,53% ao mês".
+
+## 171. Simulador da página individual de cada programa: campo "valor" quebrando a grade
+
+**Pedido do cliente.** Print mostrando o simulador na página individual
+do Pronampe (o mesmo formulário existe em toda página de programa: PEAC
+FGI, Pronampe, Procred 360): o campo "Valor que você gostaria de
+captar" ficava sozinho numa linha, com um vão vazio do lado — quebrando
+o alinhamento da grade de 2 colunas. Pedido explícito pra corrigir
+imediatamente, e também pra conferir se o mesmo problema acontece em
+qualquer outra calculadora do site.
+
+**Causa.** Esse formulário é usado em dois lugares: na página geral de
+programas (`programas.html`, com um campo a mais pra escolher qual
+programa) e em cada página individual de programa (sem esse campo,
+porque a página já É daquele programa específico). Numa grade de 2
+colunas, a página geral tem 4 campos visíveis (par, preenche
+certinho); a página individual tem só 3 (ímpar), então o último campo
+sempre sobrava sozinho numa linha, com o espaço do lado vazio.
+
+**O que mudou.** Só na página individual (quando é o único programa),
+o último campo ("Valor que você gostaria de captar") passa a ocupar a
+linha inteira, usando o mesmo recurso (`field--full`) que outros
+formulários do site já usam pra isso — não é uma solução nova, é o
+padrão existente aplicado onde faltava.
+
+**Conferência nas outras calculadoras do site, como pedido.** Fui a
+todo lugar que usa esse mesmo tipo de grade de formulário: a
+calculadora de capital de giro (4 campos, já batia certinho), o
+simulador da página geral de programas (4 campos, também já batia), o
+formulário de contato e o popup de captação (já usam `field--full` nos
+campos que precisam, sem sobra) e o formulário da landing do Pronampe
+2026 (idem). Só a página individual de programa tinha o problema — os
+demais já estavam alinhados.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos. `test_ui.py`
+ganhou 2 checagens confirmando que o campo "valor" ocupa a linha
+inteira na página individual (pela classe E pela largura real
+renderizada) — suíte inteira passando. Conferi visualmente com captura
+de tela da página do Pronampe: sem vão vazio, tudo alinhado.
