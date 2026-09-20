@@ -182,6 +182,16 @@ GLOBE_JS = r"""/*
     var ctx = canvas.getContext('2d');
     var W, H, DPR, cx, cy, R, sphereGrad;
     var instanceNoisePattern = null;
+    // Tela estreita (celular/tablet, retrato ou paisagem): reduz o nível de
+    // detalhe desenhado a cada quadro (grade de paralelos/meridianos,
+    // fronteiras dos países, arcos de conexão entre as praças) sem mudar a
+    // aparência de forma perceptível nesse tamanho — o traço já é fino e
+    // semitransparente, então metade dos pontos ainda forma a mesma silhueta
+    // aos olhos, só custando menos CPU por quadro. Reportado pela cliente:
+    // giro pouco fluido em celular/tablet mesmo depois da otimização
+    // anterior (decimate() acima). Recalculado a cada rebuild(), então
+    // também se ajusta se o aparelho girar de retrato pra paisagem.
+    var lowDetail = false;
 
     // Rótulo de fps (só existe com "?fps=1" na URL, ver DEBUG_FPS acima).
     // position:absolute com estilo inline, não uma classe nova em site.css:
@@ -239,6 +249,7 @@ GLOBE_JS = r"""/*
       if (Math.round(newW) === lastW && Math.round(newH) === lastH) return;
       lastW = Math.round(newW); lastH = Math.round(newH);
       W = newW; H = newH;
+      lowDetail = W < 640;
       var rawDPR = window.devicePixelRatio || 1;
       var PIXEL_BUDGET = 1.1e6;
       var dpr = Math.min(rawDPR, 1.5);
@@ -569,9 +580,10 @@ GLOBE_JS = r"""/*
       ctx.drawImage(sphereBase, 0, 0, W, H);
 
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(90,160,155,0.09)';
+      var gratStep = lowDetail ? 2 : 1;
       for (var gi = 0; gi < graticule.length; gi++) {
         var line = graticule[gi]; ctx.beginPath(); var started = false;
-        for (var vi = 0; vi < line.length; vi++) {
+        for (var vi = 0; vi < line.length; vi += gratStep) {
           var v = line[vi], pr = project(v.x, v.y, v.z);
           if (pr.depth < -0.05) { started = false; continue; }
           if (!started) { ctx.moveTo(pr.sx, pr.sy); started = true; } else ctx.lineTo(pr.sx, pr.sy);
@@ -597,7 +609,12 @@ GLOBE_JS = r"""/*
           }
           if (startOffset === -1) continue;
           var pathStarted = false, pendingExitAngle = null, havePrev = false, prevRX = 0, prevRY = 0, prevRZ = 0;
-          for (var step = 0; step <= n; step++) {
+          // Só reduz o passo em anéis grandes (mesmo corte de 24 pontos que
+          // decimate() já usa lá em cima): países pequenos como Portugal e
+          // Suíça — duas das seis praças — continuam com o contorno
+          // completo, sem perder nitidez.
+          var ringStep = (lowDetail && n > 24) ? 2 : 1;
+          for (var step = 0; step <= n; step += ringStep) {
             var k = (startOffset + step) % n;
             var x = xs[k], y = ys[k], z = zs[k];
             var rx = x * cosRotY + z * sinRotY, rz = -x * sinRotY + z * cosRotY;
@@ -634,7 +651,10 @@ GLOBE_JS = r"""/*
         var arc = arcs[ai];
         arc.phase += dt * arc.speed * 0.35; if (arc.phase > 1) arc.phase -= 1;
         ctx.beginPath(); var began = false;
-        for (var pi = 0; pi < arc.xs.length; pi++) {
+        // ARC_STEPS é par (32), então o passo 2 sempre cai exatamente no
+        // último ponto (a cidade de chegada) — o arco não fica "curto".
+        var arcStep = lowDetail ? 2 : 1;
+        for (var pi = 0; pi < arc.xs.length; pi += arcStep) {
           var prA = project(arc.xs[pi], arc.ys[pi], arc.zs[pi]);
           var vis = !isOccluded(prA.sx, prA.sy, prA.depth);
           if (!vis) { began = false; continue; }

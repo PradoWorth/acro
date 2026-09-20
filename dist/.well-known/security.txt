@@ -1,4 +1,4 @@
 Contact: mailto:contato@acropolecapital.com.br
-Expires: 2027-09-20T15:08:06Z
+Expires: 2027-09-20T15:44:05Z
 Canonical: https://www.acropolecapital.com.br/.well-known/security.txt
 Preferred-Languages: pt-BR, en

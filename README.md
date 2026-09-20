@@ -8771,3 +8771,54 @@ ganhou 1 checagem confirmando, por medição real de pixel, que "Prazo
 desejado" e "Faturamento anual" começam exatamente na mesma altura —
 suíte inteira passando. Conferi visualmente com captura de tela e com
 a auditoria automatizada acima.
+
+## 173. Globo 3D: giro pouco fluido em celular/tablet
+
+**Pedido do cliente.** "Eu vi que você otimizou bastante o globo, mas
+eu sinto que ele não está fluido o suficiente para tablet e mobile."
+
+**Medição antes de mexer em qualquer coisa.** Simulei um celular/tablet
+real (não a CPU do ambiente de teste, que é muito mais rápida que a de
+um aparelho) usando o Chrome DevTools Protocol pra limitar a CPU em
+4x e 6x mais lenta, e li o fps real desenhado por cada instância do
+globo (o próprio `?fps=1` que já existe no código, feito exatamente
+pra isso). Confirmei que o problema era real e mais grave no globo
+interativo da faixa de rede do que no globo decorativo do topo da
+página: em torno de 15fps a 4x e 11fps a 6x no globo da faixa, contra
+33fps e 17fps no globo do topo — quase metade do fps para o mesmo
+aparelho simulado.
+
+**Causa.** O globo já tinha uma otimização de borda de país aplicada
+globalmente (função `decimate()`, reduzindo pontos das fronteiras) de
+uma rodada anterior — mas ela é igual em qualquer tamanho de tela, e o
+desenho de cada quadro ainda percorre, sempre por inteiro, a grade de
+paralelos/meridianos de fundo, os 15 arcos de conexão entre as 6
+praças (32 pontos cada) e o contorno de cada país — o mesmo tanto de
+trabalho num celular de tela pequena e num monitor grande, mesmo o
+traço fino e semitransparente não sendo muito perceptível em detalhe
+numa tela pequena mesmo.
+
+**O que mudei.** Reduzi o nível de detalhe desenhado a cada quadro
+especificamente quando o globo está numa área estreita (abaixo de
+640px de largura — o que cobre celular e tablet, incluindo virado de
+lado): a grade de paralelos/meridianos e os arcos de conexão passam a
+desenhar a metade dos pontos, e o contorno dos países grandes também
+(os países pequenos — Portugal e Suíça, duas das seis praças — ficam
+de fora dessa redução, com o mesmo corte de segurança que a otimização
+anterior já usa, pra não perderem nitidez). Isso é recalculado toda
+vez que o tamanho do globo muda, então também se ajusta sozinho se o
+aparelho girar de retrato pra paisagem. Não mudei nada na velocidade
+do giro, no toque/arrasto ou na meta adaptativa de quadro que já
+existia — só o quanto cada quadro desenha, em telas estreitas.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos, `test_ui.py`
+passando por inteiro (o globo continua girando, respondendo a
+arrasto e pausando fora da tela do jeito que já era testado). Medi de
+novo o fps real com a mesma simulação de CPU de antes: no globo da
+faixa de rede (o que estava pior), foi de ~15fps para ~48fps a 4x de
+limitação de CPU, e de ~11fps para ~29fps a 6x — mais de 2,5x mais
+fluido no mesmo aparelho simulado. O globo do topo da página também
+melhorou (ficou perto do teto de 60fps mesmo com a CPU limitada).
+Visualmente, no tamanho em que aparece no celular, não dá pra notar a
+diferença de detalhe — só a diferença de fluidez.
