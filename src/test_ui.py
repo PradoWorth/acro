@@ -280,6 +280,20 @@ def run():
         pg.wait_for_timeout(1400)
         check("envio válido mostra confirmação", pg.is_visible(".formstate--ok"))
 
+        print("\n[programas: imagem + texto]")
+        pg.goto(f"{BASE}/programas.html", wait_until="networkidle")
+        check("cada programa tem uma imagem ao lado do texto (.mediarow)",
+              pg.locator("#pronampe .mediarow").count() == 1)
+        check("imagem fica à esquerda do texto no desktop",
+              pg.eval_on_selector("#pronampe .mediarow__media", "el => el.getBoundingClientRect().left")
+              < pg.eval_on_selector("#pronampe .mediarow__body", "el => el.getBoundingClientRect().left"))
+        check("conteúdo completo continua presente (lista de detalhes do programa)",
+              pg.locator("#pronampe .mediarow__body dl").count() == 1)
+        check("link \"ver a página completa\" continua presente",
+              pg.locator("#pronampe a:has-text('Ver a página completa')").count() == 1)
+        check("âncora do programa continua funcionando (#pronampe)",
+              pg.eval_on_selector("#pronampe", "el => el.tagName") == "SECTION")
+
         print("\n[teclado e foco]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")
         pg.keyboard.press("Tab")
@@ -318,6 +332,12 @@ def run():
         pg.wait_for_timeout(600)
         check("Escape fecha a gaveta", pg.get_attribute(".drawer", "data-open") == "false")
         check("scroll é liberado", pg.locator("body.is-locked").count() == 0)
+
+        print("\n[programas: imagem + texto no celular]")
+        pg.goto(f"{BASE}/programas.html", wait_until="networkidle")
+        check("no celular a imagem empilha ACIMA do texto (não lado a lado)",
+              pg.eval_on_selector("#pronampe .mediarow__media", "el => el.getBoundingClientRect().top")
+              < pg.eval_on_selector("#pronampe .mediarow__body", "el => el.getBoundingClientRect().top"))
 
         print("\n[popup de captação no celular]")
         pg.eval_on_selector(".rail[data-lead-modal]", "el => el.click()")

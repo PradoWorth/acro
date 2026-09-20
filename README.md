@@ -8478,3 +8478,47 @@ nenhuma garantia — `touch-action` cobre o mesmo território (zoom, duplo
 toque, arrasto lateral) de um jeito que os navegadores tratam de forma
 consistente entre si. Se o problema persistir depois deste deploy, peço
 um vídeo da tela no Android pra investigar mais a fundo.
+
+## 167. Página "ver todos os programas": cada programa ganhou uma imagem ao lado do texto
+
+**Pedido do cliente.** Na página de programas (`programas.html`, a que
+lista BNDES, PEAC FGI, Pronampe e Procred 360), cada seção de programa
+era só texto — cabeçalho, tabela de condições, avisos e links, tudo
+empilhado numa coluna só. Pedido: colocar uma imagem à esquerda e manter
+o texto à direita, pra ficar mais visual e menos "página cheia de
+texto".
+
+**O que mudou.** Cada seção (`_program_section()`, em
+`content/programas.py`) agora usa o painel de imagem+texto já existente
+no site (`media_row()`, o mesmo bloco de `.mediarow` usado, por exemplo,
+na home) em vez de renderizar o texto sozinho. A imagem reaproveita
+exatamente o mesmo arquivo que já existe no banco de imagens do site
+para aquele programa (`programa-bndes`, `programa-peac-fgi`,
+`programa-pronampe`, `programa-procred-360` — os mesmos usados no topo
+da página individual de cada programa), então não foi preciso subir
+nenhuma imagem nova. Todo o conteúdo que já existia continua exatamente
+igual — número da seção, título, resumo, tabela de condições (para
+quem, valor máximo, taxa, prazo, garantia), aviso quando existe, os
+links de artigos relacionados, o link "ver a página completa" e o
+bloco de campanha ativa quando o programa tem uma — só que agora dentro
+da metade direita do painel, com a imagem ocupando a metade esquerda.
+No celular, onde não cabem duas colunas lado a lado, a imagem fica em
+cima e o texto embaixo (o mesmo comportamento que esse painel já tem em
+qualquer outro lugar do site), então a leitura continua natural em
+qualquer tamanho de tela. A âncora de cada programa (por exemplo,
+`#pronampe`, usada por outras páginas do site para linkar direto pra um
+programa específico) foi mantida sem nenhuma mudança.
+
+**Verificação.** Rebuild completo das 58 páginas,
+`preflight.py`/`audit.py`/`audit_deep.py`/`design_audit.py` sem
+apontamentos novos (só os 2 falsos-positivos já conhecidos e antigos,
+sem relação com essa mudança). `test_ui.py` ganhou 4 checagens novas no
+desktop confirmando que a imagem aparece à esquerda do texto em cada
+programa, que a tabela de condições e o link "ver a página completa"
+continuam presentes dentro do novo layout, e que a âncora do programa
+continua funcionando — mais 1 checagem no celular confirmando que a
+imagem empilha acima do texto (não fica lado a lado numa tela estreita).
+Toda a suíte passou. Conferi visualmente com capturas de tela no
+desktop (1440px) e no celular (390px) — o resultado bate com o exemplo
+de imagem que você mandou: imagem à esquerda, texto completo à direita,
+sem perder nenhum conteúdo que já existia.
