@@ -320,6 +320,10 @@ def run():
         form_w = pg.eval_on_selector(".fgrid", "el => el.getBoundingClientRect().width")
         check("largura do campo bate com a largura do formulário (realmente cheio, não só a classe)",
               abs(valor_w - form_w) < 2, f"{valor_w} vs {form_w}")
+        prazo_top = pg.eval_on_selector("#sim-prazo", "el => el.closest('.field').querySelector('.cs-trigger').getBoundingClientRect().top")
+        fat_top = pg.eval_on_selector("#sim-faturamento", "el => el.getBoundingClientRect().top")
+        check("\"Prazo desejado\" e \"Faturamento anual\" começam na mesma altura (rótulos do mesmo tamanho, sem quebrar linha um e não o outro)",
+              abs(prazo_top - fat_top) < 2, f"{prazo_top} vs {fat_top}")
 
         print("\n[teclado e foco]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")

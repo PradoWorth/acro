@@ -8721,3 +8721,53 @@ ganhou 2 checagens confirmando que o campo "valor" ocupa a linha
 inteira na página individual (pela classe E pela largura real
 renderizada) — suíte inteira passando. Conferi visualmente com captura
 de tela da página do Pronampe: sem vão vazio, tudo alinhado.
+
+## 172. Simulador da página individual: "Prazo desejado" e "Faturamento" começando em alturas diferentes
+
+**Pedido do cliente.** Você mandou novo print mostrando que, mesmo
+depois do ajuste do item 171, "Prazo desejado" e "Faturamento anual da
+empresa" ainda não começavam na mesma altura — o rótulo do faturamento
+quebrava em 2 linhas ("Faturamento anual da\nempresa") enquanto "Prazo
+desejado" ficava numa linha só, então a caixa de um começava mais acima
+que a do outro.
+
+**Causa.** Cada campo desse formulário empilha rótulo e caixa (sem
+esticar a caixa quando o rótulo é mais alto — ver comentário já
+existente no `site.css` sobre `align-content: start`). Isso evita que a
+CAIXA fique esticada, mas não resolve quando os DOIS rótulos vizinhos
+têm alturas diferentes: cada campo começa sua caixa logo depois do
+próprio rótulo, então um rótulo de 1 linha e um de 2 linhas produzem
+caixas em alturas diferentes na mesma fileira.
+
+**O que mudou.** Encurtei os dois rótulos que causavam o descompasso —
+"Faturamento anual da empresa" virou "Faturamento anual", e "Valor que
+você gostaria de captar" virou "Valor desejado" — pra caberem numa
+linha só, do mesmo jeito que "Prazo desejado" e "Programa" já cabem.
+Encurtei os dois (não só o que aparecia no print) porque esse mesmo
+simulador é usado em dois formatos: na página geral de programas
+(4 campos: Programa + Prazo numa fileira, Faturamento + Valor na
+outra) e na página de cada programa (3 campos: Prazo + Faturamento
+numa fileira, Valor sozinho embaixo). Só ajustar o Faturamento
+resolvia a página individual mas quebrava a página geral do mesmo jeito
+na fileira de baixo (Faturamento de 1 linha ao lado de Valor de 2) —
+corrigindo os dois rótulos, o alinhamento fica garantido nos dois
+formatos, em qualquer combinação de fileira.
+
+**Auditoria em todo o site, como pedido.** Escrevi um script (Playwright)
+que mede a altura real de cada par de campos lado a lado em todo
+formulário de 2 colunas do site — contato, popup de captação, a
+calculadora de capital de giro, o simulador (geral e de cada um dos 4
+programas) e o formulário da campanha do Pronampe — comparando a
+posição de onde a CAIXA de verdade começa (não o `<select>` nativo,
+que neste site fica escondido atrás do menu customizado — ver "select
+customizado" no `test_ui.py` — o que na primeira tentativa me deu um
+resultado errado, porque medi o elemento escondido em vez do visível).
+Depois do ajuste, rodei de novo em todos eles: nenhum outro
+desalinhamento sobrou em lugar nenhum do site.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos. `test_ui.py`
+ganhou 1 checagem confirmando, por medição real de pixel, que "Prazo
+desejado" e "Faturamento anual" começam exatamente na mesma altura —
+suíte inteira passando. Conferi visualmente com captura de tela e com
+a auditoria automatizada acima.

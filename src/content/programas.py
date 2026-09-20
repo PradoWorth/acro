@@ -461,11 +461,11 @@ def _simulator_section(path, slugs=None):
               <select id="sim-prazo" name="prazo" required></select>
             </div>
             <div class="field">
-              <label for="sim-faturamento">Faturamento anual da empresa</label>
+              <label for="sim-faturamento">Faturamento anual</label>
               <input type="text" inputmode="numeric" id="sim-faturamento" name="faturamento" data-mask="currency" placeholder="R$ 0" required>
             </div>
             <div class="field{' field--full' if len(slugs) == 1 else ''}">
-              <label for="sim-valor">Valor que você gostaria de captar</label>
+              <label for="sim-valor">Valor desejado</label>
               <input type="text" inputmode="numeric" id="sim-valor" name="valor" data-mask="currency" placeholder="R$ 0 (opcional, deixe em branco para ver o teto)">
             </div>
           </div>
