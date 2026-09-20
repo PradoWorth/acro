@@ -8219,3 +8219,29 @@ itens) em largura de celular: a linha 05 agora cabe numa linha só, e a
 linha 08 ("Recebíveis e Mercado de Capitais", a mais longa da lista) quebra
 o título em duas linhas com a categoria limpa embaixo, sem nenhuma
 sobreposição. Pacote navegável reempacotado (58 rotas).
+
+## 161. Lista de Soluções: categoria sempre embaixo do título, também no PC
+
+Ajuste de preferência da cliente sobre o item 160: no desktop, título e
+categoria continuavam lado a lado (como era antes da regressão); ela
+preferiu que a categoria fique sempre numa linha própria, embaixo do
+título, em qualquer tamanho de tela — não só no celular.
+
+**Mudança.** Em `site.css`, o bloco `.solrow__body` deixou de alternar
+entre lado a lado (acima de 940px) e empilhado (abaixo de 940px): agora é
+sempre `flex-direction: column`, sem media query nenhuma. Título e
+categoria ficam empilhados do celular ao desktop.
+
+Isso também fecha de vez a porta para o problema original do item 160: com
+os dois sempre em linhas separadas, um título comprido quebrando em duas
+linhas nunca mais tem como colidir com a categoria, em nenhuma largura.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`
+sem apontamentos, `design_audit.py` sem novidade (as duas divergências que
+já apareciam antes — `.pagehead__meta` em `agronegocio.html` e o
+`<option>` de `contato.html` — continuam sendo as mesmas de sempre,
+nenhuma nova), `test_ui.py` inteiro passando. Conferi visualmente a lista
+de Soluções em largura de desktop (1440px): todas as linhas, incluindo
+"02 Home Equity / Garantia de imóvel" e "05 Estruturação de Crédito /
+Operações desenhadas", mostram a categoria numa linha limpa embaixo do
+título. Pacote navegável reempacotado (58 rotas).

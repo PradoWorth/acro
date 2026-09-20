@@ -1213,16 +1213,13 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
 }
 .solrow__n { font-size: var(--t-sm); font-weight: 600; color: var(--slate-2); font-variant-numeric: tabular-nums; }
 /* Título e categoria vivem juntos num contêiner flex (não mais uma 3ª
-   coluna do grid) para poderem trocar de arranjo conforme o espaço: lado a
-   lado numa linha só quando cabe (a lista, no layout de 2 colunas do
-   desktop, tem folga de sobra), empilhados (categoria embaixo do título)
-   quando não cabe — sem isso, um título comprido (ex.: "Estruturação de
-   Crédito") quebra em duas linhas e a categoria, espremida do lado, quebra
+   coluna do grid) e sempre empilhados, categoria embaixo do título — em
+   qualquer tamanho de tela, por preferência do cliente (antes ficavam lado
+   a lado quando cabia, no desktop). Empilhado também evita de vez o
+   problema original: um título comprido (ex.: "Estruturação de Crédito")
+   quebrando em duas linhas e a categoria, espremida do lado, quebrando
    junto, as duas caindo uma em cima da outra. */
-.solrow__body { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 1rem; row-gap: .25rem; }
-@media (max-width: 58.6875rem) { /* abaixo de 940px: mesmo ponto em que .solindex deixa de ser 2 colunas */
-  .solrow__body { flex-direction: column; align-items: flex-start; }
-}
+.solrow__body { display: flex; flex-direction: column; align-items: flex-start; row-gap: .25rem; }
 .solrow__t { font-family: var(--sans); font-size: var(--t-h3); line-height: 1.2; }
 .solrow__k { font-size: var(--t-sm); color: var(--slate-2); }
 .solrow { position: relative; }
