@@ -8642,3 +8642,42 @@ com 2 checagens novas confirmando que o botão flutuante se move só por
 passando. Lighthouse re-executado na home depois da correção: o item
 "animações não compostas" não aparece mais (deixou de se aplicar),
 confirmando que a mudança resolveu.
+
+## 170. Simulador dos programas: taxa só em porcentagem ao mês, sem mostrar ao ano
+
+**Pedido do cliente.** No simulador da página de programas (o mesmo
+usado na página geral e em cada página individual de programa, como o
+Pronampe), o resultado mostrava a taxa estimada em porcentagem ao ano
+(ex.: 20% ao ano). Taxa ao ano soa alta e assusta o cliente, mesmo
+quando o custo mensal real é pequeno (ex.: 1,53% ao mês) — pedido:
+mostrar só a taxa ao mês, tirando a taxa ao ano de qualquer lugar do
+resultado. Primeiro ajustei para mostrar as duas, com a mensal em
+destaque e a anual entre parênteses; o cliente foi claro que não é
+isso — é para a taxa ao ano não aparecer de jeito nenhum, só a mensal.
+
+**O que mudou.** A linha "Taxa estimada" do resultado do simulador
+(`_simulator_section()`, em `content/programas.py`) agora mostra só
+`data-sim-taxa-am` (ex.: "1,53% ao mês"). O JavaScript do simulador
+também não escreve mais nada no elemento da taxa ao ano (ele nem existe
+mais no HTML). O cálculo interno continua o mesmo — a taxa ao ano
+(`taxaAA`) ainda é calculada, porque é a partir dela que a taxa ao mês e
+a parcela são derivadas em alguns programas — só não é mais mostrada em
+lugar nenhum da tela.
+
+**O que eu NÃO mexi, por ser outra coisa.** O texto de rodapé do
+resultado ("Cálculo ilustrativo, com a fórmula pública de cada programa
+e uma Selic de referência de setembro de 2026 (14,0% ao ano)...")
+continua citando a Selic em base anual. Isso não é o custo do produto
+pro cliente — é a explicação de metodologia (qual taxa de referência do
+Banco Central foi usada no cálculo), e a Selic sempre é divulgada e
+discutida em base anual, em qualquer lugar (imprensa, Banco Central,
+mercado financeiro) — não é um número comparável ao "20% ao ano
+assusta" do produto em si. Se você quiser que eu tire essa menção
+também, é só falar.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos. `test_ui.py`
+ganhou 2 checagens confirmando que a taxa ao mês aparece e que a taxa
+ao ano não aparece em lugar nenhum do resultado — suíte inteira
+passando. Conferi visualmente com captura de tela do resultado do
+Pronampe: aparece só "1,53% ao mês".

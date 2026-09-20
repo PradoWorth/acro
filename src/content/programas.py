@@ -228,7 +228,6 @@ function acrSimInit() {
     const custoTotal = pmt * n;
 
     result.querySelector('[data-sim-elegivel]').textContent = acrSimBRL(valorAprovado);
-    result.querySelector('[data-sim-taxa-aa]').textContent = acrSimPct(taxaAA, 1) + ' ao ano';
     result.querySelector('[data-sim-taxa-am]').textContent = acrSimPct(taxaAM, 2) + ' ao mês';
     result.querySelector('[data-sim-prazo]').textContent = n + ' meses';
     result.querySelector('[data-sim-parcela]').textContent = acrSimBRL(pmt) + ' / mês';
@@ -486,7 +485,7 @@ def _simulator_section(path, slugs=None):
           <p data-sim-warn hidden class="notice mt-2">Informe o faturamento anual para calcular o valor elegível.</p>
           <div class="deflist mt-2">
             <div class="deflist__row"><dt>Valor estimado elegível</dt><dd data-sim-elegivel class="figures"></dd></div>
-            <div class="deflist__row"><dt>Taxa estimada</dt><dd><span data-sim-taxa-aa class="figures"></span> (<span data-sim-taxa-am class="figures"></span>)</dd></div>
+            <div class="deflist__row"><dt>Taxa estimada</dt><dd><span data-sim-taxa-am class="figures"></span></dd></div>
             <div class="deflist__row"><dt>Prazo simulado</dt><dd data-sim-prazo class="figures"></dd></div>
             <div class="deflist__row"><dt>Carência típica</dt><dd data-sim-carencia></dd></div>
             <div class="deflist__row"><dt>Parcela estimada</dt><dd data-sim-parcela class="figures"></dd></div>

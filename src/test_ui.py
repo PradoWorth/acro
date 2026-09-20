@@ -299,6 +299,19 @@ def run():
         check("âncora do programa continua funcionando (#pronampe)",
               pg.eval_on_selector("#pronampe", "el => el.tagName") == "SECTION")
 
+        print("\n[simulador: só a taxa ao mês, sem taxa ao ano]")
+        pg.select_option("#sim-programa", "pronampe")
+        pg.wait_for_timeout(200)
+        pg.fill("#sim-faturamento", "1000000")
+        pg.fill("#sim-valor", "100000")
+        pg.click("form[data-sim-form] button[type=submit]")
+        pg.wait_for_timeout(400)
+        taxa_row = pg.eval_on_selector("[data-sim-taxa-am]", "el => el.parentElement.textContent")
+        check("mostra a taxa ao mês (pedido do cliente: valor mensal não assusta)",
+              "ao mês" in taxa_row, taxa_row)
+        check("NÃO mostra a taxa ao ano em lugar nenhum (pedido explícito do cliente)",
+              "ao ano" not in taxa_row, taxa_row)
+
         print("\n[teclado e foco]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")
         pg.keyboard.press("Tab")
