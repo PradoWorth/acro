@@ -998,6 +998,17 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
   padding-inline-end: var(--gut);
 }
 .hero__inner { padding-inline-start: max(var(--gut), calc((100vw - var(--shell)) / 2 + var(--gut))); }
+/* No celular/tablet retrato (coluna única, ver .hero__grid acima), esse
+   respiro de 5rem no topo — pensado pro layout de 2 colunas do desktop —
+   sobra em cima do próprio espaço que o .hero já reserva pro cabeçalho
+   fixo (padding-top: 5rem, no início desta seção): as duas reservas
+   somadas empurravam o h1 pra baixo demais, deixando uma faixa preta
+   vazia enorme entre o cabeçalho e o título — pedido do cliente pra
+   reduzir. Só nessa faixa de largura o respiro do miolo encolhe; o
+   layout de 2 colunas do desktop continua com o espaçamento original. */
+@media (max-width: 899px) {
+  .hero__inner { padding-block: var(--sp-4); }
+}
 @media (min-width: 900px) { .hero__inner { display: flex; flex-direction: column; justify-content: center; } }
 .hero h1 {
   /* Dimensionado à parte da escala geral (--t-display): a coluna de texto

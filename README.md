@@ -8344,3 +8344,32 @@ navegador não tem como dar zoom nem arrastar a tela, sejam quais forem
 os gatilhos. Se a cliente puder testar num celular real depois do
 próximo deploy — de preferência com o navegador fechado e reaberto, para
 não pegar cache antigo do JS/CSS — dá pra confirmar de vez.
+
+## 164. Hero da home: espaço vazio grande demais entre o cabeçalho e o título, no celular
+
+A cliente reportou (com print) uma faixa preta vazia grande entre o
+cabeçalho fixo e o título "Crédito como ferramenta de crescimento..." no
+celular, pedindo pra reduzir.
+
+**Causa.** Duas reservas de espaço se somando por engano. O `.hero` já
+cancela a reserva de 5rem que o `body` abre pro cabeçalho fixo (margem
+negativa + padding positivo, pra pintura do fundo escuro continuar por
+baixo do cabeçalho) — isso sozinho já devolve exatamente os 5rem certos
+de respiro antes do conteúdo. Só que `.hero__inner` (o miolo com
+título/texto/botões) tinha o próprio `padding-block` de 5rem no topo,
+pensado pro ritmo vertical do layout de 2 colunas do desktop — e no
+celular, com layout de coluna única, esse padding se somava ao respiro
+que o `.hero` já dava, resultando em ~10rem (160px) de vazio antes do
+título, em vez dos 5rem pretendidos.
+
+**Correção.** Abaixo de 900px de largura (mesmo ponto em que o hero
+empilha em coluna única, ver `.hero__grid`), `.hero__inner` passou a usar
+um respiro menor (2,5rem em vez de 5rem, tanto em cima quanto embaixo).
+O layout de 2 colunas do desktop não muda em nada.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`/
+`design_audit.py` sem apontamentos novos, `test_ui.py` inteiro passando.
+Conferi visualmente a home em largura de celular (o vazio ficou bem mais
+enxuto, título aparece logo depois do cabeçalho, sem colar nele) e em
+largura de desktop (idêntico a antes, nenhuma mudança visível). Pacote
+navegável reempacotado (58 rotas).
