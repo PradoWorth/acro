@@ -8822,3 +8822,70 @@ fluido no mesmo aparelho simulado. O globo do topo da página também
 melhorou (ficou perto do teto de 60fps mesmo com a CPU limitada).
 Visualmente, no tamanho em que aparece no celular, não dá pra notar a
 diferença de detalhe — só a diferença de fluidez.
+
+## 174. Globo 3D: teste completo pedido pela cliente, cobrindo paisagem, e um limite técnico que preciso deixar claro
+
+**Pedido da cliente.** "Faça testes no globo e garanta que ele esteja
+rodando entre 60 a 100 fps."
+
+**O teste completo.** Ampliei a simulação do item anterior: medi fps
+real (com o `?fps=1` do próprio código) em celular retrato, celular
+deitado, tablet retrato, tablet deitado e desktop, em 6 níveis de CPU
+mais lenta (de 1x/sem limitação até 6x mais lenta), e também com a
+densidade de pixel de tela real de aparelho (retina — a suíte de
+antes rodava numa densidade de 1x, que nenhum celular/tablet real
+usa; refeita com 2x/3x, que é o real).
+
+**O que o teste achou de novo.** A redução de detalhe do item 173 só
+entrava quando o CANVAS do globo em si media menos de 640px de
+largura. Isso cobre celular e tablet na maioria dos casos — mas não
+tablet ou celular grande DEITADO: nessas orientações a faixa de rede
+troca pro globo "largo" (o mesmo formato do desktop, mais caro), que
+pode passar fácil de 640px mesmo sendo, na prática, ainda um aparelho
+de celular por dentro. Ou seja: a fluidez em paisagem continuava sem
+a otimização.
+
+**O que corrigi.** Troquei o critério de "tela estreita" por um sinal
+mais confiável de "isto é um celular ou tablet": `pointer: coarse` (o
+próprio navegador informa se o toque é o tipo de entrada principal),
+que não muda com a orientação da tela. Também apertei um pouco o
+teto de nitidez (densidade de pixel do canvas) nesses aparelhos — o
+custo de preencher a esfera e as fronteiras cresce com a ÁREA em
+pixels, não só com a quantidade de pontos, e esse ajuste ataca
+justamente o globo "largo" grande que aparece deitado, sem ficar
+perceptível num traço fino e semitransparente como esse.
+
+**O limite técnico que preciso ser direto sobre.** Não existe forma de
+GARANTIR por código que qualquer aparelho, em qualquer condição,
+desenhe 60 a 100fps — isso já estava documentado no próprio código do
+globo de uma rodada anterior com você, e continua valendo: se o
+aparelho fisicamente não consegue desenhar mais rápido que isso,
+nenhum JavaScript força a mão sem travar a página inteira tentando.
+O que dá pra garantir, e o teste confirma, é o oposto: nunca segurar
+de propósito um aparelho capaz de mais (o teto de 120fps já existe pra
+isso) e nunca insistir além do que um aparelho fraco consegue entregar
+sem travar (é o que a meta adaptativa já fazia).
+
+Os números medidos, com densidade de pixel real de aparelho: sem
+limitação de CPU nenhuma e com CPU 2x mais lenta que este ambiente de
+teste (que já é mais rápido que a maioria dos celulares/tablets em
+uso), o globo roda a 60fps consistente em toda combinação testada —
+celular, tablet, retrato e paisagem. A partir de 3x mais lento é que
+começa a cair (a faixa de rede em paisagem é o ponto mais sensível,
+por ser o formato "largo" e maior). Não tenho como te dizer com
+certeza que aparelho real corresponde a qual desses multiplicadores —
+não é uma escala oficial — mas cobre uma faixa ampla, de celular
+recente até aparelho visivelmente mais fraco.
+
+**Se quiser ir além disso**, a próxima etapa seria reescrever o globo
+usando WebGL (GPU) em vez de Canvas 2D (CPU) — aí sim o desenho corre
+solto até em aparelho bem mais fraco, porque passa a ser a placa de
+vídeo fazendo o trabalho pesado, não o processador. É uma reescrita
+bem maior, com mais risco de quebrar algo no meio do caminho, então
+não fiz sem confirmar antes com você se vale a pena — o resultado
+atual, no aparelho real de quem visita o site, já deve estar entre 60
+e 100fps na esmagadora maioria dos casos.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos, `test_ui.py`
+passando por inteiro.

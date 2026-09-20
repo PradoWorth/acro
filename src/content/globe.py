@@ -32,6 +32,14 @@ GLOBE_JS = r"""/*
 (function () {
   'use strict';
   var prefersReducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  // Aparelho de toque (celular/tablet, qualquer orientação): pointer grosso
+  // é o sinal mais confiável de "é um celular ou tablet", porque a LARGURA
+  // sozinha engana em paisagem — um tablet ou celular grande deitado pode
+  // passar de 899px (o próprio ponto de corte do CSS entre o globo
+  // "compacto" e o "largo" na faixa de rede) e acabar recebendo o globo do
+  // jeito desktop, mesmo rodando num chip de celular. Ver uso em
+  // rebuild()/lowDetail logo abaixo.
+  var isTouchDevice = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 
   // Existiu aqui uma pausa total de redesenho durante a rolagem (um
   // listener de 'scroll' que desligava o desenho do globo por 140ms a cada
@@ -249,10 +257,25 @@ GLOBE_JS = r"""/*
       if (Math.round(newW) === lastW && Math.round(newH) === lastH) return;
       lastW = Math.round(newW); lastH = Math.round(newH);
       W = newW; H = newH;
-      lowDetail = W < 640;
+      // isTouchDevice cobre paisagem (largura enganosamente grande num
+      // celular/tablet deitado); os outros dois cobrem os casos sem toque
+      // detectável (ex.: emulação de dispositivo sem esse recurso) — 899px
+      // é o mesmo ponto de corte que o CSS já usa pra trocar entre o globo
+      // compacto e o largo (ver .netband__globe--wide em site.css), e
+      // W < 640 continua pegando o próprio canvas quando ele é estreito por
+      // outro motivo (ex.: coluna lateral apertada).
+      lowDetail = isTouchDevice || window.innerWidth <= 899 || W < 640;
       var rawDPR = window.devicePixelRatio || 1;
-      var PIXEL_BUDGET = 1.1e6;
-      var dpr = Math.min(rawDPR, 1.5);
+      // Em celular/tablet, o globo "largo" (visível deitado, ver
+      // isTouchDevice acima) pode ocupar uma faixa bem maior que o
+      // "compacto" — e o custo de preencher/traçar a esfera e as fronteiras
+      // cresce com a ÁREA em pixels do canvas, não com a quantidade de
+      // pontos (que já foi reduzida acima). Um teto de nitidez um pouco
+      // menor nesses casos (a diferença não é perceptível num traço fino e
+      // semitransparente) devolve fôlego real de CPU onde o corte de pontos
+      // sozinho não alcança (tela grande + aparelho fraco).
+      var PIXEL_BUDGET = lowDetail ? 0.75e6 : 1.1e6;
+      var dpr = Math.min(rawDPR, lowDetail ? 1.2 : 1.5);
       if (W * H * dpr * dpr > PIXEL_BUDGET) dpr = Math.max(1, Math.sqrt(PIXEL_BUDGET / (W * H)));
       DPR = dpr;
       canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
