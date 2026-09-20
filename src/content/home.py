@@ -199,8 +199,9 @@ def solutions(path):
         f'<button class="solrow" role="tab" id="solrow-{s["slug"]}" data-sol="{s["slug"]}" '
         f'aria-selected="{"true" if i == 0 else "false"}" aria-controls="solpanel-{s["slug"]}">'
         f'<span class="solrow__n">{i + 1:02d}</span>'
+        f'<span class="solrow__body">'
         f'<span class="solrow__t">{s["title"]}</span>'
-        f'<span class="solrow__k">{s["kicker"]}</span></button>'
+        f'<span class="solrow__k">{s["kicker"]}</span></span></button>'
         for i, s in enumerate(SOLUTIONS)
     )
     panels = ""

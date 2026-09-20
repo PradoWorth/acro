@@ -8187,3 +8187,35 @@ deles —, então nenhuma página precisou de alteração.
 apontamentos novos, `test_ui.py` passando. Conferi o favicon ampliado em
 16px e 32px: o "A" continua legível mesmo no tamanho mínimo. Pacote
 navegável reempacotado (a arte do favicon vai embutida nele também).
+
+## 160. Regressão: título e categoria colidindo na lista de Soluções (mobile), causada pelo aumento de fonte
+
+A cliente reportou (com print) a linha "05 Estruturação de Crédito /
+Operações desenhadas", na lista de Soluções da home, com o texto
+colidindo/sobreposto no celular — corrigido de imediato.
+
+**Causa.** Efeito colateral direto do item 157 (textos maiores). Essa
+lista (`.solrow`, em `content/home.py`) é uma grade de 3 colunas: número,
+título e categoria lado a lado. Com o texto maior, o título "Estruturação
+de Crédito" passou a quebrar em duas linhas nessa largura — e a categoria,
+espremida na coluna fixa ao lado, quebrou junto, as duas caindo uma sobre
+a outra. Antes da fonte crescer, nenhum título chegava a quebrar nessa
+largura, então o problema nunca tinha aparecido.
+
+**Correção.** Título e categoria saíram de colunas de grid separadas e
+passaram a viver juntos num mesmo bloco (`.solrow__body`, um `<span>` novo
+em volta dos dois, em `content/home.py`). Esse bloco é flexível: no
+desktop (a lista de Soluções vira 2 colunas a partir de 940px, com folga
+de sobra), título e categoria continuam lado a lado, exatamente como
+antes; abaixo de 940px, a categoria passa para uma linha própria embaixo
+do título — não importa quantas linhas o título ocupe, os dois nunca mais
+disputam o mesmo espaço horizontal.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`
+sem apontamentos, `design_audit.py` sem novidade (um espaçamento novo que
+a mudança introduziu, 2.4px fora da grade de 8px, foi ajustado para 4px),
+`test_ui.py` inteiro passando. Conferi visualmente a lista inteira (8
+itens) em largura de celular: a linha 05 agora cabe numa linha só, e a
+linha 08 ("Recebíveis e Mercado de Capitais", a mais longa da lista) quebra
+o título em duas linhas com a categoria limpa embaixo, sem nenhuma
+sobreposição. Pacote navegável reempacotado (58 rotas).

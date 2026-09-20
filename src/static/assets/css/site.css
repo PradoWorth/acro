@@ -1198,7 +1198,7 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
 .solrow {
   width: 100%;
   display: grid;
-  grid-template-columns: 2.6rem 1fr auto;
+  grid-template-columns: 2.6rem 1fr;
   align-items: baseline;
   gap: 1rem;
   padding: var(--sp-4) 0.25rem;
@@ -1212,6 +1212,17 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
   transition: color var(--dur-default) var(--ease);
 }
 .solrow__n { font-size: var(--t-sm); font-weight: 600; color: var(--slate-2); font-variant-numeric: tabular-nums; }
+/* Título e categoria vivem juntos num contêiner flex (não mais uma 3ª
+   coluna do grid) para poderem trocar de arranjo conforme o espaço: lado a
+   lado numa linha só quando cabe (a lista, no layout de 2 colunas do
+   desktop, tem folga de sobra), empilhados (categoria embaixo do título)
+   quando não cabe — sem isso, um título comprido (ex.: "Estruturação de
+   Crédito") quebra em duas linhas e a categoria, espremida do lado, quebra
+   junto, as duas caindo uma em cima da outra. */
+.solrow__body { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 1rem; row-gap: .25rem; }
+@media (max-width: 58.6875rem) { /* abaixo de 940px: mesmo ponto em que .solindex deixa de ser 2 colunas */
+  .solrow__body { flex-direction: column; align-items: flex-start; }
+}
 .solrow__t { font-family: var(--sans); font-size: var(--t-h3); line-height: 1.2; }
 .solrow__k { font-size: var(--t-sm); color: var(--slate-2); }
 .solrow { position: relative; }
@@ -1220,13 +1231,13 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
    deslocamento é .75rem (e não 1rem como no .artrow) porque aqui a regra
    antiga TROCAVA o padding lateral de repouso, que é .25rem, por 1rem; o
    transform soma ao que já existe, então .25 + .75 dá exatamente a mesma
-   posição final de antes.
-   A última coluna (a categoria, à direita) fica de fora: como o grid a
-   ancora à direita, com padding ela não saía do lugar — só as duas da
-   esquerda avançavam. Excluí-la mantém o movimento idêntico ao original. */
-.solrow > *:not(:last-child) { transition: transform var(--dur-slow) var(--ease); }
-.solrow:hover > *:not(:last-child),
-.solrow[aria-selected="true"] > *:not(:last-child) { transform: translateX(.75rem); }
+   posição final de antes. Título e categoria agora avançam juntos (um só
+   filho, .solrow__body, os contém) — antes a categoria ficava de fora por
+   ser uma coluna de grid ancorada à direita; como bloco flex à esquerda,
+   ela pode acompanhar o título sem esse problema. */
+.solrow > .solrow__n, .solrow > .solrow__body { transition: transform var(--dur-slow) var(--ease); }
+.solrow:hover > .solrow__n, .solrow:hover > .solrow__body,
+.solrow[aria-selected="true"] > .solrow__n, .solrow[aria-selected="true"] > .solrow__body { transform: translateX(.75rem); }
 .solrow[aria-selected="true"] .solrow__n { color: var(--iris-on-dark); }
 .solrow[aria-selected="true"] .solrow__t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .28em; }
 
