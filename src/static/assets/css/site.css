@@ -2276,6 +2276,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
   -webkit-backdrop-filter: blur(6px);
   opacity: 0;
   transition: opacity var(--dur) var(--ease);
+  /* Nada aqui rola — sem gesto nenhum, nem pinça nem toque duplo. */
+  touch-action: none;
 }
 .leadmodal[data-open="true"] .leadmodal__overlay { opacity: 1; }
 .leadmodal__dialog {
@@ -2285,6 +2287,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
   max-height: calc(100vh - 2 * var(--sp-2));
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Reforço em CSS da trava de zoom em toque (ver lockZoom em site.js):
+     libera só a rolagem vertical (é o que a pessoa precisa pra ver os
+     campos seguintes) e recusa qualquer outro gesto — pinça, duplo
+     toque, arrasto lateral — direto no navegador, sem depender só da
+     tag <meta viewport>. */
+  touch-action: pan-y;
   scrollbar-width: thin;
   scrollbar-color: var(--rule) transparent;
   background: var(--paper);

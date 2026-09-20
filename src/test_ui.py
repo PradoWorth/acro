@@ -320,12 +320,23 @@ def run():
         check("scroll é liberado", pg.locator("body.is-locked").count() == 0)
 
         print("\n[popup de captação no celular]")
+        viewport_before = pg.eval_on_selector('meta[name="viewport"]', "el => el.content")
         pg.eval_on_selector(".rail[data-lead-modal]", "el => el.click()")
         pg.wait_for_timeout(400)
         check("NÃO foca campo algum ao abrir em toque (evita zoom travado no iOS)",
               pg.evaluate("() => document.activeElement.tagName") != "INPUT")
+        check("trava o zoom da página (viewport com maximum-scale=1, user-scalable=no) enquanto o popup está aberto",
+              "user-scalable=no" in pg.eval_on_selector('meta[name="viewport"]', "el => el.content"))
+        check("dialog só permite rolagem vertical (touch-action: pan-y) — sem pinça, sem arrasto lateral",
+              pg.eval_on_selector(".leadmodal__dialog", "el => getComputedStyle(el).touchAction") == "pan-y")
+        pg.click("#lm-nome")
+        pg.fill("#lm-nome", "Teste")
+        check("mesmo com o zoom travado, o campo continua digitável ao toque manual",
+              pg.input_value("#lm-nome") == "Teste")
         pg.keyboard.press("Escape")
         pg.wait_for_timeout(400)
+        check("devolve o viewport original ao fechar o popup",
+              pg.eval_on_selector('meta[name="viewport"]', "el => el.content") == viewport_before)
 
         print("\n[tipografia de formulário no mobile]")
         pg.goto(f"{BASE}/contato.html", wait_until="networkidle")

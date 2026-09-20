@@ -8288,3 +8288,59 @@ conhecido do iOS, e a correção (não disparar foco programático durante a
 animação de um popup em toque) é a prática recomendada para evitá-lo por
 completo — se ainda notar o zoom acontecendo depois de publicado, me avise
 com um vídeo da tela pra eu investigar mais a fundo.
+
+## 163. Popup de captação no celular: trava de zoom definitiva (a correção do item 162 não foi suficiente)
+
+A cliente confirmou que o problema do item 162 persistia: o popup ainda
+direcionava para o campo "Nome" ao abrir no celular, com a tela dando
+zoom, e depois desse zoom ainda dava pra arrastar a página para os
+lados/para cima — travamento total do zoom era explicitamente exigido
+("não é para dar zoom, não é para dar zoom out, não é para mover para os
+lados... é para ele estar fixo").
+
+**Por que o item 162 não bastou.** Aquela correção atacou a causa mais
+provável (foco automático disparado no meio da animação de entrada), mas
+era uma correção "evitar o gatilho conhecido", não uma garantia. Pode não
+ter sido suficiente por cache do navegador da cliente (o JS/CSS ficam até
+1h em cache no ar), ou por algum outro gatilho de zoom que a correção
+anterior não cobria. De qualquer forma, o pedido agora é por uma garantia
+categórica, não por eliminar um gatilho específico.
+
+**Correção (agora à prova de causa).** Duas camadas, as duas só ativas
+durante o tempo em que o popup está aberto e só em toque (celular/
+tablet) — no restante do site e no desktop nada muda:
+
+1. **`site.js`** reescreve a própria tag `<meta name="viewport">` ao abrir
+   o popup, acrescentando `maximum-scale=1, user-scalable=no` — trava o
+   zoom da página inteira (pinça, duplo toque, foco em campo, o que for)
+   enquanto o popup estiver na tela. Ao fechar (botão de fechar, clique
+   fora, Escape ou envio), devolve a tag ao valor original, e o resto do
+   site continua com zoom normal (pinça livre é importante pra
+   acessibilidade — só o popup em si fica travado).
+2. **`site.css`**: `.leadmodal__dialog` ganhou `touch-action: pan-y`
+   (permite só rolar verticalmente — é o que a pessoa precisa pra
+   preencher os campos seguintes — e recusa pinça, duplo toque e arrasto
+   lateral direto no navegador) e `.leadmodal__overlay` ganhou
+   `touch-action: none` (a área escura de fundo não aceita gesto nenhum).
+   Isso reforça em CSS o que a troca da tag `viewport` já faz, sem
+   depender de uma única camada.
+
+O foco automático continua desligado em toque (do item 162) — mesmo sem
+mais o risco de zoom, não faz sentido abrir o teclado sozinho antes da
+pessoa tocar em algo.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`/
+`design_audit.py` sem apontamentos novos, `test_ui.py` com cinco testes
+novos especificamente para isso: confirma que a tag `viewport` ganha
+`user-scalable=no` ao abrir o popup em toque, que `.leadmodal__dialog`
+tem `touch-action: pan-y`, que mesmo com a trava o campo continua
+digitável ao toque manual (a pessoa não fica impedida de preencher), e
+que a tag `viewport` volta exatamente ao valor original ao fechar — os
+cinco passando, junto com a suíte inteira. Continua sem WebKit/iOS real
+disponível neste ambiente para reproduzir o zoom do Safari em si, mas
+diferente da correção anterior, esta não depende de evitar uma causa
+específica: com `user-scalable=no` e `touch-action` travados, o
+navegador não tem como dar zoom nem arrastar a tela, sejam quais forem
+os gatilhos. Se a cliente puder testar num celular real depois do
+próximo deploy — de preferência com o navegador fechado e reaberto, para
+não pegar cache antigo do JS/CSS — dá pra confirmar de vez.

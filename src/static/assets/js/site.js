@@ -235,7 +235,26 @@
     var leadForm = $('form', leadModal);
     var leadLastFocus = null;
 
+    /* Trava de zoom do popup em toque: pedido explícito da cliente —
+       enquanto o popup está aberto no celular/tablet, nenhum toque (foco
+       em campo, duplo toque, pinça) pode dar zoom nem deixar a tela
+       arrastável para os lados; tem que ficar fixa. A forma confiável de
+       garantir isso é reescrever a própria tag <meta name="viewport">
+       enquanto o popup está aberto, e devolver o valor original ao
+       fechar — assim o resto do site continua com zoom normal (pinça
+       livre é acessibilidade), só o popup fica travado. No desktop essa
+       tag não tem efeito nenhum, então nem mexemos nela. */
+    var viewportMeta = document.querySelector('meta[name="viewport"]');
+    var viewportDefault = viewportMeta ? viewportMeta.getAttribute('content') : null;
+    var lockZoom = function (state) {
+      if (!viewportMeta || !isCoarsePointer) return;
+      viewportMeta.setAttribute('content', state
+        ? 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'
+        : viewportDefault);
+    };
+
     var setLeadModal = function (state) {
+      lockZoom(state);
       leadModal.setAttribute('data-open', state ? 'true' : 'false');
       leadModal.setAttribute('aria-hidden', state ? 'false' : 'true');
       setBodyLock('leadModal', state);
@@ -249,10 +268,12 @@
         /* Sem foco automático em toque (celular/tablet): no iOS, chamar
            .focus() num campo enquanto o popup ainda está com transform em
            transição (entrada de .3s, ver .leadmodal__dialog) faz o Safari
-           calcular errado o zoom ao abrir o teclado — e a página fica
-           travada nesse zoom, sem voltar sozinha ao normal. No desktop,
-           com teclado físico, o foco automático continua (não abre teclado
-           nenhum, não tem esse risco, e ajuda quem navega por teclado). */
+           calcular errado o zoom ao abrir o teclado. Com a trava de zoom
+           acima isso já não seria mais possível de qualquer forma, mas
+           continuamos sem focar sozinho em toque: a pessoa que toque no
+           campo que quiser, na hora que quiser. No desktop, com teclado
+           físico, o foco automático continua (ajuda quem navega só pelo
+           teclado, e lá não existe esse risco de zoom). */
         if (!isCoarsePointer) {
           var firstField = $('input, select', leadModal);
           if (firstField) firstField.focus();
