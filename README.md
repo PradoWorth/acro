@@ -8431,3 +8431,50 @@ visita seguinte — os cinco passando, junto com o resto da suíte inteira
 flutuante). Conferi visualmente em celular e desktop, com e sem rolagem
 (pra ver a caixinha e o botão flutuante juntos): nenhuma sobreposição em
 nenhum dos dois casos. Pacote navegável reempacotado (58 rotas).
+
+## 166. Popup de captação: trava de zoom quebrava no Android (item 163 abandonado em favor de CSS puro)
+
+A cliente reportou que o Android tinha o mesmo problema do item 162 (zoom
+ao abrir o popup) e um problema próprio, pior: o popup aparecia esticado
+de ponta a ponta da tela, sem o canto arredondado que tem no iPhone, e
+dava pra arrastar a tela para os lados.
+
+**Causa.** A trava do item 163 reescrevia a própria tag `<meta
+name="viewport">` por JavaScript (acrescentando `maximum-scale=1,
+user-scalable=no` ao abrir o popup, devolvendo o valor original ao
+fechar). Essa técnica é conhecida por ser instável entre navegadores —
+funciona bem no Safari/iOS, mas o Chrome no Android não relayouta a
+página de forma confiável quando o conteúdo dessa tag muda depois que a
+página já carregou: o resultado observado (esticar de ponta a ponta,
+perder o canto arredondado, ficar arrastável) é sintoma exatamente disso
+— o Android tentando recalcular a página numa largura de viewport
+diferente da que o CSS do popup foi pensado para (`max-width: 34rem` +
+padding do `.leadmodal` em volta), e não conseguindo de forma limpa.
+
+**Correção.** Tirei a reescrita da tag `viewport` inteiramente — não é
+mais necessária. A trava de zoom/arrasto passou a depender só de
+`touch-action`, propriedade de CSS padrão e madura em todos os
+navegadores modernos (diferente da tag `viewport`, que nunca foi pensada
+para ser trocada dinamicamente): `.leadmodal` (o popup inteiro) recebeu
+`touch-action: none`, `.leadmodal__dialog` continua com `touch-action:
+pan-y` (só rolagem vertical, que é o que a pessoa precisa) e
+`.leadmodal__overlay` continua com `touch-action: none`. O foco
+automático em toque continua desligado (do item 162). Nenhuma tag do
+`<head>` é mais tocada em JS nenhuma hora — o popup fica com o mesmo
+comportamento em qualquer navegador, sem depender de como cada um decide
+interpretar uma mudança dinâmica na tag `viewport`.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos. Os testes de
+`test_ui.py` que checavam a tag `viewport` foram trocados por testes que
+checam `touch-action` diretamente nos três elementos do popup, mais um
+teste novo confirmando que o canto arredondado do dialog nunca é zero
+(ou seja, nunca fica "de ponta a ponta") — todos passando, junto com o
+resto da suíte inteira. Sem WebKit/iOS nem um Android real disponíveis
+neste ambiente para reproduzir os dois comportamentos relatados
+diretamente, mas a mudança elimina a causa mais provável (a única peça
+instável entre navegadores era exatamente a reescrita da tag) sem perder
+nenhuma garantia — `touch-action` cobre o mesmo território (zoom, duplo
+toque, arrasto lateral) de um jeito que os navegadores tratam de forma
+consistente entre si. Se o problema persistir depois deste deploy, peço
+um vídeo da tela no Android pra investigar mais a fundo.

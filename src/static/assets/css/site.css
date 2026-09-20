@@ -2329,6 +2329,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
   padding: var(--sp-2);
   visibility: hidden;
   pointer-events: none;
+  /* Trava de gesto em toque (celular/tablet): nada aqui aceita pinça,
+     duplo toque ou arrasto — só .leadmodal__dialog libera rolagem
+     vertical (ver a regra dele, mais abaixo), que é o único gesto que a
+     pessoa precisa dentro do popup. Reforço em CSS puro, padrão entre
+     navegadores — ver item 166/README sobre a tentativa anterior de
+     reescrever a tag <meta viewport> por JS, que causava um bug próprio
+     no Android (popup esticando de ponta a ponta, sem canto arredondado,
+     arrastável para os lados) e foi abandonada em favor só disso. */
+  touch-action: none;
 }
 .leadmodal[data-open="true"] { visibility: visible; pointer-events: auto; }
 .leadmodal__overlay {
