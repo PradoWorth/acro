@@ -282,13 +282,14 @@ def run():
 
         print("\n[programas: imagem + texto]")
         pg.goto(f"{BASE}/programas.html", wait_until="networkidle")
-        check("cada programa tem uma imagem ao lado do texto (.mediarow)",
+        check("cada programa tem uma imagem ao lado do título/resumo (.mediarow)",
               pg.locator("#pronampe .mediarow").count() == 1)
-        check("imagem fica à esquerda do texto no desktop",
+        check("imagem fica à esquerda do cabeçalho no desktop",
               pg.eval_on_selector("#pronampe .mediarow__media", "el => el.getBoundingClientRect().left")
               < pg.eval_on_selector("#pronampe .mediarow__body", "el => el.getBoundingClientRect().left"))
-        check("conteúdo completo continua presente (lista de detalhes do programa)",
-              pg.locator("#pronampe .mediarow__body dl").count() == 1)
+        check("tabela de condições volta a ocupar a largura inteira (fora do painel de imagem)",
+              pg.locator("#pronampe .mediarow dl").count() == 0
+              and pg.locator("#pronampe dl").count() == 1)
         check("link \"ver a página completa\" continua presente",
               pg.locator("#pronampe a:has-text('Ver a página completa')").count() == 1)
         check("âncora do programa continua funcionando (#pronampe)",

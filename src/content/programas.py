@@ -356,28 +356,31 @@ def _program_section(path, i, p):
     pagina_html = f'<div class="mt-1">{B.tlink("Ver a página completa do " + p["nome"], "programas/" + p["slug"] + ".html", path)}</div>'
     campanha_html = _campaign_callout(path, p["slug"])
     band_cls = "band band--top-rule" if i % 2 else "band band--stone band--top-rule"
-    # Pedido do cliente: em vez de uma coluna só de texto, cada programa
-    # ganha uma imagem ao lado (a mesma foto/arte já usada no topo da
-    # página individual do programa — ver program_page() — reaproveitada
-    # aqui, sem precisar de nenhum arquivo novo). Empilha no celular (imagem
-    # em cima, texto embaixo — comportamento padrão do media_row/.mediarow)
-    # e vira duas colunas a partir de 760px.
-    body_html = f"""{B.sechead(str(i + 1), p["nome"], p["resumo"], note=p["kicker"])}
-    <div class="stack-2">
-      {rows_html}
-      {nota_html}
-      {artigo_html}
-      {artigo2_html}
-      {pagina_html}
-      {campanha_html}
-    </div>"""
-    media_html = B.media_row(path, "programa-" + p["slug"], "pagehead-" + str(i % 3), body_html,
+    # Pedido do cliente: só o cabeçalho do programa (título + resumo) fica
+    # ao lado da imagem — o restante (tabela de condições, avisos, links,
+    # campanha) volta a ocupar a largura inteira da seção, exatamente como
+    # era antes. A 1ª tentativa colocou o bloco inteiro dentro da coluna de
+    # texto do painel, o que espremeu a tabela demais no desktop; o ajuste
+    # troca isso por um painel de imagem+cabeçalho só, com o resto solto
+    # embaixo. Empilha no celular (imagem em cima, cabeçalho embaixo —
+    # comportamento padrão do media_row/.mediarow) e vira duas colunas a
+    # partir de 760px.
+    sechead_html = B.sechead(str(i + 1), p["nome"], p["resumo"], note=p["kicker"])
+    media_html = B.media_row(path, "programa-" + p["slug"], "pagehead-" + str(i % 3), sechead_html,
                               alt=p["nome"])
     # id âncora (ex.: #pronampe) — permite que outras páginas do site linkem
     # direto para o programa específico, em vez de só para o topo da página.
     return f"""<section class="{band_cls}" id="{p['slug']}">
   <div class="shell">
     {media_html}
+    <div class="stack-2 mt-3">
+      {rows_html}
+      {nota_html}
+      {artigo_html}
+      {artigo2_html}
+      {pagina_html}
+      {campanha_html}
+    </div>
   </div>
 </section>"""
 

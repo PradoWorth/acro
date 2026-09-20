@@ -8479,7 +8479,7 @@ toque, arrasto lateral) de um jeito que os navegadores tratam de forma
 consistente entre si. Se o problema persistir depois deste deploy, peço
 um vídeo da tela no Android pra investigar mais a fundo.
 
-## 167. Página "ver todos os programas": cada programa ganhou uma imagem ao lado do texto
+## 167. Página "ver todos os programas": título e resumo de cada programa ganharam uma imagem ao lado
 
 **Pedido do cliente.** Na página de programas (`programas.html`, a que
 lista BNDES, PEAC FGI, Pronampe e Procred 360), cada seção de programa
@@ -8488,37 +8488,44 @@ empilhado numa coluna só. Pedido: colocar uma imagem à esquerda e manter
 o texto à direita, pra ficar mais visual e menos "página cheia de
 texto".
 
-**O que mudou.** Cada seção (`_program_section()`, em
-`content/programas.py`) agora usa o painel de imagem+texto já existente
-no site (`media_row()`, o mesmo bloco de `.mediarow` usado, por exemplo,
-na home) em vez de renderizar o texto sozinho. A imagem reaproveita
-exatamente o mesmo arquivo que já existe no banco de imagens do site
-para aquele programa (`programa-bndes`, `programa-peac-fgi`,
-`programa-pronampe`, `programa-procred-360` — os mesmos usados no topo
-da página individual de cada programa), então não foi preciso subir
-nenhuma imagem nova. Todo o conteúdo que já existia continua exatamente
-igual — número da seção, título, resumo, tabela de condições (para
-quem, valor máximo, taxa, prazo, garantia), aviso quando existe, os
-links de artigos relacionados, o link "ver a página completa" e o
-bloco de campanha ativa quando o programa tem uma — só que agora dentro
-da metade direita do painel, com a imagem ocupando a metade esquerda.
-No celular, onde não cabem duas colunas lado a lado, a imagem fica em
-cima e o texto embaixo (o mesmo comportamento que esse painel já tem em
-qualquer outro lugar do site), então a leitura continua natural em
-qualquer tamanho de tela. A âncora de cada programa (por exemplo,
-`#pronampe`, usada por outras páginas do site para linkar direto pra um
-programa específico) foi mantida sem nenhuma mudança.
+**1ª tentativa e ajuste.** A primeira versão colocou a seção inteira
+(cabeçalho + tabela de condições + avisos + links + campanha) dentro da
+coluna de texto do painel de imagem, ao lado da imagem inteira. Ficou
+bem no celular, mas no desktop espremeu demais a tabela de condições
+numa coluna estreita, ao lado de uma imagem alta — visualmente pesado,
+não o efeito pedido. Ajustei para o que a marcação enviada por você
+mostrava: só o cabeçalho (número, título "Pronampe", resumo e o texto
+menor do kicker) fica ao lado da imagem, num painel compacto. A tabela
+de condições, o aviso, os links de artigos, o link "ver a página
+completa" e o bloco de campanha voltam a ocupar a largura inteira da
+seção, exatamente como estavam antes — só o bloco imagem+cabeçalho é
+novo.
+
+**O que mudou.** `_program_section()`, em `content/programas.py`, agora
+monta um painel de imagem+texto (`media_row()`, o mesmo bloco de
+`.mediarow` usado, por exemplo, na home) só com o cabeçalho do
+programa, e mantém o resto do conteúdo solto embaixo, como sempre foi.
+A imagem reaproveita exatamente o mesmo arquivo que já existe no banco
+de imagens do site para aquele programa (`programa-bndes`,
+`programa-peac-fgi`, `programa-pronampe`, `programa-procred-360` — os
+mesmos usados no topo da página individual de cada programa), então não
+foi preciso subir nenhuma imagem nova. No celular, onde não cabem duas
+colunas lado a lado, a imagem fica em cima e o cabeçalho embaixo (o
+mesmo comportamento que esse painel já tem em qualquer outro lugar do
+site). A âncora de cada programa (por exemplo, `#pronampe`, usada por
+outras páginas do site para linkar direto pra um programa específico)
+foi mantida sem nenhuma mudança.
 
 **Verificação.** Rebuild completo das 58 páginas,
 `preflight.py`/`audit.py`/`audit_deep.py`/`design_audit.py` sem
 apontamentos novos (só os 2 falsos-positivos já conhecidos e antigos,
 sem relação com essa mudança). `test_ui.py` ganhou 4 checagens novas no
-desktop confirmando que a imagem aparece à esquerda do texto em cada
-programa, que a tabela de condições e o link "ver a página completa"
-continuam presentes dentro do novo layout, e que a âncora do programa
-continua funcionando — mais 1 checagem no celular confirmando que a
-imagem empilha acima do texto (não fica lado a lado numa tela estreita).
-Toda a suíte passou. Conferi visualmente com capturas de tela no
-desktop (1440px) e no celular (390px) — o resultado bate com o exemplo
-de imagem que você mandou: imagem à esquerda, texto completo à direita,
-sem perder nenhum conteúdo que já existia.
+desktop confirmando que a imagem aparece à esquerda do cabeçalho em
+cada programa, que a tabela de condições volta a ficar fora do painel
+de imagem (largura inteira) e que o link "ver a página completa" e a
+âncora do programa continuam presentes — mais 1 checagem no celular
+confirmando que a imagem empilha acima do cabeçalho (não fica lado a
+lado numa tela estreita). Toda a suíte passou. Conferi visualmente com
+capturas de tela no desktop (1440px) e no celular (390px) — o resultado
+bate exatamente com a área que você marcou de verde: só o
+título/resumo ao lado da imagem, o resto da seção como estava.
