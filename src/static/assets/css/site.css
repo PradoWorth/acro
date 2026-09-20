@@ -159,6 +159,7 @@
   --z-float:    80;   /* botão flutuante de contato */
   --z-sticky:   90;   /* cabeçalho */
   --z-drawer:   95;   /* gaveta mobile */
+  --z-cookiebar: 150; /* aviso de cookies */
   --z-skip:    200;   /* atalho "pular para o conteúdo" */
   --z-modal:   210;   /* modal de lead */
 
@@ -2240,7 +2241,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
   position: fixed;
   isolation: isolate;
   right: clamp(.9rem, 2vw, 1.6rem);
-  bottom: clamp(.9rem, 2vw, 1.6rem);
+  /* --cookiebar-h (site.js) é a altura de verdade do aviso de cookies
+     enquanto ele está na tela, e 0px quando não está — soma ao respiro
+     de sempre pra o botão nunca ficar embaixo do aviso, que tem z-index
+     maior. */
+  bottom: calc(clamp(.9rem, 2vw, 1.6rem) + var(--cookiebar-h, 0px));
   z-index: var(--z-float);
   display: inline-flex;
   align-items: center;
@@ -2255,7 +2260,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
   opacity: 0;
   transform: translateY(10px);
   pointer-events: none;
-  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease), box-shadow var(--dur-default) var(--ease);
+  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease), box-shadow var(--dur-default) var(--ease), bottom var(--dur) var(--ease-out);
 }
 .rail[data-show="true"] { opacity: 1; transform: none; pointer-events: auto; }
 .rail:hover { box-shadow: var(--shadow-lg); }
@@ -2263,6 +2268,53 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
 /* Círculo de 3.25rem (52px) já cobre com folga o mínimo de 44px de toque
    confortável em qualquer largura — sem precisar de uma regra extra só
    para ponteiro grosso, como o botão com rótulo tinha antes. */
+
+/* ---------- 18a. Aviso de cookies ---------- */
+/* Caixinha discreta no canto inferior direito (pedido explícito do
+   cliente: nada de barra ocupando a linha inteira — uma "caixinha
+   pequena", quase um popup de notificação, só para a pessoa aceitar).
+   Mostrada uma vez na primeira visita (ver data-cookie-accept em
+   site.js, que grava a escolha em localStorage). Mesmo canto do botão
+   flutuante de contato (.rail) — fica por cima dele (z-index maior) só
+   enquanto está na tela; o .rail se desloca pra cima da caixinha
+   enquanto ela estiver aberta (--cookiebar-h, ver site.js), então os
+   dois nunca se sobrepõem. z-index abaixo do popup de captação e do
+   skip-link — se os dois aparecerem juntos, o popup de captação (ação
+   que a pessoa pediu) vence o aviso de cookies. */
+.cookiebar {
+  position: fixed;
+  right: clamp(.9rem, 2vw, 1.6rem);
+  bottom: clamp(.9rem, 2vw, 1.6rem);
+  left: auto;
+  z-index: var(--z-cookiebar);
+  width: 19rem;
+  max-width: calc(100vw - 2 * clamp(.9rem, 2vw, 1.6rem));
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  padding: 1rem;
+  background: var(--cloud);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+}
+.cookiebar[data-show="true"] { opacity: 1; transform: none; pointer-events: auto; }
+.cookiebar p {
+  margin: 0;
+  font-size: var(--t-xs);
+  line-height: 1.5;
+  color: var(--slate-2);
+}
+.cookiebar a { color: var(--ink); text-decoration-color: var(--rule); }
+.cookiebar a:hover { text-decoration-color: currentColor; }
+.cookiebar__actions { display: flex; justify-content: flex-end; }
+.cookiebar__actions .btn { width: 100%; justify-content: center; }
+@media (prefers-reduced-motion: reduce) { .cookiebar { transition: none; } }
 
 /* ---------- 19a. Popup de captação rápida ---------- */
 /* Abre por cima de qualquer CTA de "Solicitar uma análise" ou de WhatsApp

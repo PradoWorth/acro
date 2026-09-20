@@ -344,6 +344,23 @@ def run():
             .map(e => parseFloat(getComputedStyle(e).fontSize))""")
         check("nenhum campo abaixo de 16px (evita zoom no iOS)",
               all(s >= 16 for s in sizes if s > 0), str(sorted(set(sizes))))
+
+        print("\n[aviso de cookies]")
+        pg.goto(f"{BASE}/index.html", wait_until="networkidle")
+        pg.wait_for_timeout(300)
+        check("aparece na 1ª visita", pg.get_attribute("#cookiebar", "data-show") == "true")
+        check("é uma caixinha pequena no canto (não uma barra ocupando a linha inteira)",
+              pg.eval_on_selector("#cookiebar", "el => el.getBoundingClientRect().width") < 350)
+        pg.click("[data-cookie-accept]")
+        pg.wait_for_timeout(400)
+        check("some ao aceitar", pg.get_attribute("#cookiebar", "data-show") == "false")
+        check("lembra a escolha (localStorage)",
+              pg.evaluate("() => localStorage.getItem('cookieconsent:v1')") == "accepted")
+        pg.reload(wait_until="networkidle")
+        pg.wait_for_timeout(300)
+        check("não aparece de novo depois de aceito",
+              pg.get_attribute("#cookiebar", "data-show") == "false")
+        pg.evaluate("() => localStorage.removeItem('cookieconsent:v1')")  # não vaza estado pros testes seguintes
         ctx.close()
         br.close()
 

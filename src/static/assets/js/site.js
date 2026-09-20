@@ -121,6 +121,46 @@
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
+  /* --------------------------------------------------- aviso de cookies */
+  /* Mostra uma vez, na primeira visita, e some para sempre depois que a
+     pessoa clicar em "Aceitar" — a escolha fica em localStorage. Tentativa
+     de leitura/escrita embrulhada em try/catch: em navegação privada
+     alguns navegadores bloqueiam localStorage e lançam erro só de acessar
+     a propriedade — sem isso, o aviso quebraria o carregamento da página
+     inteira para quem estiver nesse modo. Se não der pra lembrar a
+     escolha, a barra some ao clicar mesmo assim (só volta a aparecer na
+     próxima visita, o que é um mau-menor aceitável). */
+  var cookiebar = $('#cookiebar');
+  if (cookiebar) {
+    var COOKIE_KEY = 'cookieconsent:v1';
+    var alreadyAccepted = false;
+    try { alreadyAccepted = localStorage.getItem(COOKIE_KEY) === 'accepted'; } catch (e) {}
+
+    /* Empurra o botão flutuante de contato pra cima da caixinha enquanto
+       ela está visível — os dois vivem no mesmo canto (inferior direito)
+       e, sem isso, um tampa o outro. A altura da caixinha varia com o
+       tamanho da tela (o texto quebra em mais ou menos linhas), então é
+       medida de verdade em vez de um valor fixo, com uma folga extra de
+       12px pra não ficarem colados — e reagimos ao redimensionamento da
+       janela enquanto a caixinha estiver na tela. */
+    var updateCookiebarOffset = function () {
+      var h = cookiebar.getAttribute('data-show') === 'true' ? cookiebar.offsetHeight + 12 : 0;
+      document.documentElement.style.setProperty('--cookiebar-h', h + 'px');
+    };
+
+    if (!alreadyAccepted) {
+      cookiebar.setAttribute('data-show', 'true');
+      updateCookiebarOffset();
+      window.addEventListener('resize', updateCookiebarOffset);
+    }
+    $('[data-cookie-accept]', cookiebar).addEventListener('click', function () {
+      try { localStorage.setItem(COOKIE_KEY, 'accepted'); } catch (e) {}
+      cookiebar.setAttribute('data-show', 'false');
+      updateCookiebarOffset();
+      window.removeEventListener('resize', updateCookiebarOffset);
+    });
+  }
+
   /* ------------------------------------------------- painel de soluções */
   // Os listeners de document (Escape e clique fora) eram registrados uma
   // vez POR item de mega-menu dentro do forEach: com N itens, N listeners

@@ -8373,3 +8373,61 @@ Conferi visualmente a home em largura de celular (o vazio ficou bem mais
 enxuto, título aparece logo depois do cabeçalho, sem colar nele) e em
 largura de desktop (idêntico a antes, nenhuma mudança visível). Pacote
 navegável reempacotado (58 rotas).
+
+## 165. Novo: aviso de cookies
+
+Pedido novo da cliente: um aviso de cookies na primeira visita, com um
+botão para a pessoa aceitar. Passou por três versões na mesma tarde, cada
+uma ajustando o visual a um pedido de refinamento:
+
+1. Primeira versão: barra escura (mesma cor do cabeçalho/hero),
+   ocupando a largura inteira da tela, fixa no rodapé.
+2. A cliente pediu mais discrição: fundo trocado para cinza claro
+   (`--cloud`, `#f1f5f9` — o mesmo já usado em fundos alternados do
+   site), texto e botão menores, ainda como barra de largura inteira.
+3. A cliente pediu de novo, mais específico: não deveria ser uma barra
+   "ganhando linha" — uma caixinha pequena, no canto direito, quase um
+   popup de notificação. Essa é a versão final: card compacto (19rem),
+   ancorado no canto inferior direito (mesmo canto do botão flutuante de
+   contato), com cantos arredondados, borda fina e sombra — sem ocupar
+   nada da largura da tela.
+
+**Por que só um botão, sem gerenciamento por categoria.** O site hoje não
+carrega nenhum script de terceiro nem grava cookie nenhum de verdade — o
+endpoint do formulário e o analytics continuam vazios em `config.js`
+(modo demonstração, ver a conversa sobre os dois pontos mais urgentes do
+site: formulário sem endpoint real e analytics zerado). Um aviso com "OK"
+simples é proporcional ao que existe hoje. Quando a Acrópole ligar
+analytics de verdade, vale revisitar para um modelo de consentimento por
+categoria (necessário/analytics/marketing) — o texto do aviso já cita a
+Política de Privacidade, que pode receber essa granularidade depois.
+
+**Como funciona.** `cookie_bar()`, novo em `build.py`, gera a caixinha em
+toda página (inserida no template-base, ao lado do popup de captação). O
+texto e o botão "Aceitar" reaproveitam a paleta e os componentes do site
+(`--cloud`, `--r-card`, `.btn--line.btn--sm`). Em `site.js`: aparece uma
+vez por dispositivo (guardado em `localStorage`, chave
+`cookieconsent:v1`) e some para sempre depois que a pessoa aceitar — sem
+JS ou com `localStorage` bloqueado (navegação privada em alguns
+navegadores), a caixinha nem chega a aparecer, silenciosamente, pra nunca
+atrapalhar quem estiver nessa situação.
+
+**O detalhe do botão flutuante de contato.** A caixinha vive no mesmo
+canto (inferior direito) que o botão flutuante de contato (`.rail`) — os
+dois ficam fixos ali. Sem tratamento, um cobriria o outro quando
+aparecessem juntos (a pessoa rola a página antes de aceitar o aviso). A
+correção: uma variável CSS (`--cookiebar-h`), atualizada por JS com a
+altura de verdade da caixinha sempre que ela aparece/some/a tela muda de
+tamanho, empurra o `.rail` pra cima da caixinha automaticamente. Os dois
+nunca colidem, em nenhuma largura de tela.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos. Cinco testes
+novos em `test_ui.py`: aparece na primeira visita, é de fato uma caixinha
+pequena (menos de 350px de largura, não uma barra), some ao clicar em
+"Aceitar", grava a escolha em `localStorage`, e não volta a aparecer numa
+visita seguinte — os cinco passando, junto com o resto da suíte inteira
+(incluindo os testes de sobreposição com o popup de captação e o botão
+flutuante). Conferi visualmente em celular e desktop, com e sem rolagem
+(pra ver a caixinha e o botão flutuante juntos): nenhuma sobreposição em
+nenhum dos dois casos. Pacote navegável reempacotado (58 rotas).

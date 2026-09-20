@@ -1262,6 +1262,34 @@ def _lm_select(id_, name, label, options, hint=None, required=False, full=False)
     </div>"""
 
 
+def cookie_bar(path):
+    """
+    Aviso de cookies (pedido do cliente): uma caixinha discreta no canto
+    inferior direito, mostrada uma vez na primeira visita, com um botão só
+    ("Aceitar") — sem gerenciamento granular de categorias porque o site
+    hoje não carrega nenhum script de terceiro nem grava cookie nenhum de
+    verdade (ver `config.js`: endpoint de formulário e analytics ainda
+    vazios, ambos em modo demonstração). Quando a Acrópole ligar analytics
+    de verdade (ver item 155/README sobre a pendência), vale a pena
+    revisitar isso para um modelo de consentimento por categoria — por
+    ora, o pedido era só o aviso com um OK, pequeno e discreto (não uma
+    barra ocupando a linha inteira — pedido explícito, ver item 165 do
+    README), e é isso que existe.
+
+    A escolha fica em localStorage (site.js, `cookieconsent:v1`), então a
+    caixinha não aparece de novo nas próximas visitas depois que a pessoa
+    aceitar. Sem JS (localStorage indisponível ou bloqueado), ela nem
+    chega a aparecer — silenciosamente, para nunca cobrir conteúdo em
+    quem tem JS desligado.
+    """
+    return f"""<div class="cookiebar" id="cookiebar" data-show="false" role="region" aria-label="Aviso de cookies">
+  <p>Usamos cookies para melhorar sua experiência. Ao continuar, você concorda com nossa <a href="{rel(path, 'politica-de-privacidade.html')}">Política de Privacidade</a>.</p>
+  <div class="cookiebar__actions">
+    <button type="button" class="btn btn--line btn--sm" data-cookie-accept>Aceitar</button>
+  </div>
+</div>"""
+
+
 def lead_modal(path, lead_context=None):
     """
     Popup de captação rápida. Os CTAs de "Solicitar uma análise" e os links
@@ -1480,6 +1508,7 @@ def document(page):
 </main>
 {footer(path)}
 {lead_modal(path, page.get("lead_context"))}
+{cookie_bar(path)}
 <script src="{rel(path, 'assets/js/config.js')}" defer></script>
 <script src="{rel(path, 'assets/js/site.js')}" defer></script>
 </body>
