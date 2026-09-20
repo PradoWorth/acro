@@ -8529,3 +8529,67 @@ lado numa tela estreita). Toda a suíte passou. Conferi visualmente com
 capturas de tela no desktop (1440px) e no celular (390px) — o resultado
 bate exatamente com a área que você marcou de verde: só o
 título/resumo ao lado da imagem, o resto da seção como estava.
+
+## 168. Auditoria de performance/acessibilidade (Lighthouse) e correção de um contraste baixo no aviso de cookies
+
+**Contexto.** Você mandou o link do relatório do PageSpeed Insights do
+site publicado e pediu pra eu analisar se as melhorias que ele aponta
+fazem sentido. Não consegui abrir o relatório em si: a página do
+PageSpeed é toda montada por JavaScript depois de carregar (o
+conteúdo real não vem no HTML), e a API pública do Google que alimenta
+essa página está limitando as tentativas no momento — tentei importar
+os dados por dois caminhos diferentes e os dois esbarraram nisso. Pra
+não te deixar sem resposta, rodei a mesma ferramenta que o PageSpeed
+usa por trás (o Lighthouse, do Google) direto na build atual do site,
+o que dá o mesmo tipo de nota e diagnóstico que você veria lá.
+
+**Resultado.** Nas páginas testadas (home, programas, contato,
+capital de giro), no perfil de celular: performance entre 95 e 97 de
+100, SEO 100, boas práticas 100 em todas. LCP (tempo até o maior
+elemento aparecer) entre 2,1s e 2,4s, TBT (bloqueio da thread principal)
+baixo (0 a 240ms), CLS (deslocamento de layout) zerado em todas — ou
+seja, nada pula na tela enquanto carrega. São números bons pra um site
+institucional com bastante conteúdo e imagem; não achei nenhuma
+melhoria de performance que valha a pena priorizar agora.
+
+**Um problema real, encontrado e corrigido.** A auditoria de
+acessibilidade apontou o aviso de cookies (item 165): o texto dele
+("Usamos cookies para melhorar sua experiência...") tinha contraste de
+4,27:1 contra o fundo cinza claro do card, abaixo do 4,5:1 exigido pelo
+padrão WCAG AA pra texto pequeno — o mesmo problema que o site já tinha
+resolvido em outros dois lugares (o cartão de captura de e-mail dos
+artigos e as seções com fundo cinza), só que ninguém tinha aplicado
+esse ajuste ao aviso de cookies, que é um componente novo e solto (não
+herda a correção porque não fica dentro de uma dessas seções). Corrigi
+aplicando o mesmo ajuste de cor já usado nos outros dois lugares
+(`--slate-2: var(--iron)`), diretamente no `.cookiebar`. Depois da
+correção, a nota de acessibilidade da home voltou a 100.
+
+**Um alarme falso, investigado e descartado.** A página de programas
+mostrou acessibilidade 97 por causa de um suposto contraste baixo entre
+o rótulo "Dúvidas frequentes" (fim da página) e o fundo verde-claro do
+bloco de campanha de um programa anterior — sinal de que os dois
+estariam se sobrepondo na tela. Investiguei renderizando a página de
+verdade (Playwright) e comparando as posições dos dois blocos: não há
+sobreposição nenhuma quando a página é medida do jeito que uma pessoa
+realmente vê, rolando a tela. O que aconteceu foi a ferramenta de
+auditoria medir a posição de uma seção antes dela terminar de carregar
+de verdade — o site usa `content-visibility: auto` pra não desenhar
+seções fora da tela por performance (ver o comentário já existente no
+`site.css` sobre "pegadinhas de ferramenta que não afetam quem visita
+o site"), e isso confunde ferramentas automáticas de quando em quando.
+Forcei o navegador a desenhar a página inteira de uma vez e conferi:
+sem sobreposição, sem problema de contraste real. Não fiz nenhuma
+mudança de código por causa disso — é um falso positivo de auditoria,
+não um bug visível pra quem visita o site.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos, `test_ui.py`
+com a suíte inteira passando. Lighthouse re-executado na home depois da
+correção do cookiebar confirma acessibilidade 100.
+
+**Sobre o relatório que você mandou:** se puder me mandar um print ou
+colar o texto das sugestões específicas que o PageSpeed apontou pra
+esse link, eu confiro cada uma pontualmente — sem o conteúdo exato do
+relatório, não dá pra saber se ele está sugerindo algo além do que essa
+auditoria já cobriu.

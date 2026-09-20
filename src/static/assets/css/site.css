@@ -2295,6 +2295,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
   padding: 1rem;
   background: var(--cloud);
   color: var(--ink);
+  /* Mesmo ajuste já documentado em .band--stone: --slate-2 (#6d757b) contra
+     --cloud fica em 4,27:1, abaixo do 4,5:1 exigido pelo WCAG AA em texto
+     pequeno. Aqui o cookiebar é um elemento solto (fora de qualquer
+     .band), então precisa da própria redefinição em vez de herdar a de
+     .band--stone. */
+  --slate-2: var(--iron);
   border: 1px solid var(--rule);
   border-radius: var(--r-card);
   box-shadow: var(--shadow-lg);
