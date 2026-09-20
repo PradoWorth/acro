@@ -285,6 +285,11 @@ def run():
         pg.keyboard.press("Tab")
         check("primeiro Tab chega ao atalho de conteúdo",
               pg.evaluate("() => document.activeElement.className") == "skip")
+
+        pg.eval_on_selector(".rail[data-lead-modal]", "el => el.click()")
+        pg.wait_for_timeout(400)
+        check("popup de captação foca o 1º campo no desktop (teclado físico)",
+              pg.evaluate("() => document.activeElement.id") == "lm-nome")
         ctx.close()
 
         # ----------------------------------------------------------- mobile
@@ -313,6 +318,14 @@ def run():
         pg.wait_for_timeout(600)
         check("Escape fecha a gaveta", pg.get_attribute(".drawer", "data-open") == "false")
         check("scroll é liberado", pg.locator("body.is-locked").count() == 0)
+
+        print("\n[popup de captação no celular]")
+        pg.eval_on_selector(".rail[data-lead-modal]", "el => el.click()")
+        pg.wait_for_timeout(400)
+        check("NÃO foca campo algum ao abrir em toque (evita zoom travado no iOS)",
+              pg.evaluate("() => document.activeElement.tagName") != "INPUT")
+        pg.keyboard.press("Escape")
+        pg.wait_for_timeout(400)
 
         print("\n[tipografia de formulário no mobile]")
         pg.goto(f"{BASE}/contato.html", wait_until="networkidle")

@@ -8,6 +8,7 @@
   'use strict';
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
 
@@ -245,8 +246,17 @@
           ok && ok.setAttribute('data-show', 'false');
           err && err.setAttribute('data-show', 'false');
         }
-        var firstField = $('input, select', leadModal);
-        if (firstField) firstField.focus();
+        /* Sem foco automático em toque (celular/tablet): no iOS, chamar
+           .focus() num campo enquanto o popup ainda está com transform em
+           transição (entrada de .3s, ver .leadmodal__dialog) faz o Safari
+           calcular errado o zoom ao abrir o teclado — e a página fica
+           travada nesse zoom, sem voltar sozinha ao normal. No desktop,
+           com teclado físico, o foco automático continua (não abre teclado
+           nenhum, não tem esse risco, e ajuda quem navega por teclado). */
+        if (!isCoarsePointer) {
+          var firstField = $('input, select', leadModal);
+          if (firstField) firstField.focus();
+        }
       } else if (leadLastFocus) {
         leadLastFocus.focus();
       }

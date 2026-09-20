@@ -8245,3 +8245,46 @@ de Soluções em largura de desktop (1440px): todas as linhas, incluindo
 "02 Home Equity / Garantia de imóvel" e "05 Estruturação de Crédito /
 Operações desenhadas", mostram a categoria numa linha limpa embaixo do
 título. Pacote navegável reempacotado (58 rotas).
+
+## 162. Popup de captação no celular: zoom involuntário ao focar um campo, que ficava travado
+
+A cliente reportou um erro grave: no celular, ao tocar em qualquer campo do
+popup de captação rápida (o formulário que abre por cima da página, pelos
+CTAs "Solicitar análise" e pelo botão flutuante), o navegador dava um zoom
+sozinho — e esse zoom não desfazia depois, prejudicando a rolagem para
+preencher os campos seguintes.
+
+**Causa.** Nada a ver com o tamanho da fonte dos campos (já estavam certos,
+18px, acima do mínimo de 16px que o iOS exige para não dar zoom ao focar
+um campo — isso já era coberto pelo teste automatizado). O problema estava
+em `site.js`: assim que o popup abre, o código focava sozinho o primeiro
+campo (`firstField.focus()`) — no exato instante em que o próprio popup
+ainda está em plena animação de entrada (`.leadmodal__dialog` sai de
+`transform: scale(.98)` até o normal, em 0,3s). Chamar `.focus()` num
+campo enquanto o elemento em volta dele ainda está com `transform` em
+transição é uma armadilha conhecida do Safari no iOS: ele calcula errado o
+zoom ao abrir o teclado, e a página fica presa nesse zoom errado, sem
+voltar sozinha — exatamente o comportamento relatado.
+
+**Correção.** O foco automático ao abrir o popup passou a acontecer só em
+dispositivos com teclado físico (checado por `matchMedia('(pointer:
+coarse)')` — a mesma técnica-padrão para diferenciar toque de mouse/
+teclado). Em toque (celular e tablet), o popup abre sem focar nada
+sozinho: a pessoa toca no campo que quiser, quando quiser, e o Safari
+nunca entra nesse cálculo de zoom no meio de uma animação. No desktop o
+comportamento não muda em nada — continua focando o primeiro campo ao
+abrir, o que ajuda quem navega só pelo teclado e não tem esse risco de
+zoom (não há teclado virtual nem tela sendo tocada).
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`/
+`design_audit.py` sem apontamentos novos. Escrevi dois testes novos em
+`test_ui.py`: um confirma que em toque nenhum campo recebe foco sozinho ao
+abrir o popup, outro confirma que no desktop o primeiro campo continua
+sendo focado normalmente — os dois passando, junto com o resto da suíte
+inteira (`test_ui.py`). Não foi possível reproduzir o zoom do Safari em si
+neste ambiente (não há um WebKit/iOS real disponível aqui para testar),
+mas a causa identificada é um padrão de bug documentado e amplamente
+conhecido do iOS, e a correção (não disparar foco programático durante a
+animação de um popup em toque) é a prática recomendada para evitá-lo por
+completo — se ainda notar o zoom acontecendo depois de publicado, me avise
+com um vídeo da tela pra eu investigar mais a fundo.
