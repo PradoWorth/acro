@@ -112,6 +112,10 @@ def run():
         pg.mouse.wheel(0, 900)
         pg.wait_for_timeout(500)
         check("contato discreto aparece só depois", pg.get_attribute(".rail", "data-show") == "true")
+        check("botão flutuante entra na tela por transform, não por bottom (animação compositada na GPU, sem custo de layout — apontado pelo Lighthouse)",
+              pg.eval_on_selector(".rail", "el => getComputedStyle(el).transform") != "none")
+        check("nenhuma transição anima a propriedade bottom do botão flutuante",
+              "bottom" not in pg.eval_on_selector(".rail", "el => getComputedStyle(el).transitionProperty"))
 
         print("\n[rolagem suave no trackpad/mouse]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")

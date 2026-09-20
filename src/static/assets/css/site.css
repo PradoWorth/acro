@@ -2241,11 +2241,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
   position: fixed;
   isolation: isolate;
   right: clamp(.9rem, 2vw, 1.6rem);
-  /* --cookiebar-h (site.js) é a altura de verdade do aviso de cookies
-     enquanto ele está na tela, e 0px quando não está — soma ao respiro
-     de sempre pra o botão nunca ficar embaixo do aviso, que tem z-index
-     maior. */
-  bottom: calc(clamp(.9rem, 2vw, 1.6rem) + var(--cookiebar-h, 0px));
+  bottom: clamp(.9rem, 2vw, 1.6rem);
   z-index: var(--z-float);
   display: inline-flex;
   align-items: center;
@@ -2258,11 +2254,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
   border-radius: 50%;
   box-shadow: var(--shadow-button);
   opacity: 0;
-  transform: translateY(10px);
+  /* --rail-enter (10px ao entrar na tela, 0px depois) e --cookiebar-h
+     (site.js: altura de verdade do aviso de cookies enquanto ele está na
+     tela, 0px quando não está) se somam num translateY só. Antes o
+     deslocamento pelo aviso de cookies era feito animando `bottom`
+     (propriedade de layout — obriga o navegador a recalcular a posição de
+     tudo ao redor a cada quadro), o que o Lighthouse aponta como animação
+     "não composta"; `transform` roda só na GPU, sem esse custo. */
+  --rail-enter: 10px;
+  transform: translateY(calc(var(--rail-enter) - var(--cookiebar-h, 0px)));
   pointer-events: none;
-  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease), box-shadow var(--dur-default) var(--ease), bottom var(--dur) var(--ease-out);
+  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease), box-shadow var(--dur-default) var(--ease);
 }
-.rail[data-show="true"] { opacity: 1; transform: none; pointer-events: auto; }
+.rail[data-show="true"] { opacity: 1; --rail-enter: 0px; pointer-events: auto; }
 .rail:hover { box-shadow: var(--shadow-lg); }
 .rail picture, .rail img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* Círculo de 3.25rem (52px) já cobre com folga o mínimo de 44px de toque

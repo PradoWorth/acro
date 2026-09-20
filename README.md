@@ -8593,3 +8593,52 @@ colar o texto das sugestões específicas que o PageSpeed apontou pra
 esse link, eu confiro cada uma pontualmente — sem o conteúdo exato do
 relatório, não dá pra saber se ele está sugerindo algo além do que essa
 auditoria já cobriu.
+
+## 169. Correções apontadas pelo relatório do PageSpeed que o cliente mandou
+
+**Contexto.** Você mandou print das 5 sugestões ("Insights") que o
+PageSpeed listou pro celular. Fui item por item:
+
+1. **"Solicitações que bloqueiam a renderização" (site.css, ~120ms) e
+   "árvore de dependência da rede".** Faz sentido, mas é de baixo
+   retorno aqui: o ganho estimado é de 120ms num site que já carrega a
+   página inteira (LCP) em 2,1-2,4s. A correção de verdade
+   (separar um CSS "crítico" — só o que aparece na primeira tela — do
+   resto, e carregar o resto depois) é um trabalho grande, que mexeria
+   em toda a base do CSS do site (uma folha só, usada em todas as 58
+   páginas) com risco real de quebrar alguma coisa por engano, pra
+   economizar um tempo que já é curto. Não fiz essa mudança agora; se
+   no futuro a performance virar prioridade (por exemplo, se o Vercel
+   analytics mostrar visitantes com conexão ruim tendo problema), é o
+   próximo passo natural.
+2. **"Detalhamento da LCP" (atraso de 590ms na renderização do
+   elemento).** É consequência direta do item 1 (o navegador espera o
+   CSS pra saber como desenhar o título) — mesmo raciocínio: real, mas
+   ligado à mesma correção de alto custo/baixo retorno.
+3. **"Minimize o trabalho da thread principal" (2,1s, maior parte em
+   "Other").** Essa categoria "Other" do Chrome é, em grande parte,
+   trabalho interno do próprio navegador (não é código do site) e o
+   próprio relatório marca esse item como "Fora da pontuação" — não
+   conta pra nota. O número que de fato conta pra performance (TBT,
+   tempo de bloqueio real) está em 0-240ms nas páginas testadas, o que
+   é ótimo. Não é uma sugestão que eu ignoraria por princípio, mas não
+   há uma correção pontual e segura pra fazer aqui — não é sobre um
+   script específico do site que dá pra otimizar.
+4. **"Evitar animações não compostas" (botão flutuante de WhatsApp).**
+   Essa fazia sentido total, e era uma consequência direta de uma
+   mudança que eu mesmo fiz no item 165: pra desviar o botão flutuante
+   pra cima do aviso de cookies, eu tinha animado a propriedade
+   `bottom` dele — o que obriga o navegador a recalcular o layout da
+   página inteira a cada quadro da animação, em vez de deixar a placa
+   de vídeo cuidar sozinha. Corrigido: agora o mesmo efeito usa só
+   `transform` (a técnica que o próprio Chrome recomenda), sem nenhuma
+   mudança visual — o botão continua se desviando do aviso de cookies
+   exatamente como antes, só que sem custo de desempenho.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos, `test_ui.py`
+com 2 checagens novas confirmando que o botão flutuante se move só por
+`transform` e que nenhuma transição anima mais `bottom` — suíte inteira
+passando. Lighthouse re-executado na home depois da correção: o item
+"animações não compostas" não aparece mais (deixou de se aplicar),
+confirmando que a mudança resolveu.
