@@ -421,6 +421,106 @@
     }
   }
 
+  /* ------------------------------------------ esteira de depoimentos --
+     Antes rodava só por CSS (@keyframes + animation-play-state: paused
+     no hover/focus-within). Reportado pelo cliente: "travando" ao passar
+     o mouse ou o dedo — no toque, :hover não solta de forma confiável ao
+     tirar o dedo da tela (o iOS/Android costuma deixar o estado "grudado"
+     até tocar em outro elemento), então a esteira parava e ficava parada
+     olhando pra quem passou o dedo, em vez de continuar. Substituído por
+     um carrossel arrastável de verdade (mouse e toque, os dois sentidos):
+     arrasta livre enquanto o ponteiro está apertado, e ao soltar retoma
+     sozinho o deslizamento automático (com um respiro de sensação de
+     "inércia", que decai suavemente até virar o ritmo constante de
+     sempre — mesma técnica de física por tempo real, não por quadro, que
+     o globo já usa, ver globe.py).
+     A esteira duplica os cartões (cards+cards, ver home.py) pra fechar o
+     loop sem costura: a posição sempre "volta" pro início assim que
+     passa da largura de UM conjunto, então parece infinita. */
+  $$('.testirow__track').forEach(function (track) {
+    if (track.dataset.testirowBound) return;
+    track.dataset.testirowBound = '1';
+    var wrap = track.parentElement;
+    if (!wrap) return;
+    var reducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var SPEED = 32; // px/s — mesmo ritmo dos 70s que a animação em CSS levava pra atravessar meia esteira
+
+    var half = 0; // largura de UM conjunto de cartões (a esteira tem 2 conjuntos, ver acima)
+    function measure() { half = track.scrollWidth / 2 || 0; }
+    measure();
+    // ResizeObserver (não só 'resize' da janela): pega troca de fonte,
+    // mudança de largura do cartão por breakpoint etc. — qualquer motivo
+    // que mude a largura real da esteira, não só a da janela.
+    if (window.ResizeObserver) { new ResizeObserver(measure).observe(track); }
+    else { window.addEventListener('resize', measure); }
+
+    function wrapPos(v) {
+      if (half <= 0) return v;
+      v = v % half;
+      if (v > 0) v -= half; // mantém sempre <= 0, espelhando o "0 a -50%" da animação original
+      return v;
+    }
+    function apply() { track.style.transform = 'translateX(' + pos + 'px)'; }
+
+    var pos = 0;
+    var dragging = false, startX = 0, startPos = 0, lastX = 0, lastT = 0;
+    var driftVel = 0; // "inércia" ao soltar, em px/s — decai até virar o auto-scroll constante
+    var inView = true;
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) { inView = entries[0].isIntersecting; }, { rootMargin: '200px 0px' });
+      io.observe(wrap);
+    }
+
+    wrap.style.touchAction = 'pan-y'; // deixa a rolagem vertical da página passar; só o arrasto horizontal é capturado
+    wrap.style.cursor = 'grab';
+
+    wrap.addEventListener('pointerdown', function (e) {
+      dragging = true; driftVel = 0;
+      startX = e.clientX; startPos = pos; lastX = e.clientX; lastT = performance.now();
+      wrap.style.cursor = 'grabbing';
+      if (wrap.setPointerCapture) { try { wrap.setPointerCapture(e.pointerId); } catch (err) {} }
+    });
+    wrap.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var now = performance.now(), dtm = Math.max(1, now - lastT);
+      pos = wrapPos(startPos + (e.clientX - startX));
+      driftVel = (e.clientX - lastX) / dtm * 1000; // px/s, pro impulso de soltar
+      lastX = e.clientX; lastT = now;
+      apply();
+    });
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      wrap.style.cursor = 'grab';
+      // Sem movimento com redução de movimento pedida no sistema: solta a
+      // esteira onde o visitante deixou, sem retomar sozinha.
+      if (reducedMotion) driftVel = 0;
+    }
+    wrap.addEventListener('pointerup', endDrag);
+    wrap.addEventListener('pointercancel', endDrag);
+
+    var lastFrame = null;
+    function frame(now) {
+      if (lastFrame === null) lastFrame = now;
+      var dt = Math.min((now - lastFrame) / 1000, 0.05);
+      lastFrame = now;
+      if (!dragging && inView && !document.hidden) {
+        if (Math.abs(driftVel) > 1) {
+          // decaimento por tempo real (não por quadro), mesma constante de
+          // "peso" que o globo já usa pro giro solto — ver globe.py
+          pos += driftVel * dt;
+          driftVel *= Math.exp(-3.2 * dt);
+        } else if (!reducedMotion) {
+          pos -= SPEED * dt;
+        }
+        pos = wrapPos(pos);
+        apply();
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
+
   /* ------------------------------------------------------- acordeões
      dataset.accBound evita ligar o mesmo botão 2 vezes quando bindPage()
      roda mais de uma vez sobre o mesmo conteúdo — no arquivo único

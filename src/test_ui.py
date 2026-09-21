@@ -191,6 +191,40 @@ def run():
         else:
             check("esteira de depoimentos encontrada pra testar", False, "não encontrada na rolagem")
 
+        # Pedido do cliente: arrastar a esteira de depoimentos (mouse ou
+        # dedo) pros dois lados, e ao soltar ela retoma sozinha o
+        # deslizamento automático — antes, o pause por :hover/:focus-within
+        # do CSS "grudava" no toque (ver comentário em site.css/site.js).
+        print("\n[esteira de depoimentos: arrastar]")
+        pg.goto(f"{BASE}/index.html", wait_until="networkidle")
+        testirow2 = pg.locator(".testirow")
+        testirow2.scroll_into_view_if_needed()
+        pg.wait_for_timeout(400)
+
+        def track_transform():
+            return pg.evaluate("document.querySelector('.testirow__track').style.transform")
+
+        box2 = testirow2.bounding_box()
+        cx, cy = box2["x"] + box2["width"] / 2, box2["y"] + box2["height"] / 2
+        t0 = track_transform()
+        pg.mouse.move(cx, cy)
+        pg.mouse.down()
+        pg.mouse.move(cx + 150, cy, steps=10)
+        pg.wait_for_timeout(50)
+        t_right = track_transform()
+        pg.mouse.move(cx - 100, cy, steps=10)
+        pg.wait_for_timeout(50)
+        t_left = track_transform()
+        pg.mouse.up()
+        check("arrastar com o mouse move a esteira pros dois lados",
+              t0 != t_right and t_right != t_left,
+              f"antes: {t0}, arrastando p/ direita: {t_right}, arrastando p/ esquerda: {t_left}")
+        t_release = track_transform()
+        pg.wait_for_timeout(1200)
+        t_depois = track_transform()
+        check("ao soltar, a esteira retoma sozinha o deslizamento automático",
+              t_release != t_depois, f"logo ao soltar: {t_release}, 1,2s depois: {t_depois}")
+
         print("\n[índice de soluções]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")
         pg.click('.solrow[data-sol="auto-equity"]')

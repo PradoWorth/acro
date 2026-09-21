@@ -8889,3 +8889,60 @@ e 100fps na esmagadora maioria dos casos.
 **Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
 `audit_deep.py`/`design_audit.py` sem apontamentos novos, `test_ui.py`
 passando por inteiro.
+
+## 175. Esteira de depoimentos: arrastar pros dois lados, sem travar
+
+**Pedido do cliente.** "Eu quero que esse campo de depoimentos, ao
+passar o mouse ou o dedo por ele, o usuário consiga mover, tanto para
+a direita quanto pra esquerda, e ao soltar, ele volta com a animação
+passando para o lado sozinho. Hoje ele está travando quando se passa
+o mouse ou o dedo e está trazendo uma experiência ruim ao usuário."
+
+**Causa.** A esteira rodava só por CSS (`@keyframes` + `animation-play-
+state: paused` no `:hover`/`:focus-within`) — pausava ao passar o
+cursor, e retomava ao tirar. No toque, isso não funciona direito: o
+estado de `:hover` não solta de forma confiável quando a pessoa tira o
+dedo da tela (comportamento normal do próprio navegador em celular),
+então a esteira ficava "grudada" parada até a pessoa tocar em outro
+lugar da página — exatamente o "travando" relatado.
+
+**O que mudei.** Troquei a animação em CSS por um carrossel arrastável
+de verdade, em JavaScript (`site.js`): dá pra arrastar com o mouse OU
+o dedo, pros dois lados, livremente enquanto o ponteiro está apertado.
+Ao soltar, ela retoma sozinha o deslizamento automático — com uma
+pequena "inércia" na direção que a pessoa arrastou por último, que
+decai suavemente até virar o ritmo constante de sempre (a mesma
+técnica de física por tempo real que o globo da home já usa pro giro
+solto, não uma técnica nova). A esteira continua parecendo infinita do
+mesmo jeito de antes (os cartões duplicados fecham o loop sem costura).
+Também travei a seleção de texto durante o arrasto (sem isso, arrastar
+com o mouse por cima do texto do depoimento também selecionava o
+texto, uma faixa verde acompanhando o cursor — comportamento padrão do
+navegador ao "arrastar sobre texto", não uma falha, mas ruim junto com
+o carrossel se movendo).
+
+**Um efeito colateral encontrado e corrigido no caminho.** Ao trocar a
+animação em CSS pelo movimento em JS, um teste automatizado de rolagem
+passou a falhar: uma rolagem instantânea simulada terminava ~300px
+antes do esperado. Rastreei até o "scroll anchoring" do próprio
+navegador — um ajuste automático que ele faz sozinho quando algo perto
+do topo da tela muda de tamanho (ex.: uma fonte terminando de
+carregar), pra "disfarçar" esse salto de layout movendo a página por
+baixo. Enquanto a esteira rodava só por `@keyframes`, ela já ficava
+automaticamente fora de cogitação para esse ajuste (é uma exceção da
+própria especificação: nada com animação CSS em andamento pode virar
+"âncora" de rolagem) — ao trocar pra JS, ela deixou de estar protegida
+por essa exceção. Como o site já tem sua própria lógica cuidadosa pra
+nunca deixar a rolagem "pular" ou "brigar" sozinha (dois bugs já
+corrigidos antes por causa disso, ver itens anteriores), desliguei esse
+ajuste automático do navegador de propósito, em todo o site — ele
+nunca deveria disputar com o que o site já garante.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos. `test_ui.py`
+ganhou 2 checagens novas: uma confirma que arrastar com o mouse move a
+esteira pros dois lados, outra confirma que ela retoma sozinha o
+deslizamento depois de soltar — as duas passando, junto com o resto da
+suíte inteira (incluindo o teste de rolagem que motivou a correção do
+scroll anchoring acima). Testei visualmente com captura de tela durante
+o arrasto, antes e depois de soltar.

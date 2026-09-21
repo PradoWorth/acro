@@ -210,6 +210,17 @@ input, select, textarea, button { margin: 0; }
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* O site já tem sua própria lógica pra nunca deixar uma rolagem "brigar"
+     ou pular sozinha (ver "rolagem suave (trackpad)" em site.js — dois
+     bugs relatados pelo cliente já foram corrigidos exatamente por causa
+     disso). O ajuste automático de rolagem do navegador (scroll anchoring:
+     quando algo próximo ao topo da tela muda de tamanho — ex.: uma fonte
+     terminando de carregar — ele desloca a página sozinho pra "compensar")
+     é bem-intencionado, mas é feito por fora dessa lógica, sem passar pelo
+     nosso controle de "isso foi rolagem nossa ou de fora?" — então pode
+     produzir exatamente o tipo de salto de posição sem aviso que o site já
+     trabalha pra nunca deixar acontecer. Desligado globalmente. */
+  overflow-anchor: none;
   /* Cabeçalho fixo (ver ---------- 7. Cabeçalho / navegação ---------- em
      mais abaixo): sem isso, rolar até uma âncora (#pronampe, um item do
      sumário de um artigo etc.) para o alvo bem no topo, escondido atrás do
@@ -1679,8 +1690,13 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
 /* Esteira de depoimentos: mesmo padrão da esteira de parceiros
    (.partners/.partners__track acima), com o cartão .lift/.lift__foot no
    lugar do logotipo. Roda devagar (a leitura de uma citação leva mais
-   tempo do que reconhecer um logotipo) e para no hover/foco, porque aqui
-   o conteúdo é pra ler, não só reconhecer de relance. */
+   tempo do que reconhecer um logotipo).
+   Movimento por JS (site.js, bloco "esteira de depoimentos"), não mais
+   só por @keyframes: pedido do cliente pra dar pra arrastar pros dois
+   lados (mouse ou dedo) e retomar sozinho ao soltar — o pause por
+   :hover/:focus-within do CSS puro "grudava" no toque (o estado de hover
+   não solta de forma confiável ao tirar o dedo da tela), travando a
+   esteira. cursor/touch-action ficam inline (JS), não aqui. */
 .testirow {
   overflow: hidden;
   /* Respiro vertical + margem negativa igual: dá espaço pra sombra do
@@ -1691,15 +1707,30 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
   margin-block: -0.75rem;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
           mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  /* Achado ao testar: enquanto a esteira rodava só por @keyframes, o
+     próprio navegador já excluía o conteúdo dela de virar âncora de
+     rolagem (a especificação de scroll anchoring já ignora qualquer
+     coisa com animação CSS em andamento). Trocando pra transform via JS,
+     esse conteúdo passou a ser candidato normal, e uma pequena mudança
+     de layout ali dentro (ex.: fonte terminando de carregar) podia puxar
+     o resto da página alguns pixels pra compensar — nada visível numa
+     navegação normal, mas ficou claro num teste de rolagem automatizada
+     que dá um salto instantâneo. overflow-anchor:none deixa explícito o
+     que a animação garantia antes sem querer: esta esteira nunca serve
+     de referência pra rolagem da página. */
+  overflow-anchor: none;
+  /* Sem isto, arrastar com o mouse sobre o texto dos cartões também
+     seleciona o texto (o comportamento padrão do navegador pra "arrastar
+     sobre texto") — junto com o carrossel se movendo, ficava com uma
+     faixa verde de seleção acompanhando o dedo/cursor, feio e confuso. */
+  -webkit-user-select: none;
+  user-select: none;
 }
 .testirow__track {
   display: flex;
   width: max-content;
   gap: var(--sp-3);
-  animation: testirow-scroll 70s linear infinite;
-}
-.testirow:hover .testirow__track, .testirow:focus-within .testirow__track {
-  animation-play-state: paused;
+  will-change: transform;
 }
 .testirow__card {
   width: 22rem; max-width: 82vw; flex: 0 0 auto;
@@ -1709,21 +1740,6 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-5) 0; }
      eles vivem dentro da faixa branca de "Metodologia" (seção 47),
      sem precisar de uma seção com cor própria pra isso. */
   background: var(--cloud);
-}
-@keyframes testirow-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .testirow { overflow-x: auto; -webkit-overflow-scrolling: touch; -webkit-mask-image: none; mask-image: none; }
-  .testirow__track { animation: none; }
-  /* Com a animação desligada, a 2ª metade da esteira (a duplicata que fecha
-     o loop) fica parada e visível — sem o movimento que a esconderia atrás
-     da primeira volta. Como ela já é oculta de leitor de tela
-     (aria-hidden, a lista .sr acima é que carrega o conteúdo de verdade
-     pra esse público), aqui ela também some de quem vê a tela: sobra só
-     uma passagem por cartão, navegável por rolagem manual. */
-  .testirow__track > .testirow__card:nth-child(n+7) { display: none; }
 }
 
 .ctaband { display: grid; gap: 2rem; align-items: end; }
