@@ -829,19 +829,26 @@
     el.addEventListener('input', function () { if (f.getAttribute('data-invalid') === 'true') validateField(f); });
   });
 
-  /* ---------------------------------- CTA só libera após o consentimento */
+  /* -------------------------------------------------- caixa de consentimento
+     A caixa nasce desmarcada (pedido do cliente reconsiderado: marcá-la de
+     antemão não é uma manifestação "livre, informada e inequívoca" da
+     pessoa, que é o que a LGPD exige pra consentimento valer — ver
+     README). O botão de enviar não fica mais travado (disabled) enquanto
+     ela está desmarcada — ficava sem nenhuma pista de por que não
+     respondia ao clique, o que confundia. Agora ele sempre responde:
+     tentar enviar sem marcar aciona o erro visível de validateScope() logo
+     abaixo (mesmo padrão de "campo obrigatório" dos outros campos), que já
+     rola a página até a caixa. Aqui só limpa esse erro assim que a pessoa
+     marca, sem esperar uma nova tentativa de envio. */
   $$('form[data-endpoint-form]').forEach(function (form) {
     if (form.dataset.consentBound) return;
     form.dataset.consentBound = '1';
     var consent = $('input[name="consentimento"]', form);
-    var cbtn = $('[data-step-submit], button[type="submit"]', form);
-    if (!consent || !cbtn) return;
-    var syncConsent = function () {
-      cbtn.disabled = !consent.checked;
-      cbtn.setAttribute('aria-disabled', String(!consent.checked));
-    };
-    consent.addEventListener('change', syncConsent);
-    syncConsent();
+    if (!consent) return;
+    consent.addEventListener('change', function () {
+      var wrap = consent.closest('.consent');
+      if (wrap && consent.checked) wrap.setAttribute('data-invalid', 'false');
+    });
   });
 
   /* ------------------------------------------------- envio de formulário */

@@ -106,6 +106,7 @@ def lead_form(path):
       <label class="consent mt-2">
         <input type="checkbox" name="consentimento" required>
         <span>Confirmo que a empresa e os sócios <strong>não possuem restrições</strong> ativas no SPC/Serasa, e autorizo o contato da Acrópole Capital para tratar desta solicitação conforme a <a href="{B.rel(path, 'politica-de-privacidade.html')}">Política de Privacidade</a>. O envio não representa solicitação formal de crédito nem aprovação.</span>
+        <span class="consent__err">Marque a caixa acima pra continuar.</span>
       </label>
 
       <div class="formfoot" style="margin-top:1.25rem">

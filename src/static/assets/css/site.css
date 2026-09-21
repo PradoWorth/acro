@@ -2124,6 +2124,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
 
 .consent { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem; align-items: start; font-size: var(--t-xs); color: var(--slate); line-height: 1.6; }
 .consent input { width: 1.05rem; height: 1.05rem; margin-top: 0.25rem; accent-color: var(--petrol); }
+/* A caixa nasce desmarcada de propósito (consentimento real exige um ato
+   deliberado da pessoa, não pode vir pré-marcado) e o botão de enviar não
+   fica mais travado por causa dela — ver ---------- CTA só libera após o
+   consentimento ---------- em site.js. Em vez disso, tentar enviar sem
+   marcar mostra este aviso, no mesmo padrão visual de erro que os outros
+   campos do formulário já usam (.field__err), e rola a página até aqui. */
+.consent[data-invalid="true"] input { outline: 2px solid var(--danger); outline-offset: 2px; }
+.consent__err { grid-column: 2; font-size: var(--t-micro); color: var(--danger); display: none; }
+.consent[data-invalid="true"] .consent__err { display: block; }
 /* A caixa de marcação tinha 17px, bem abaixo do alvo confortável no toque.
    Um pseudo-elemento não resolve aqui: caixa de marcação é elemento
    substituído e ignora ::before na maioria dos navegadores. Então a própria

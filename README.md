@@ -8946,3 +8946,47 @@ deslizamento depois de soltar — as duas passando, junto com o resto da
 suíte inteira (incluindo o teste de rolagem que motivou a correção do
 scroll anchoring acima). Testei visualmente com captura de tela durante
 o arrasto, antes e depois de soltar.
+
+## 176. Caixa de consentimento: pedido de vir pré-marcada, e por que não fiz
+
+**Pedido do cliente.** Que as caixas de "Autorizo o contato..." (nos
+três formulários do site — contato, popup de captação e campanha do
+Pronampe) já viessem marcadas por padrão, com a pessoa livre pra
+desmarcar se quisesse. Motivo dado: preocupação de que, desmarcada, o
+botão de enviar ficasse "travado" sem a pessoa entender por quê.
+
+**Por que não implementei do jeito pedido.** Expliquei o risco antes de
+mexer em qualquer coisa, e a cliente concordou em reconsiderar. A LGPD
+define consentimento, no art. 5º, XII, como manifestação "livre,
+informada e **inequívoca**" — uma caixa que já nasce marcada não é um
+ato inequívoco da pessoa, é o site decidindo por ela. Isso pode
+invalidar a base legal do contato feito com aquele lead, o mesmo
+raciocínio que a Justiça europeia já usou pra derrubar caixas
+pré-marcadas na GDPR (caso Planet49). Não sou advogado, e deixei isso
+claro pra cliente — recomendei confirmar com o jurídico dela antes de
+decidir — mas o risco é conhecido o suficiente que eu não me senti à
+vontade implementando sem essa confirmação.
+
+**O que implementei no lugar.** O problema real por trás do pedido —
+gente confusa com um botão que não reage — tem solução sem esse risco.
+Antes, o botão de enviar ficava com o atributo `disabled` até a caixa
+ser marcada (`syncConsent()` em site.js): clicar nele simplesmente não
+fazia nada, sem nenhuma pista visível do motivo. Troquei isso: o botão
+agora sempre responde ao clique. Se a pessoa tentar enviar sem marcar
+a caixa, aparece um contorno vermelho ao redor dela e a mensagem
+"Marque a caixa acima pra continuar." logo abaixo — o mesmo padrão
+visual de erro que "Informe seu nome completo." e os outros campos
+obrigatórios já usam — e a página rola até lá (o mecanismo de foco em
+campo inválido já existente, que não precisou de nenhuma mudança pra
+também pegar a caixa de consentimento). Marcar a caixa limpa o erro na
+hora, sem precisar tentar enviar de novo. A caixa em si continua
+nascendo desmarcada nos três formulários (contato.py, pronampe.py, e o
+popup de captação em build.py) — consentimento real, não presumido.
+
+**Verificação.** Rebuild completo, `preflight.py`/`audit.py`/
+`audit_deep.py`/`design_audit.py` sem apontamentos novos. `test_ui.py`
+teve as checagens de consentimento reescritas pro comportamento novo
+(caixa nasce desmarcada, botão nunca trava, erro aparece e some na
+hora certa) — suíte inteira passando. Testei visualmente com captura
+de tela o estado de erro (contorno vermelho + mensagem, botão colorido
+e clicável) no formulário de contato.

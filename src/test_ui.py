@@ -279,16 +279,21 @@ def run():
         print("\n[formulário de contato]")
         check("botão Enviar sempre visível (formulário de uma etapa só)",
               pg.is_visible("[data-step-submit]"))
-        check("CTA começa desabilitado antes do consentimento",
-              pg.eval_on_selector("[data-step-submit]", "el => el.disabled") is True)
-
-        pg.check('input[name="consentimento"]')
-        check("CTA libera assim que o consentimento é marcado",
+        # Pedido do cliente reconsiderado (risco de LGPD): a caixa de
+        # consentimento nasce desmarcada, e o botão de Enviar NÃO fica mais
+        # travado (disabled) enquanto ela está assim — ver comentário em
+        # site.js. Confirma os dois: a caixa começa desmarcada, e o botão
+        # já responde ao clique mesmo sem marcar.
+        check("caixa de consentimento nasce desmarcada",
+              pg.eval_on_selector('input[name="consentimento"]', "el => el.checked") is False)
+        check("botão de enviar nunca fica travado (disabled) por causa da caixa",
               pg.eval_on_selector("[data-step-submit]", "el => el.disabled") is False)
 
         pg.click("[data-step-submit]")
         pg.wait_for_timeout(250)
         check("bloqueia envio com campos vazios", pg.locator('[data-invalid="true"]').count() > 0)
+        check("tentar enviar sem marcar a caixa mostra o erro dela, visível",
+              pg.get_attribute(".consent", "data-invalid") == "true" and pg.is_visible(".consent__err"))
 
         pg.fill("#telefone", "31988887777")
         check("máscara de telefone", pg.input_value("#telefone") == "(31) 98888-7777",
@@ -307,11 +312,12 @@ def run():
         pg.wait_for_timeout(300)
         check("e-mail inválido bloqueia o envio",
               pg.get_attribute("#email", "aria-invalid") == "true")
+        check("com o resto certo, só a caixa de consentimento continua marcada como erro",
+              pg.get_attribute(".consent", "data-invalid") == "true")
 
-        pg.uncheck('input[name="consentimento"]')
-        check("desmarcar o consentimento desabilita o CTA de novo",
-              pg.eval_on_selector("[data-step-submit]", "el => el.disabled") is True)
         pg.check('input[name="consentimento"]')
+        check("marcar a caixa limpa o erro dela na hora, sem precisar tentar enviar de novo",
+              pg.get_attribute(".consent", "data-invalid") == "false" and not pg.is_visible(".consent__err"))
 
         pg.fill("#email", "contato@empresa.com.br")
         pg.click("[data-step-submit]")
