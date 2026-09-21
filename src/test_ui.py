@@ -478,6 +478,23 @@ def run():
         pg.wait_for_timeout(400)
         check("popup de captação foca o 1º campo no desktop (teclado físico)",
               pg.evaluate("() => document.activeElement.id") == "lm-nome")
+
+        print("\n[cache busting: CSS/JS versionados por hash do conteúdo]")
+        # Bug relatado pela cliente rastreado até isso: sem uma URL que muda
+        # a cada deploy, o navegador (e a borda da Vercel) podem continuar
+        # servindo um site.css velho por até 1h depois do HTML novo já estar
+        # no ar — CSS e HTML descompassados na mesma visita (ver
+        # cache_bust em build.py). Confirma que toda folha de estilo/script
+        # externo carrega com "?v=<hash>" e responde 200 — ou seja, a versão
+        # é sempre a que bate com o HTML que a referencia.
+        css_href = pg.get_attribute('link[rel="stylesheet"]', "href")
+        site_js_src = pg.eval_on_selector('script[src*="site.js"]', "el => el.getAttribute('src')")
+        config_js_src = pg.eval_on_selector('script[src*="config.js"]', "el => el.getAttribute('src')")
+        check("site.css é servido com \"?v=<hash>\" na URL", "?v=" in (css_href or ""), css_href)
+        check("site.js é servido com \"?v=<hash>\" na URL", "?v=" in (site_js_src or ""), site_js_src)
+        check("config.js é servido com \"?v=<hash>\" na URL", "?v=" in (config_js_src or ""), config_js_src)
+        css_status = pg.evaluate(f"() => fetch('{css_href}').then(r => r.status)")
+        check("a URL versionada do CSS responde 200 (não é um link quebrado)", css_status == 200, css_status)
         ctx.close()
 
         # ----------------------------------------------------------- mobile

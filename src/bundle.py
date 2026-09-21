@@ -127,7 +127,10 @@ def inline_page_scripts(html):
     PAGE_LEVEL = {"globe.js"}
 
     def sub(m):
-        name = m.group(2)
+        # build.py agora versiona esses scripts com "?v=<hash>" (cache
+        # busting, ver cache_bust em build.py) — o nome do arquivo em si,
+        # sem a query string, é o que importa aqui.
+        name = m.group(2).split("?", 1)[0]
         if name not in PAGE_LEVEL:
             return m.group(0)
         p = os.path.join(DIST, "assets", "js", name)

@@ -9111,3 +9111,69 @@ depois confirma que disparar `pageshow` sincroniza e some com ele.
 Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`/
 `design_audit.py` sem apontamentos novos, suíte inteira de
 `test_ui.py` passando.
+
+## 179. Investigando o mesmo print: o desalinhamento do aviso, e a causa raiz por trás dos dois bugs
+
+Depois do item 178, a cliente reenviou o mesmo print e perguntou se eu
+também tinha corrigido "o espaçamento que está errado". Reexaminei o
+print com mais cuidado (inclusive medindo pixel a pixel onde cada
+elemento começa) e achei uma segunda coisa ali, além da caixa marcada
+com aviso preso: a mensagem "Marque a caixa acima pra continuar."
+aparecia grudada embaixo da caixinha, alinhada à esquerda — não
+alinhada com o texto de consentimento ao lado, como deveria.
+
+**Não reproduzi isso no código atual.** Testei em várias larguras
+(mobile 390px, desktop 652px e 1440px) e o aviso sempre veio alinhado
+certinho com o texto, exatamente como o CSS manda (`grid-column: 2`,
+adicionado no item 176). Então fui atrás do motivo de ainda assim
+aparecer errado pra ela — e a resposta explica os dois bugs do mesmo
+print de uma vez.
+
+**Causa raiz: HTML novo, CSS velho, ao mesmo tempo.** `assets/(css|js)/*`
+é publicado com `Cache-Control: max-age=3600` (uma hora) no
+`vercel.json`. Isso é ótimo pra desempenho, mas tem um efeito colateral
+que ninguém notou até agora: depois de um deploy, tanto o navegador de
+quem já visitou o site quanto a borda de rede da Vercel podem continuar
+servindo a cópia ANTIGA de `site.css` por até uma hora, mesmo com o
+HTML novo já no ar. O print da cliente mostra exatamente essa mistura:
+o HTML já tinha o `<span class="consent__err">` do item 176 (por isso
+o aviso aparece, em vermelho), mas o CSS que o navegador dela usou
+ainda era de ANTES desse commit — sem a regra `grid-column: 2` daquele
+span. Sem essa regra, o algoritmo de posicionamento automático do CSS
+Grid empurra o item pra próxima linha da primeira coluna: exatamente
+embaixo da caixa, flush à esquerda. Reproduz o print peça por peça.
+
+(O outro sintoma do mesmo print — caixa marcada com o aviso preso,
+item 178 — é um bug diferente, de verdade presente no código até
+então, e já corrigido; a causa acima é sobre o desalinhamento
+especificamente.)
+
+**Correção: versionar CSS/JS pelo hash do conteúdo.** Implementei
+`cache_bust()` em `build.py`, que roda depois da minificação e calcula
+um hash SHA-256 (10 caracteres) do conteúdo final de `site.css`,
+`site.js`, `config.js` e `globe.js`, e reescreve toda referência a
+esses arquivos nas 58 páginas com `?v=<hash>` na URL — ex.:
+`assets/css/site.css?v=042c2143bc`. Como a URL muda automaticamente
+toda vez que o conteúdo muda, essa janela de "HTML novo com CSS velho"
+deixa de existir: o navegador e a Vercel sempre buscam a cópia certa
+pra URL nova, em vez de arriscar servir uma versão em cache que não
+bate mais. Isso resolve essa classe inteira de bug pra qualquer deploy
+futuro, não só o de hoje — sem precisar reduzir o cache (que continua
+podendo durar 1h, ou mais, sem risco, já que uma URL versionada nunca
+fica desatualizada por definição).
+
+Ajustei dois lugares que dependiam do nome do arquivo sem a query
+string: `bundle.py` (que embute `globe.js` no pacote navegável de
+arquivo único) e `audit.py` (que verifica se cada link/asset referenciado
+existe de verdade em disco — sem o ajuste, ele passaria a acusar
+"link quebrado" pra toda folha de estilo/script, porque `?v=...`
+não é parte do caminho de arquivo).
+
+**Verificação.** Novo teste em `test_ui.py` confirma que `site.css`,
+`site.js` e `config.js` carregam com `?v=<hash>` na URL e que essa URL
+responde 200 (não é um link quebrado). Rebuild completo,
+`preflight.py`/`audit.py`/`audit_deep.py`/`design_audit.py` sem
+apontamentos novos, suíte inteira de `test_ui.py` passando —
+incluindo a confirmação de que o pacote navegável (`acropole-navegavel.html`)
+continua embutindo o globo da home corretamente mesmo com o `?v=` no
+nome do arquivo.

@@ -1730,6 +1730,59 @@ def harden_csp(dist):
             f.write("\n")
 
 
+def cache_bust(dist):
+    """
+    Acrescenta `?v=<hash>` à URL de cada folha de estilo/script externo
+    referenciado no HTML, calculado a partir do conteúdo final (já
+    minificado, ver minify_assets — por isso roda depois) de cada arquivo.
+
+    Bug relatado pela cliente (README, item 178-bis): print de tela
+    mostrando a caixa de consentimento marcada, com o aviso de erro
+    "Marque a caixa acima pra continuar." ainda visível E desalinhado —
+    grudado embaixo da caixa, flush à esquerda, em vez de alinhado com o
+    texto de consentimento ao lado. Investigando, o HTML dela já tinha o
+    `<span class="consent__err">` do item 176, mas o CSS ainda não conhecia
+    a regra `grid-column: 2` daquele span (adicionada no mesmo commit) —
+    ou seja, o navegador dela estava rodando HTML novo com CSS antigo ao
+    mesmo tempo. Sem essa regra, o posicionamento automático do CSS Grid
+    empurra o item pra próxima linha da primeira coluna, exatamente embaixo
+    da caixa: reproduz o print exato.
+
+    Causa raiz: `assets/(css|js)/*` é publicado com
+    `Cache-Control: max-age=3600` (ver vercel.json) — depois de um deploy,
+    tanto o navegador de quem já visitou quanto a borda da Vercel podem
+    continuar servindo a cópia antiga de site.css por até 1h enquanto o
+    HTML novo já está no ar. Versionar a URL pelo hash do conteúdo elimina
+    essa janela: como o endereço muda toda vez que o conteúdo muda, a
+    versão errada nunca fica em cache sob o endereço novo — sem precisar
+    de refresh forçado nem de esperar o cache expirar.
+    """
+    targets = {}
+    for rel_path in ("assets/css/site.css", "assets/js/site.js",
+                      "assets/js/config.js", "assets/js/globe.js"):
+        full = os.path.join(dist, *rel_path.split("/"))
+        if os.path.exists(full):
+            with open(full, "rb") as f:
+                targets[rel_path] = hashlib.sha256(f.read()).hexdigest()[:10]
+    if not targets:
+        return
+    patterns = [
+        (re.compile(r'((?:href|src)="[^"]*' + re.escape(rel_path) + r')(")'), h)
+        for rel_path, h in targets.items()
+    ]
+    for root, _, names in os.walk(dist):
+        for n in names:
+            if not n.endswith(".html"):
+                continue
+            path = os.path.join(root, n)
+            raw = open(path, encoding="utf-8").read()
+            patched = raw
+            for pattern, h in patterns:
+                patched = pattern.sub(lambda m, h=h: f"{m.group(1)}?v={h}{m.group(2)}", patched)
+            if patched != raw:
+                open(path, "w", encoding="utf-8").write(patched)
+
+
 def emit_globe_js(dist):
     """
     Escreve o JS do globo como arquivo próprio (assets/js/globe.js).
@@ -1799,6 +1852,7 @@ def build():
         f.write(security_txt)
 
     minify_assets(DIST)
+    cache_bust(DIST)
     harden_csp(DIST)
 
     print(f"{len(pages)} páginas geradas em {DIST}")

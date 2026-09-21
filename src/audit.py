@@ -91,6 +91,10 @@ def audit():
                     problems.append(f"{rel_f}: âncora inexistente {href}")
                 continue
             base, _, frag = href.partition("#")
+            # Assets versionados por cache_bust (build.py) levam "?v=<hash>"
+            # na URL — isso não faz parte do caminho no disco (o navegador
+            # também ignora a query string ao resolver o arquivo).
+            base = base.split("?", 1)[0]
             target = os.path.normpath(os.path.join(os.path.dirname(f), base))
             if not os.path.exists(target):
                 problems.append(f"{rel_f}: link quebrado -> {href}")
