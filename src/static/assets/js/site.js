@@ -963,17 +963,46 @@
      tentar enviar sem marcar aciona o erro visível de validateScope() logo
      abaixo (mesmo padrão de "campo obrigatório" dos outros campos), que já
      rola a página até a caixa. Aqui só limpa esse erro assim que a pessoa
-     marca, sem esperar uma nova tentativa de envio. */
+     marca, sem esperar uma nova tentativa de envio.
+
+     Bug relatado pelo cliente (print de tela): a caixa aparecia MARCADA
+     (verde) e, ao mesmo tempo, a mensagem "Marque a caixa acima pra
+     continuar." continuava visível — os dois ao mesmo tempo, contraditório.
+     Causa: essa mensagem só some quando o evento `change` da caixa dispara,
+     e alguns navegadores/gerenciadores de senha marcam a caixa sozinhos ao
+     recarregar a página (autofill, ou o próprio navegador restaurando o
+     estado do formulário ao voltar/avançar — bfcache) SEM disparar esse
+     evento — a caixa fica visualmente marcada, mas o erro antigo nunca é
+     limpo. O envio em si não ficava bloqueado de verdade (validateScope()
+     recalcula o estado real da caixa no clique de Enviar), mas a tela
+     parecia quebrada, com o aviso teimando em ficar ali. Correção: em vez
+     de depender só do `change`, sincroniza o aviso com o estado real da
+     caixa toda vez que há uma chance de ele ter mudado sem esse evento —
+     ao carregar a página e ao voltar por bfcache (`pageshow`) — e não só
+     quando a pessoa marca com o mouse/toque. */
+  var syncConsent = function (consent) {
+    var wrap = consent.closest('.consent');
+    if (wrap && consent.checked && wrap.getAttribute('data-invalid') === 'true') {
+      wrap.setAttribute('data-invalid', 'false');
+    }
+  };
+  var boundConsents = [];
   $$('form[data-endpoint-form]').forEach(function (form) {
     if (form.dataset.consentBound) return;
     form.dataset.consentBound = '1';
     var consent = $('input[name="consentimento"]', form);
     if (!consent) return;
-    consent.addEventListener('change', function () {
-      var wrap = consent.closest('.consent');
-      if (wrap && consent.checked) wrap.setAttribute('data-invalid', 'false');
-    });
+    boundConsents.push(consent);
+    consent.addEventListener('change', function () { syncConsent(consent); });
   });
+  if (boundConsents.length) {
+    // Autofill/gerenciador de senha pode já ter marcado a caixa antes desse
+    // script rodar — sincroniza uma vez logo de cara.
+    boundConsents.forEach(syncConsent);
+    // `pageshow` cobre a página voltando do cache do navegador (botão
+    // voltar/avançar) com a caixa já marcada de uma visita anterior.
+    window.addEventListener('pageshow', function () { boundConsents.forEach(syncConsent); });
+  }
 
   /* ------------------------------------------------- envio de formulário */
   $$('form[data-endpoint-form]').forEach(function (form) {

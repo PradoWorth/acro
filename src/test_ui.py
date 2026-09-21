@@ -324,6 +324,30 @@ def run():
         pg.wait_for_timeout(1400)
         check("envio válido mostra confirmação", pg.is_visible(".formstate--ok"))
 
+        print("\n[bug relatado: caixa marcada por autofill não limpava o aviso de erro]")
+        # Print da cliente mostrava a caixa já MARCADA (verde) com a mensagem
+        # "Marque a caixa acima pra continuar." ainda visível ao mesmo tempo —
+        # sintoma de autofill/gerenciador de senha marcando a caixa sem
+        # disparar o evento `change` que limpa esse aviso (ver comentário em
+        # site.js). Reproduz o cenário sem depender de autofill de verdade:
+        # gera o erro pelo caminho normal (tentar enviar sem marcar), depois
+        # marca a caixa via JS SEM emitir `change` (como um autofill faria) e
+        # confirma que o aviso continua preso até a sincronização de
+        # `pageshow` (voltar por bfcache) rodar.
+        pg.goto(f"{BASE}/contato.html", wait_until="networkidle")
+        pg.click("[data-step-submit]")
+        pg.wait_for_timeout(250)
+        check("(preparação) tentar enviar sem marcar mostra o erro",
+              pg.get_attribute(".consent", "data-invalid") == "true" and pg.is_visible(".consent__err"))
+        pg.eval_on_selector('input[name="consentimento"]', "el => { el.checked = true; }")
+        pg.wait_for_timeout(100)
+        check("caixa marcada sem o evento `change` (como autofill faz) ainda deixa o aviso preso — reproduz o bug relatado",
+              pg.get_attribute(".consent", "data-invalid") == "true" and pg.is_visible(".consent__err"))
+        pg.evaluate("window.dispatchEvent(new Event('pageshow'))")
+        pg.wait_for_timeout(100)
+        check("ao voltar por bfcache (evento pageshow), o aviso é sincronizado e some — corrigido",
+              pg.get_attribute(".consent", "data-invalid") == "false" and not pg.is_visible(".consent__err"))
+
         print("\n[programas: imagem + texto]")
         pg.goto(f"{BASE}/programas.html", wait_until="networkidle")
         check("cada programa tem uma imagem ao lado do título/resumo (.mediarow)",

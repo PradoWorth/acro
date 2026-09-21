@@ -9071,3 +9071,43 @@ abortada) confirma que a nota some em silêncio sem quebrar nada.
 Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`/
 `design_audit.py` sem apontamentos novos, suíte inteira de
 `test_ui.py` passando.
+
+## 178. Bug relatado: caixa de consentimento marcada, mas o aviso de erro não sumia
+
+**O que a cliente reportou.** Print de tela mostrando a caixa de
+consentimento do formulário de contato já **marcada** (verde) e, ao
+mesmo tempo, a mensagem "Marque a caixa acima pra continuar." ainda
+visível logo abaixo — contraditório: se está marcada, por que o aviso
+de "marque a caixa" continua lá?
+
+**Causa.** Essa mensagem só some quando o evento `change` da caixa
+dispara (ver item 176) — e é isso que acontece quando a própria pessoa
+clica nela. Só que alguns navegadores/gerenciadores de senha marcam a
+caixa sozinhos ao recarregar a página — autofill, ou o navegador
+restaurando o estado do formulário ao voltar/avançar (cache de
+navegação, "bfcache") — **sem disparar esse evento**. A caixa fica
+visualmente marcada, mas o aviso antigo (de uma tentativa de envio
+anterior, sem marcar) nunca é limpo, porque o código só ouvia por
+aquele clique específico.
+
+Importante: o envio em si **não estava realmente bloqueado** —
+`validateScope()` recalcula o estado real da caixa no momento do
+clique em "Enviar", então mandar o formulário já funcionava mesmo com
+o aviso preso na tela. Mas a tela parecia quebrada, o que é
+suficientemente ruim sozinho (alguém pode desistir achando que o site
+não aceita o consentimento).
+
+**Correção.** Em vez de depender só do clique, o aviso agora é
+sincronizado com o estado real da caixa toda vez que ele pode ter
+mudado sem o evento `change`: uma vez ao carregar a página (cobre
+autofill que já rodou antes do nosso script) e no evento `pageshow`
+(cobre voltar/avançar pelo cache do navegador com a caixa já marcada
+de uma visita anterior).
+
+**Verificação.** Novo teste em `test_ui.py` reproduz o bug de
+propósito — marca a caixa via JS sem emitir `change` (como um autofill
+faria) e confirma que o aviso realmente fica preso até então — e
+depois confirma que disparar `pageshow` sincroniza e some com ele.
+Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`/
+`design_audit.py` sem apontamentos novos, suíte inteira de
+`test_ui.py` passando.
