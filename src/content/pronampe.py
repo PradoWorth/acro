@@ -93,9 +93,11 @@ def lead_form(path):
       <div class="fgrid fgrid--2" style="gap:1rem">
         {_field("pn-nome", "nome", "Nome completo", placeholder="Ex: João Silva", err="Informe seu nome completo.")}
         {_field("pn-telefone", "telefone", "Telefone / WhatsApp", kind="tel", placeholder="(00) 00000-0000", mask="phone", validate="phone", err="Informe um número com DDD.")}
+        {_field("pn-email", "email", "E-mail", kind="email", placeholder="nome@empresa.com.br", validate="email", err="Informe um e-mail válido.")}
         {_field("pn-cnpj", "cnpj", "CNPJ da empresa", placeholder="00.000.000/0000-00", mask="doc", validate="doc", err="Informe um CNPJ válido.", full=True, note=True)}
         {_select("pn-faturamento", "faturamento_mensal", "Faturamento médio mensal", REVENUE_OPTIONS, full=True)}
       </div>
+      <input type="hidden" name="tracking_params" value="">
 
       <div class="pronampe-notice">
         {_ICON_CLOCK}

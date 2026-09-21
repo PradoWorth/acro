@@ -125,6 +125,8 @@ def form(path):
     <input type="text" id="company_website" name="company_website" tabindex="-1" autocomplete="off">
   </div>
 
+  <input type="hidden" name="tracking_params" value="">
+
   <label class="consent mt-2">
     <input type="checkbox" name="consentimento" required>
     <span>Autorizo o contato da Acrópole Capital para tratar desta solicitação e o tratamento dos meus dados conforme a <a href="{B.rel(path, 'politica-de-privacidade.html')}">Política de Privacidade</a>. O envio não representa solicitação formal de crédito nem aprovação.</span>

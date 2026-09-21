@@ -9177,3 +9177,125 @@ apontamentos novos, suíte inteira de `test_ui.py` passando —
 incluindo a confirmação de que o pacote navegável (`acropole-navegavel.html`)
 continua embutindo o globo da home corretamente mesmo com o `?v=` no
 nome do arquivo.
+
+## 180. Webhook de leads (n8n) + captura de tracking params (UTM/gclid/fbclid)
+
+**Pedido da cliente.** Toda vez que um formulário do site for preenchido
+e enviado, ele precisa disparar um webhook pra uma automação n8n dela,
+com 5 chaves obrigatórias no payload: `name`, `email`, `whatsapp`,
+`faturamento`, `tracking_params`. Ela também mandou o HTML de uma outra
+landing page dela (um wizard de 6 passos, "Diagnóstico 360 de
+Elegibilidade Bancária™") pra eu usar como referência da lógica de
+tracking params — não pra copiar a página, só a lógica de captura de
+atribuição (UTM, cliques pagos, cookies do Pixel).
+
+**Endpoint ligado (modo teste).** `config.js` tinha `endpoint: ""`
+("modo demonstração": nenhum formulário do site chegou a transmitir
+nada de verdade até agora, ver item anterior sobre isso). Troquei pela
+URL de TESTE que ela passou:
+`https://n8n.srv1800205.hstgr.cloud/webhook-test/recebimento-de-leads`
+— reparem no `-test` no caminho; é intencional, é a URL que ela
+escreveu como "teste" na mensagem (diferente da URL de produção, sem
+o `-test`, que aparecia embutida no HTML de referência que ela colou
+depois). Deixei um comentário em `config.js` lembrando de trocar pra
+URL de produção quando ela validar o fluxo no n8n — é só editar essa
+uma linha e rodar `build.py` de novo. Também precisei liberar esse
+domínio no CSP (`connect-src` em `vercel.json`), senão o navegador
+bloqueia o `fetch()` silenciosamente mesmo com o endpoint certo.
+
+**Chaves canônicas, porque os 3 formulários usam nomes de campo
+diferentes.** O formulário de contato e o popup de captação já usam
+`email` e `faturamento` nativamente, mas o telefone se chama
+`telefone` (não `whatsapp`) e o nome se chama `nome` (não `name`). O
+Pronampe é o mais diferente: campo de faturamento se chama
+`faturamento_mensal`, e (esse é importante, ver abaixo) não tinha
+campo de e-mail nenhum. Em vez de reescrever os 3 formulários pra usar
+os nomes exigidos pelo webhook — o que quebraria o preenchimento
+automático do navegador (autofill reconhece `name="email"`,
+`autocomplete`, etc. — nomes genéricos ajudam nisso) — apliquei um
+"apelido" no envio, em `site.js`, logo antes de montar o payload:
+
+```js
+if (!payload.name) payload.name = payload.nome || '';
+if (!payload.whatsapp) payload.whatsapp = payload.telefone || '';
+if (!payload.faturamento) payload.faturamento = payload.faturamento_mensal || '';
+```
+
+Assim cada formulário continua com os nomes de campo que já tinha (e
+o autofill do navegador continua funcionando do jeito que já
+funcionava), e só na hora de montar o payload do webhook é que ele
+ganha as 5 chaves exatas que ela pediu.
+
+**Mudança que ela precisa saber: e-mail agora é obrigatório no
+Pronampe.** O formulário da campanha do Pronampe (`pronampe-2026.html`)
+nunca teve campo de e-mail — só nome, telefone e CNPJ. Como `email` é
+uma das 5 chaves obrigatórias do webhook, adicionei um campo de e-mail
+(com a mesma validação dos outros formulários do site) logo depois do
+telefone. Isso é uma mudança de funil, não só técnica: mais um campo
+pra preencher pode reduzir um pouco a taxa de conclusão daquela
+campanha especificamente. Se ela preferir manter o Pronampe enxuto do
+jeito que estava, dá pra reverter isso e mandar `email: ""` pro
+webhook (ela decide se o n8n aceita lead sem e-mail ou descarta) — é
+só avisar.
+
+**Tracking params: mesma lógica da página de referência, aplicada no
+site inteiro.** Repliquei o mecanismo de captura de atribuição da
+página que ela mandou, em `initTrackingParams()` (`site.js`), chamada
+uma vez no `boot()` de toda página:
+
+- Lê um cookie `app_attribution` (se já existir) como base, e sobrepõe
+  com os parâmetros da URL atual — mas só os que vierem preenchidos:
+  `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`,
+  `gclid`, `gbraid`, `wbraid`, `fbclid`. Isso preserva a atribuição
+  original mesmo que a pessoa navegue pra uma página sem UTM na URL
+  (ex.: clicou um anúncio, caiu na home, depois foi olhar "Soluções" —
+  o `utm_source=google` da primeira página continua valendo).
+- Grava `page_location`, `user_agent` e `captured_at` (hora exata da
+  captura).
+- Fica de olho nos cookies `_fbp`/`_fbc` do Pixel do Facebook (que
+  às vezes demoram alguns instantes pra existir depois do carregamento
+  da página) — tenta a cada 500ms, até 10 vezes, e inclui assim que
+  aparecerem.
+- Grava tudo isso, em JSON, num cookie `app_attribution` (30 dias,
+  `path=/`, `SameSite=Lax`) e replica o mesmo JSON em todo campo
+  oculto `tracking_params` da página (os 3 formulários ganharam esse
+  campo oculto).
+- Como reforço, também preenche de novo bem na hora do envio (listener
+  de `submit` na fase de captura, e uma releitura direta do cookie no
+  `site.js` antes de montar o payload) — mesmo padrão de
+  "cinto e suspensório" da página de referência, pra garantir que o
+  valor enviado é sempre o mais atual, mesmo se o timer de 500ms ainda
+  não tiver rodado.
+
+**O que NÃO entrou.** A página de referência também carrega uma tag
+de GTM/rastreamento do lado do servidor — isso é um script de
+terceiro carregado na página, questão bem diferente de "aplicar a
+lógica de tracking params" que foi o pedido. Não instalei. Se ela
+quiser isso no site da Acrópole também, é melhor tratar como um item
+separado (inclusive porque aí entra a política de cookies por
+categoria, ver abaixo).
+
+**Nota sobre a Política de Privacidade.** Gravar um cookie de
+atribuição de verdade (antes o site não gravava cookie nenhum de
+fato, como os comentários do código deixavam explícito) é diferente
+do que existia antes. A Política de Privacidade já tinha uma cláusula
+genérica cobrindo isso ("Este site pode utilizar cookies e ferramentas
+de análise para entender o uso das páginas..."), então não há
+contradição — mas se no futuro entrar analytics de terceiro ou pixel
+de verdade (não só esse cookie próprio de atribuição), vale revisitar
+pra um modelo de consentimento por categoria, mais granular que o
+aviso de cookies atual.
+
+**Verificação.** `test_ui.py` ganhou 3 blocos novos: (1) confere que o
+envio do formulário de contato dispara exatamente 1 chamada ao
+webhook, com as 5 chaves preenchidas e os apelidos de campo certos
+(`name` veio de `nome`, `whatsapp` veio de `telefone`); (2) o mesmo
+pro formulário do Pronampe, incluindo o novo campo de e-mail bloqueando
+envio quando inválido; (3) confere a captura de `utm_source`,
+`utm_medium`, `utm_campaign`, `gclid` da URL no campo `tracking_params`,
+a gravação do cookie `app_attribution`, e que a atribuição sobrevive
+à navegação pra uma página sem UTM na URL. O webhook real é
+interceptado nos testes (`page.route`) pra não gerar leads falsos de
+verdade no n8n de teste dela a cada rodada de testes. Rebuild completo,
+`preflight.py`/`audit.py`/`audit_deep.py`/`design_audit.py` sem
+apontamentos novos, suíte inteira de `test_ui.py` passando.

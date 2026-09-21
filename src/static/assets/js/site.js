@@ -1040,6 +1040,23 @@
       });
       payload.page = location.pathname;
 
+      // Chaves canônicas que todo webhook de lead precisa, independente de
+      // como cada formulário nomeia seus próprios campos internamente
+      // (nome/telefone aqui, faturamento_mensal no Pronampe etc.) — sem
+      // isso, quem consome o webhook teria que conhecer 3 esquemas
+      // diferentes de payload em vez de um só.
+      if (!payload.name) payload.name = payload.nome || '';
+      if (!payload.whatsapp) payload.whatsapp = payload.telefone || '';
+      if (!payload.faturamento) payload.faturamento = payload.faturamento_mensal || '';
+      // Relê o cookie de atribuição na hora exata do envio: garantia extra
+      // além do listener de submit em initTrackingParams (mesmo padrão do
+      // formulário de referência da cliente), pro valor nunca ir um passo
+      // atrasado em relação ao que está no cookie agora.
+      try {
+        var m = document.cookie.match(/(?:^|; )app_attribution=([^;]+)/);
+        if (m) payload.tracking_params = decodeURIComponent(m[1]);
+      } catch (e) {}
+
       form.classList.add('is-loading');
       btn && btn.setAttribute('aria-disabled', 'true');
 
@@ -1159,7 +1176,99 @@
 
   window.Acropole = { bindGlobal: bindGlobal, bindPage: bindPage };
 
-  function boot() { bindGlobal(); bindPage(document); }
+  /* ------------------------------------------- tracking_params (atribuição)
+     Captura de onde o lead veio (UTMs, cliques pagos) para o CRM/automação
+     conseguir medir origem de cada lead, não só receber o contato. Guarda
+     tudo num cookie próprio (`app_attribution`, 30 dias) que sobrevive a
+     navegação entre páginas do site, e replica o valor em JSON num campo
+     oculto (`name="tracking_params"`) de todo formulário — é esse campo que
+     entra no payload enviado ao webhook (ver "envio de formulário" acima).
+
+     Mesma lógica de atribuição usada na landing do Diagnóstico 360 (pedido
+     da cliente: aplicar aqui também), adaptada a este site: sem depender de
+     jQuery/Elementor (não existem aqui), sem o script de GTM/Meta Pixel que
+     aquela página carrega (não decidido ainda pra este site — ver README) —
+     só o mecanismo de captura de UTM/cookie/preenchimento de campo em si.
+     A leitura de _fbp/_fbc (cookies que o Pixel do Facebook cria) continua
+     aqui por compatibilidade: sem Pixel instalado esses cookies nunca
+     existem, então o preenchimento simplesmente segue sem eles — o mesmo
+     comportamento correto se um Pixel vier a ser instalado depois. */
+  function initTrackingParams() {
+    var COOKIE_NAME = 'app_attribution';
+    var UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+                     'gclid', 'gbraid', 'wbraid', 'fbclid'];
+
+    var getCookie = function (name) {
+      try {
+        var value = '; ' + document.cookie;
+        var parts = value.split('; ' + name + '=');
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      } catch (e) {}
+      return null;
+    };
+    var setCookie = function (name, value, days) {
+      try {
+        var expires = '';
+        if (days) {
+          var date = new Date();
+          date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+          expires = '; expires=' + date.toUTCString();
+        }
+        document.cookie = name + '=' + (value || '') + expires + '; path=/; SameSite=Lax';
+      } catch (e) {}
+    };
+
+    var trackingData = {};
+    try {
+      var existing = getCookie(COOKIE_NAME);
+      if (existing) trackingData = JSON.parse(decodeURIComponent(existing));
+    } catch (e) { trackingData = {}; }
+
+    try {
+      var urlParams = new URLSearchParams(window.location.search);
+      UTM_KEYS.forEach(function (key) {
+        if (urlParams.has(key) && urlParams.get(key) !== '') trackingData[key] = urlParams.get(key);
+      });
+    } catch (e) {}
+
+    trackingData.page_location = window.location.href;
+    trackingData.user_agent = navigator.userAgent;
+    trackingData.captured_at = new Date().toISOString();
+
+    var preencherCampos = function () {
+      var fbp = getCookie('_fbp');
+      var fbc = getCookie('_fbc');
+      if (fbp) trackingData.fbp = fbp;
+      if (fbc) trackingData.fbc = fbc;
+
+      setCookie(COOKIE_NAME, encodeURIComponent(JSON.stringify(trackingData)), 30);
+
+      var json = JSON.stringify(trackingData);
+      $$('input[name="tracking_params"], input#tracking_params').forEach(function (input) {
+        input.value = json;
+      });
+
+      return !!fbp; // avisa o monitoramento abaixo que pode parar de tentar
+    };
+
+    var encontrouFbCookies = preencherCampos();
+    if (!encontrouFbCookies) {
+      var tentativas = 0;
+      var intervalo = setInterval(function () {
+        tentativas++;
+        var sucesso = preencherCampos();
+        if (sucesso || tentativas >= 10) clearInterval(intervalo);
+      }, 500);
+    }
+
+    // Garantia extra: preenche de novo bem na hora do submit (captura em
+    // fase de captura, antes de qualquer handler de envio rodar), pro campo
+    // nunca ir com um valor um passo atrasado em relação ao que está no
+    // cookie naquele exato instante.
+    document.addEventListener('submit', function () { preencherCampos(); }, true);
+  }
+
+  function boot() { initTrackingParams(); bindGlobal(); bindPage(document); }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {

@@ -2,6 +2,7 @@
 """Testes de interação: navegação, gaveta, acordeão, índice de soluções,
 busca do blog, etapas e validação do formulário, teclado e foco."""
 import http.server
+import json
 import os
 import socketserver
 import sys
@@ -47,6 +48,24 @@ def run():
         pg = ctx.new_page()
         errs = []
         pg.on("pageerror", lambda e: errs.append(str(e)))
+
+        # Intercepta o webhook de leads (n8n) pra manter os testes
+        # determinísticos e offline — sem isso, cada envio válido do
+        # formulário durante os testes bateria de verdade no webhook de
+        # TESTE da cliente, poluindo o fluxo dela no n8n com leads falsos
+        # toda vez que a suíte roda. Guarda o corpo de cada chamada em
+        # webhook_calls pra inspecionar depois (chaves obrigatórias do
+        # payload: name/email/whatsapp/faturamento/tracking_params).
+        webhook_calls = []
+
+        def mock_webhook(route):
+            try:
+                webhook_calls.append(json.loads(route.request.post_data or "{}"))
+            except Exception:
+                webhook_calls.append({})
+            route.fulfill(status=200, content_type="application/json", body='{"ok":true}')
+
+        pg.route("https://n8n.srv1800205.hstgr.cloud/**", mock_webhook)
 
         print("\n[navegação de topo]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")
@@ -324,6 +343,24 @@ def run():
         pg.wait_for_timeout(1400)
         check("envio válido mostra confirmação", pg.is_visible(".formstate--ok"))
 
+        check("webhook de leads recebeu exatamente 1 chamada nesse envio",
+              len(webhook_calls) == 1, len(webhook_calls))
+        if webhook_calls:
+            body = webhook_calls[-1]
+            for key in ("name", "email", "whatsapp", "faturamento", "tracking_params"):
+                check(f'payload do webhook (contato) inclui a chave "{key}" preenchida',
+                      bool(body.get(key)), body.get(key))
+            check('"name" veio do campo "nome" do formulário de contato',
+                  body.get("name") == "Teste de Formulário", body.get("name"))
+            check('"whatsapp" veio do campo "telefone" do formulário de contato',
+                  body.get("whatsapp") == "(31) 98888-7777", body.get("whatsapp"))
+            try:
+                tp = json.loads(body.get("tracking_params") or "{}")
+            except Exception:
+                tp = {}
+            check("tracking_params é um JSON com page_location/user_agent/captured_at",
+                  all(k in tp for k in ("page_location", "user_agent", "captured_at")), tp)
+
         print("\n[bug relatado: caixa marcada por autofill não limpava o aviso de erro]")
         # Print da cliente mostrava a caixa já MARCADA (verde) com a mensagem
         # "Marque a caixa acima pra continuar." ainda visível ao mesmo tempo —
@@ -468,6 +505,62 @@ def run():
               not pg.is_visible("#pn-cnpj-note") and pg.get_attribute("#pn-cnpj", "aria-invalid") == "false")
         pg.unroute("https://brasilapi.com.br/api/cnpj/v1/**")
 
+        print("\n[formulário do Pronampe: e-mail agora obrigatório + webhook com chaves canônicas]")
+        # Item novo (pedido da cliente): todo formulário do site passa a
+        # enviar um webhook de lead com as chaves obrigatórias
+        # name/email/whatsapp/faturamento/tracking_params. O Pronampe não
+        # tinha campo de e-mail nenhum antes — precisou ganhar um. Confirma
+        # que ele agora bloqueia sem e-mail válido, e que o payload chega
+        # com as chaves canônicas mesmo os campos internos deste formulário
+        # tendo nomes diferentes (telefone -> whatsapp, faturamento_mensal
+        # -> faturamento).
+        pg.goto(f"{BASE}/pronampe-2026.html", wait_until="networkidle")
+        pg.route("https://brasilapi.com.br/**", lambda route: route.abort())
+        pg.fill("#pn-nome", "Lead Pronampe Teste")
+        pg.fill("#pn-telefone", "31988887777")
+        pg.fill("#pn-email", "invalido")
+        pg.fill("#pn-cnpj", "11222333000181")
+        pg.select_option("#pn-faturamento", label="Abaixo de R$ 60.000/mês")
+        # A página também tem o popup de captação (oculto) com os mesmos
+        # seletores genéricos (name="consentimento", [data-step-submit]) —
+        # escopar ao card do formulário do Pronampe evita pegar o do popup.
+        # force=True porque essa página tem animações de "revelar ao
+        # rolar" (data-reveal) nos blocos ao redor do formulário — sem
+        # isso, a checagem de estabilidade do Playwright intercala com uma
+        # transição ainda em andamento e o clique acaba não sendo único.
+        # delay=100 entre mousedown/mouseup: sem isso o clique instantâneo
+        # às vezes colide com o blur do campo de faturamento preenchido
+        # logo antes (o navegador não registra o clique como único gesto
+        # down+up no mesmo elemento) e a caixa nunca fica marcada de
+        # verdade — descoberto isolando down/up manualmente com um atraso.
+        consent_pn = pg.locator('.pronampe-formcard input[name="consentimento"]')
+        consent_pn.scroll_into_view_if_needed()
+        pg.wait_for_timeout(300)
+        consent_pn.click(force=True, delay=100)
+        pg.wait_for_timeout(100)
+        pg.click(".pronampe-formcard [data-step-submit]")
+        pg.wait_for_timeout(300)
+        check("e-mail inválido bloqueia o envio no Pronampe (campo novo, agora obrigatório)",
+              pg.get_attribute("#pn-email", "aria-invalid") == "true")
+
+        pg.fill("#pn-email", "lead@empresa.com.br")
+        calls_before = len(webhook_calls)
+        pg.click(".pronampe-formcard [data-step-submit]")
+        pg.wait_for_timeout(1400)
+        check("envio válido do Pronampe mostra confirmação", pg.is_visible(".formstate--ok"))
+        check("webhook recebeu a chamada do envio do Pronampe",
+              len(webhook_calls) == calls_before + 1, len(webhook_calls))
+        if len(webhook_calls) > calls_before:
+            body = webhook_calls[-1]
+            for key in ("name", "email", "whatsapp", "faturamento", "tracking_params"):
+                check(f'payload do webhook (Pronampe) inclui a chave "{key}" preenchida',
+                      bool(body.get(key)), body.get(key))
+            check('"whatsapp" veio do campo "telefone" do Pronampe (alias de nome de campo)',
+                  body.get("whatsapp") == "(31) 98888-7777", body.get("whatsapp"))
+            check('"faturamento" veio do campo "faturamento_mensal" do Pronampe (alias — nome interno diferente)',
+                  body.get("faturamento") == "abaixo-60k", body.get("faturamento"))
+        pg.unroute("https://brasilapi.com.br/**")
+
         print("\n[teclado e foco]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")
         pg.keyboard.press("Tab")
@@ -495,6 +588,42 @@ def run():
         check("config.js é servido com \"?v=<hash>\" na URL", "?v=" in (config_js_src or ""), config_js_src)
         css_status = pg.evaluate(f"() => fetch('{css_href}').then(r => r.status)")
         check("a URL versionada do CSS responde 200 (não é um link quebrado)", css_status == 200, css_status)
+
+        print("\n[tracking_params: captura de UTM/gclid/fbclid e cookie de atribuição]")
+        # Lógica pedida pela cliente (mesma da landing do Diagnóstico 360,
+        # adaptada aqui): UTMs e cliques pagos na URL viram um cookie
+        # próprio (app_attribution, 30 dias) e são replicados em JSON no
+        # campo oculto tracking_params de todo formulário do site.
+        pg.context.clear_cookies()
+        pg.goto(f"{BASE}/contato.html?utm_source=google&utm_medium=cpc&utm_campaign=teste-sessao&gclid=abc123",
+                wait_until="networkidle")
+        pg.wait_for_timeout(200)
+        tp_value = pg.eval_on_selector('input[name="tracking_params"]', "el => el.value")
+        try:
+            tp = json.loads(tp_value or "{}")
+        except Exception:
+            tp = {}
+        check("utm_source da URL foi capturado no campo tracking_params",
+              tp.get("utm_source") == "google", tp)
+        check("utm_medium da URL foi capturado", tp.get("utm_medium") == "cpc", tp)
+        check("utm_campaign da URL foi capturado", tp.get("utm_campaign") == "teste-sessao", tp)
+        check("gclid da URL foi capturado", tp.get("gclid") == "abc123", tp)
+        check("cookie app_attribution foi gravado (30 dias)",
+              any(c["name"] == "app_attribution" for c in pg.context.cookies()))
+
+        # Navega para OUTRA página sem UTM na URL: a atribuição já capturada
+        # tem que sobreviver (não pode se perder ao trocar de página), e o
+        # campo oculto da nova página (formulário diferente) também chega
+        # preenchido com os mesmos dados.
+        pg.goto(f"{BASE}/pronampe-2026.html", wait_until="networkidle")
+        pg.wait_for_timeout(200)
+        tp2_value = pg.eval_on_selector('input[name="tracking_params"]', "el => el.value")
+        try:
+            tp2 = json.loads(tp2_value or "{}")
+        except Exception:
+            tp2 = {}
+        check("atribuição sobrevive à navegação entre páginas (sem UTM novo na URL)",
+              tp2.get("utm_source") == "google" and tp2.get("gclid") == "abc123", tp2)
         ctx.close()
 
         # ----------------------------------------------------------- mobile

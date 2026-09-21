@@ -1266,15 +1266,20 @@ def cookie_bar(path):
     """
     Aviso de cookies (pedido do cliente): uma caixinha discreta no canto
     inferior direito, mostrada uma vez na primeira visita, com um botão só
-    ("Aceitar") — sem gerenciamento granular de categorias porque o site
-    hoje não carrega nenhum script de terceiro nem grava cookie nenhum de
-    verdade (ver `config.js`: endpoint de formulário e analytics ainda
-    vazios, ambos em modo demonstração). Quando a Acrópole ligar analytics
-    de verdade (ver item 155/README sobre a pendência), vale a pena
-    revisitar isso para um modelo de consentimento por categoria — por
-    ora, o pedido era só o aviso com um OK, pequeno e discreto (não uma
-    barra ocupando a linha inteira — pedido explícito, ver item 165 do
-    README), e é isso que existe.
+    ("Aceitar") — sem gerenciamento granular de categorias.
+
+    Atualização (ver README, item sobre webhook + tracking_params): o
+    site passou a gravar um cookie próprio de atribuição
+    (`app_attribution`, 30 dias — origem de campanha/UTM, não analytics
+    de terceiro) e a enviar de verdade os formulários a um webhook (ver
+    `config.js`). O aviso genérico abaixo, apoiado na Política de
+    Privacidade (que já cobria "cookies e ferramentas de análise" de
+    forma abrangente antes disso existir de fato), continua válido —
+    mas se a Acrópole também ligar analytics/pixel de terceiro de
+    verdade no futuro, vale revisitar isso para um modelo de
+    consentimento por categoria. Por ora, o pedido era só o aviso com
+    um OK, pequeno e discreto (não uma barra ocupando a linha inteira —
+    pedido explícito, ver item 165 do README), e é isso que existe.
 
     A escolha fica em localStorage (site.js, `cookieconsent:v1`), então a
     caixinha não aparece de novo nas próximas visitas depois que a pessoa
@@ -1352,6 +1357,8 @@ def lead_modal(path, lead_context=None):
           <label for="lm-company">Não preencha este campo</label>
           <input type="text" id="lm-company" name="company_website" tabindex="-1" autocomplete="off">
         </div>
+
+        <input type="hidden" name="tracking_params" value="">
 
         <label class="consent mt-2">
           <input type="checkbox" name="consentimento" required>
