@@ -1737,6 +1737,93 @@ def harden_csp(dist):
             f.write("\n")
 
 
+def write_htaccess(dist):
+    """
+    Gera dist/.htaccess a partir do vercel.json já finalizado (depois de
+    harden_csp, pra levar os hashes de script inline junto), pra hospedagem
+    Apache/LiteSpeed (ex.: Hostinger compartilhada) ter a mesma paridade de
+    headers de segurança e cache que a Vercel já tem — sem esse arquivo, a
+    CSP, HSTS e as regras de cache simplesmente não existiriam num host
+    Apache, silenciosamente, sem nenhum aviso no navegador além da ausência.
+
+    Só lê o vercel.json como fonte única de verdade (nunca redigita a CSP
+    aqui) — assim os dois hosts nunca podem divergir por esquecimento.
+    """
+    vercel_path = os.path.join(dist, "vercel.json")
+    if not os.path.exists(vercel_path):
+        raise RuntimeError("write_htaccess: vercel.json não encontrado — rode depois de harden_csp().")
+    conf = json.load(open(vercel_path, encoding="utf-8"))
+
+    main_headers = None
+    for block in conf.get("headers", []):
+        if block.get("source") == "/(.*)":
+            main_headers = block["headers"]
+            break
+    if not main_headers:
+        raise RuntimeError("write_htaccess: bloco de headers globais ('/(.*)') não encontrado em vercel.json.")
+
+    lines = [
+        "# Gerado automaticamente por build.py (write_htaccess) a partir de vercel.json.",
+        "# Não editar à mão — rode `python3 build.py` de novo depois de mudar vercel.json.",
+        "",
+        "# Nunca listar o conteúdo de uma pasta sem index.",
+        "Options -Indexes",
+        "",
+        "# Nega acesso via navegador a qualquer arquivo de config local com segredo",
+        "# (ex.: api/config.local.php) — defesa em profundidade, mesmo que o PHP",
+        "# em si já não vaze o conteúdo se for executado normalmente.",
+        '<FilesMatch "(^|\\.)env$|config\\.local\\.php$|\\.log$">',
+        "  <IfModule mod_authz_core.c>",
+        "    Require all denied",
+        "  </IfModule>",
+        "  <IfModule !mod_authz_core.c>",
+        "    Order allow,deny",
+        "    Deny from all",
+        "  </IfModule>",
+        "</FilesMatch>",
+        "",
+        "<IfModule mod_headers.c>",
+    ]
+    for h in main_headers:
+        value = h["value"].replace('"', '\\"')
+        lines.append(f'  Header always set "{h["key"]}" "{value}"')
+    lines += [
+        "</IfModule>",
+        "",
+        "ErrorDocument 404 /404.html",
+        "",
+        "# HTTPS forçado (a maioria dos hosts já força por padrão, mas sem custo garantir aqui também).",
+        "<IfModule mod_rewrite.c>",
+        "  RewriteEngine On",
+        "  RewriteCond %{HTTPS} off",
+        "  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]",
+        "",
+        "  # URL limpa (ex.: /contato também serve contato.html) — os links do",
+        "  # próprio site já incluem .html, isso é só um bônus pra quem digita",
+        "  # a URL sem extensão direto no navegador.",
+        "  RewriteCond %{REQUEST_FILENAME} !-f",
+        "  RewriteCond %{REQUEST_FILENAME} !-d",
+        "  RewriteCond %{REQUEST_FILENAME}\\.html -f",
+        "  RewriteRule ^(.*)$ $1.html [L]",
+        "</IfModule>",
+        "",
+        "<IfModule mod_headers.c>",
+        '  <FilesMatch "\\.(css|js)$">',
+        '    Header set Cache-Control "public, max-age=3600, must-revalidate"',
+        "  </FilesMatch>",
+        '  <FilesMatch "\\.(woff2?|ttf)$">',
+        '    Header set Cache-Control "public, max-age=31536000, immutable"',
+        "  </FilesMatch>",
+        '  <FilesMatch "\\.(avif|webp|png|jpe?g|gif|svg|ico)$">',
+        '    Header set Cache-Control "public, max-age=604800, must-revalidate"',
+        "  </FilesMatch>",
+        "</IfModule>",
+        "",
+    ]
+    with open(os.path.join(dist, ".htaccess"), "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+
 def cache_bust(dist):
     """
     Acrescenta `?v=<hash>` à URL de cada folha de estilo/script externo
@@ -1861,6 +1948,7 @@ def build():
     minify_assets(DIST)
     cache_bust(DIST)
     harden_csp(DIST)
+    write_htaccess(DIST)
 
     print(f"{len(pages)} páginas geradas em {DIST}")
     return pages

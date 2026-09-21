@@ -9299,3 +9299,79 @@ interceptado nos testes (`page.route`) pra não gerar leads falsos de
 verdade no n8n de teste dela a cada rodada de testes. Rebuild completo,
 `preflight.py`/`audit.py`/`audit_deep.py`/`design_audit.py` sem
 apontamentos novos, suíte inteira de `test_ui.py` passando.
+
+## 181. Preparando a migração de hospedagem pra Hostinger (compartilhada)
+
+**Pedido da cliente.** Migrar o site inteiro, que hoje roda na Vercel, pra
+hospedagem compartilhada da Hostinger — mantendo o VPS que já roda o n8n
+separado, só pro n8n (recomendação minha: evita que tráfego do site
+institucional compita por recursos com a automação que processa lead de
+verdade).
+
+**O que descobri checando o DNS de fora (sem precisar de acesso a
+nenhuma conta).** O domínio `acropolecapital.com.br` não usa os
+nameservers nem da Hostinger nem da Vercel — está delegado pra
+Cloudflare (`junade.ns.cloudflare.com` / `ali.ns.cloudflare.com`), com o
+DNS gerenciado numa conta Cloudflare separada (acesso do sócio, Hiury).
+O domínio também tem e-mail corporativo ativo: MX pra
+`smtp.google.com` (Google Workspace) e um SPF que ainda referencia a
+Hostinger (`_spf.mail.hostinger.com`). Isso muda o plano pra melhor:
+como site e e-mail vivem na mesma zona Cloudflare, dá pra trocar só o
+hospedeiro do site editando os registros A (raiz e `www`) pra apontar
+pro IP da Hostinger — sem tocar em nameserver nenhum e sem risco de
+derrubar e-mail, já que MX/SPF/verificação do Google ficam intocados
+numa mudança separada. Passei esse roteiro em duas frentes pra
+cliente: quem tem acesso ao hPanel pega o IP da hospedagem nova, o
+Hiury troca só os dois registros A na Cloudflare.
+
+**`.htaccess` novo, gerado automaticamente pelo build.** Hospedagem
+compartilhada da Hostinger roda Apache/LiteSpeed, não o runtime de
+headers da Vercel — sem um `.htaccess`, a CSP, o HSTS, os outros
+headers de segurança e as regras de cache do `vercel.json` simplesmente
+deixariam de existir nesse host, silenciosamente. Implementei
+`write_htaccess()` em `build.py`, chamada no fim de `build()`
+(depois de `harden_csp()`, pra levar os hashes de script inline
+atualizados): ela lê o `vercel.json` já finalizado como única fonte de
+verdade e gera `dist/.htaccess` com os mesmos headers globais (CSP,
+X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
+Permissions-Policy, HSTS, COOP, CORP), `Cache-Control` por tipo de
+arquivo (fonte / css+js / imagem, mesmos tempos do `vercel.json`),
+redirecionamento forçado pra HTTPS, página 404 customizada, `Options
+-Indexes` (nunca listar pasta sem index) e bloqueio explícito de
+acesso via navegador a qualquer `config.local.php`/`.env`/`.log` (a
+pasta do proxy do webhook, ver abaixo, cai nessa regra). Os dois hosts
+(Vercel e Hostinger) nunca podem divergir por esquecimento, porque o
+`.htaccess` é derivado do `vercel.json`, nunca redigitado à mão.
+
+**Proxy do webhook em PHP, pra hospedagem que não roda função
+serverless.** A ideia de esconder o token do webhook do n8n atrás de
+uma função serverless (ver item anterior sobre secret keys) supunha
+Vercel. Hospedagem compartilhada não roda Node/funções serverless, mas
+roda PHP — então criei `deploy-extra/api/lead-webhook.php`: recebe o
+POST do formulário no próprio domínio do site (sem token nenhum
+trafegando pelo navegador), valida método/origem/campos obrigatórios,
+aplica um rate limit simples por IP (arquivo local, já que hospedagem
+compartilhada não tem Redis), e só então repassa pro n8n com o token
+no header — token esse que fica só em `api/config.local.php` (nunca
+commitado, nunca acessível via navegador graças ao `.htaccess`).
+Deixei `api/config.local.php.example` como modelo dos 3 valores a
+preencher (URL do webhook, nome do header de autenticação, token).
+Testei manualmente com um n8n falso local (servidor embutido do PHP):
+confirmei que o header/token chegam certos no destino, que origem
+errada dá 403, método errado dá 405, corpo sem os campos obrigatórios
+dá 422, e que o rate limit bloqueia depois de várias tentativas
+seguidas (429). Esse proxy ainda não está ligado no `config.js` —
+falta a cliente confirmar o nome exato do header que o n8n espera e
+gerar o token de verdade, direto no painel; a troca de código depois é
+uma linha só (`endpoint: "/api/lead-webhook.php"`).
+
+**Entrega.** Pacote ZIP com o conteúdo completo de `dist/` (incluindo
+o `.htaccess` novo, `.well-known/security.txt` e a pasta `api/` com o
+proxy e o exemplo de config) pronto pra upload no Gerenciador de
+Arquivos/FTP da Hostinger, mais a versão em arquivo único
+(`acropole-navegavel.html`) pra conferência offline. Rebuild completo,
+`preflight.py`/`audit.py`/`audit_deep.py` sem apontamentos novos, suíte
+inteira de `test_ui.py` passando (o `.htaccess` não é exercitado pelos
+testes automatizados, já que eles rodam contra um servidor Python
+simples, não Apache — validado manualmente com `php -l` e um servidor
+PHP local, como descrito acima).

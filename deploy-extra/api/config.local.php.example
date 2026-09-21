@@ -1,0 +1,23 @@
+<?php
+/**
+ * Copie este arquivo pra "config.local.php" (mesma pasta) e preencha os
+ * valores reais. NUNCA suba config.local.php pro Git nem compartilhe em
+ * texto puro por e-mail/chat — é o único lugar onde o token fica de verdade.
+ *
+ * O .htaccess da raiz do site já nega acesso via navegador a esse arquivo,
+ * mas o nome "config.local.php" (em vez de "config.php") é de propósito:
+ * fica óbvio que é local/não versionado se alguém for organizar o projeto
+ * depois.
+ */
+
+// URL do webhook do n8n. Comece com a de TESTE; troque pra produção (sem
+// o "-test" no caminho) quando o fluxo estiver validado.
+define('N8N_WEBHOOK_URL', 'https://n8n.srv1800205.hstgr.cloud/webhook-test/recebimento-de-leads');
+
+// Nome do header de autenticação que o n8n espera. Ajuste conforme o que
+// estiver configurado do lado do n8n (ex.: "Authorization" com valor
+// "Bearer xxx", ou um header próprio tipo "X-N8N-Token").
+define('N8N_WEBHOOK_HEADER', 'Authorization');
+
+// O valor do token/segredo em si.
+define('N8N_WEBHOOK_TOKEN', 'COLE_AQUI_O_TOKEN_REAL');
