@@ -722,6 +722,12 @@
 
   /* ---------------------------------------------- máscaras de entrada */
   var onlyDigits = function (v) { return (v || '').replace(/\D+/g, ''); };
+  // Desde 07/2026 a Receita Federal aceita CNPJ alfanumérico: as 12
+  // primeiras posições podem ser dígito OU letra maiúscula A-Z, e os 2
+  // dígitos verificadores finais continuam sempre numéricos. Esse helper
+  // mantém letras (maiusculizando) e dígitos, descartando o resto — usado
+  // tanto na máscara quanto na validação do CNPJ.
+  var onlyAlnumUpper = function (v) { return (v || '').toUpperCase().replace(/[^0-9A-Z]/g, ''); };
 
   var masks = {
     phone: function (v) {
@@ -732,8 +738,16 @@
       return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
     },
     doc: function (v) {
-      var d = onlyDigits(v).slice(0, 14);
-      if (d.length <= 11) {
+      // Enquanto só houver dígitos e o total já digitado não passar de 11,
+      // trata como CPF (não dá pra saber ainda se vai virar CNPJ). Assim
+      // que aparece uma letra, ou o total passa de 11 caracteres, é CNPJ —
+      // e desde 07/2026 a Receita aceita letras maiúsculas nas 12
+      // primeiras posições do CNPJ (os 2 dígitos verificadores finais
+      // continuam só numéricos).
+      var raw = onlyAlnumUpper(v);
+      var hasLetter = /[A-Z]/.test(raw);
+      if (!hasLetter && raw.length <= 11) {
+        var d = raw.slice(0, 11);
         // CPF: 000.000.000-00. As duas primeiras trocas de "." são a
         // mesma regra aplicada duas vezes (cada uma pega o próximo bloco
         // de 3 dígitos ainda sem separador — por isso não dá pra
@@ -741,13 +755,17 @@
         // passada); a terceira troca o traço antes dos 2 dígitos finais.
         return d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
       }
-      // CNPJ: 00.000.000/0000-00. Quatro passos, um símbolo por vez, na
-      // ordem em que aparecem da esquerda pra direita: 1º ponto (depois
-      // dos 2 primeiros dígitos), 2º ponto (depois do bloco de 3
-      // seguinte), a barra (depois do bloco de 3 seguinte) e por fim o
-      // traço antes dos 2 dígitos finais.
-      return d.replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-              .replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+      // CNPJ: AA.AAA.AAA/AAAA-00 — 12 posições alfanuméricas + 2 dígitos
+      // verificadores sempre numéricos. Separa a raiz (até 12) dos DVs
+      // (até 2, só dígitos) antes de pontuar, pra nunca deixar uma letra
+      // cair nos 2 últimos caracteres.
+      var root = raw.slice(0, 12);
+      var dv = onlyDigits(raw.slice(12)).slice(0, 2);
+      var out = root.replace(/^([0-9A-Z]{2})([0-9A-Z])/, '$1.$2')
+                     .replace(/^([0-9A-Z]{2})\.([0-9A-Z]{3})([0-9A-Z])/, '$1.$2.$3')
+                     .replace(/\.([0-9A-Z]{3})([0-9A-Z])/, '.$1/$2');
+      if (dv) out += '-' + dv;
+      return out;
     },
     currency: function (v) {
       // Esse campo só trabalha com reais inteiros (sem centavos). Sem essa
@@ -778,7 +796,52 @@
   /* --------------------------------------------------- validadores */
   var isEmail = function (v) { return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v.trim()); };
   var isPhone = function (v) { return onlyDigits(v).length >= 10; };
-  var isDoc = function (v) { var n = onlyDigits(v).length; return n === 11 || n === 14; };
+
+  // CPF: dígito verificador mod-11 clássico, dois dígitos.
+  var isValidCPF = function (v) {
+    var d = onlyDigits(v);
+    if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false; // 111.111.111-11 etc. não são CPFs válidos
+    var calcDV = function (len) {
+      var sum = 0;
+      for (var i = 0; i < len; i++) sum += Number(d.charAt(i)) * (len + 1 - i);
+      var r = sum % 11;
+      return r < 2 ? 0 : 11 - r;
+    };
+    return calcDV(9) === Number(d.charAt(9)) && calcDV(10) === Number(d.charAt(10));
+  };
+
+  // CNPJ: desde 07/2026 as 12 primeiras posições podem ser dígito ou letra
+  // maiúscula A-Z; os 2 dígitos verificadores finais continuam sempre
+  // numéricos. O valor de cada caractere no cálculo do DV é o código ASCII
+  // menos 48 — pra dígitos '0'-'9' isso dá o próprio valor numérico (0-9),
+  // então o mesmo algoritmo funciona sem alteração para CNPJs antigos,
+  // 100% numéricos.
+  var isValidCNPJ = function (v) {
+    var s = onlyAlnumUpper(v);
+    if (s.length !== 14) return false;
+    var root = s.slice(0, 12);
+    var dvDigits = s.slice(12);
+    if (!/^[0-9]{2}$/.test(dvDigits)) return false; // os 2 últimos precisam ser numéricos
+    if (/^([0-9A-Z])\1{11}$/.test(root)) return false; // mesmo caractere repetido nas 12 posições
+    var charVal = function (ch) { return ch.charCodeAt(0) - 48; };
+    var calcDV = function (chars, weights) {
+      var sum = 0;
+      for (var i = 0; i < chars.length; i++) sum += charVal(chars.charAt(i)) * weights[i];
+      var r = sum % 11;
+      return r < 2 ? 0 : 11 - r;
+    };
+    var dv1 = calcDV(root, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+    if (dv1 !== Number(dvDigits.charAt(0))) return false;
+    var dv2 = calcDV(root + String(dv1), [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+    return dv2 === Number(dvDigits.charAt(1));
+  };
+
+  var isDoc = function (v) {
+    var s = onlyAlnumUpper(v);
+    if (s.length === 11 && !/[A-Z]/.test(s)) return isValidCPF(v);
+    if (s.length === 14) return isValidCNPJ(v);
+    return false;
+  };
 
   function validateField(field) {
     var el = $('input, select, textarea', field);
@@ -827,6 +890,67 @@
     // validateScope.
     el.addEventListener('blur', function () { if (el.value) validateField(f); });
     el.addEventListener('input', function () { if (f.getAttribute('data-invalid') === 'true') validateField(f); });
+  });
+
+  /* ------------------------------------ consulta de situação do CNPJ (BrasilAPI)
+     Checagem só informativa, nunca trava o envio: a BrasilAPI é gratuita e
+     sem SLA (sem garantia de disponibilidade), então se ela demorar, cair
+     ou responder algo inesperado, o campo simplesmente fica em silêncio —
+     o dígito verificador (isValidCNPJ, sempre local e instantâneo) já
+     garante que o número não é fake antes mesmo de tentar essa consulta.
+     Roda no blur, só depois do CNPJ passar no checksum; tem cache em
+     memória (evita bater na API de novo se a pessoa só passa o foco pelo
+     campo sem editar), timeout de 6s via AbortController, e uma trava de
+     "requisição mais recente" pra nunca deixar uma resposta antiga
+     sobrescrever o que já foi digitado depois dela. */
+  var cnpjStatusCache = {};
+  $$('[data-validate="doc"]').forEach(function (input) {
+    if (input.dataset.cnpjCheckBound) return;
+    input.dataset.cnpjCheckBound = '1';
+    var field = input.closest('.field');
+    var note = field && $('.field__note', field);
+    if (!note) return;
+    var requestId = 0;
+    var showNote = function (text, tone) {
+      note.textContent = text;
+      note.hidden = !text;
+      note.className = 'field__note' + (tone ? ' field__note--' + tone : '');
+    };
+    input.addEventListener('blur', function () {
+      var raw = input.value;
+      if (!isValidCNPJ(raw)) return; // CPF, incompleto ou já sinalizado inválido pelo checksum — nada a consultar
+      var code = onlyAlnumUpper(raw);
+      if (cnpjStatusCache.hasOwnProperty(code)) {
+        showNote(cnpjStatusCache[code].text, cnpjStatusCache[code].tone);
+        return;
+      }
+      var myId = ++requestId;
+      showNote('Consultando situação na Receita Federal…', '');
+      var ctrl = window.AbortController ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 6000) : null;
+      fetch('https://brasilapi.com.br/api/cnpj/v1/' + code, { signal: ctrl ? ctrl.signal : undefined })
+        .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+        .then(function (data) {
+          clearTimeout(timer);
+          if (myId !== requestId) return; // campo já mudou de novo — descarta resposta velha
+          var sit = (data && data.descricao_situacao_cadastral || '').toUpperCase();
+          var result;
+          if (sit === 'ATIVA') {
+            result = { text: 'CNPJ ativo na Receita Federal.', tone: 'ok' };
+          } else if (sit) {
+            result = { text: 'Atenção: este CNPJ consta como "' + data.descricao_situacao_cadastral + '" na Receita Federal.', tone: 'warn' };
+          } else {
+            result = { text: '', tone: '' };
+          }
+          cnpjStatusCache[code] = result;
+          showNote(result.text, result.tone);
+        })
+        .catch(function () {
+          clearTimeout(timer);
+          if (myId === requestId) showNote('', ''); // falha/timeout: some em silêncio, não bloqueia nada
+        });
+    });
+    input.addEventListener('input', function () { requestId++; showNote('', ''); });
   });
 
   /* -------------------------------------------------- caixa de consentimento

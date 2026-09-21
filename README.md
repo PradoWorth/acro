@@ -8990,3 +8990,84 @@ teve as checagens de consentimento reescritas pro comportamento novo
 hora certa) — suíte inteira passando. Testei visualmente com captura
 de tela o estado de erro (contorno vermelho + mensagem, botão colorido
 e clicável) no formulário de contato.
+
+## 177. Verificação de CNPJ: checksum real (com o novo formato alfanumérico) + consulta de situação cadastral
+
+**A pergunta da cliente.** Ela perguntou se o site já detectava um CNPJ
+falso/aleatório digitado no formulário, ou se avisava quando o CNPJ já
+está baixado na Receita Federal — e pediu para implementar, caso não
+tivesse.
+
+**O que existia antes.** Nada disso, de fato. O único campo de CNPJ do
+site (`pn-cnpj`, no formulário de captação da campanha Pronampe,
+`pronampe.py`) só checava a **contagem** de dígitos (`isDoc()` em
+site.js: "tem 11 ou 14 dígitos?"). Qualquer sequência de 14 números
+passava — `00000000000000`, `12345678901234`, um CNPJ de outra empresa
+copiado errado — nenhum checava se os dois dígitos verificadores
+batiam com o resto do número, e não existia nenhuma consulta à Receita
+Federal para saber se o CNPJ está ativo.
+
+**Uma complicação real e recente: CNPJ alfanumérico.** Desde 07/2026 a
+Receita Federal passou a aceitar letras maiúsculas (A-Z) nas 12
+primeiras posições do CNPJ — só os 2 dígitos verificadores finais
+continuam sempre numéricos (fonte: nota técnica oficial da Receita
+Federal sobre o CNPJ alfanumérico). Qualquer validação de checksum
+escrita sem levar isso em conta rejeitaria como "inválido" um CNPJ
+novo, real, emitido depois dessa mudança — um bug silencioso que só
+apareceria meses depois, na primeira empresa nova a tentar preencher o
+formulário. Implementei já contemplando isso.
+
+**Validação local (instantânea, sem depender de rede).** Reescrevi
+`isDoc()` em site.js, separando em `isValidCPF()` (checksum mod-11
+clássico de CPF) e `isValidCNPJ()` (checksum mod-11 do CNPJ, agora
+alfanumérico): o valor de cada caractere no cálculo é o código ASCII
+menos 48 — para dígitos '0'-'9' isso dá o próprio valor numérico, o
+que faz o mesmo algoritmo funcionar sem alteração nenhuma para os
+CNPJs antigos, 100% numéricos, e também para os novos, com letras.
+Também reescrevi a máscara de digitação (`masks.doc`) para formatar
+corretamente `AA.AAA.AAA/AAAA-00` quando aparece uma letra, mantendo o
+formato `000.000.000-00` de CPF como estava. Um CNPJ com dígito
+verificador errado agora é barrado na hora, com a mesma mensagem de
+erro visível que os outros campos já usam — sem round-trip nenhum de
+rede.
+
+**Consulta de situação cadastral (BrasilAPI) — só informativa, nunca
+trava o envio.** Depois que o CNPJ passa no checksum local, o campo
+consulta a BrasilAPI (`brasilapi.com.br/api/cnpj/v1/{cnpj}`) no blur,
+e mostra uma nota abaixo do campo: "CNPJ ativo na Receita Federal"
+(verde) se a situação cadastral for "ATIVA", ou um aviso (vermelho,
+reaproveitando `--danger`) se vier qualquer outra coisa — "BAIXADA",
+"INAPTA", "SUSPENSA" etc. **Decisão deliberada: essa checagem nunca
+bloqueia o envio do formulário.** A BrasilAPI é gratuita, sem
+autenticação, mas também **sem SLA** — não há garantia de
+disponibilidade nem de tempo de resposta publicada, o que a torna
+imprópria como única fonte num fluxo crítico. Por isso: timeout de 6s
+(`AbortController`), qualquer erro de rede/API faz a nota
+simplesmente sumir em silêncio, uma trava contra resposta atrasada
+sobrescrever o que a pessoa já digitou depois (`requestId`), e cache
+em memória pra não repetir a consulta se a pessoa só passa o foco pelo
+campo de novo sem editar. Em nenhum cenário — CNPJ baixado, API fora
+do ar, resposta lenta — o botão de enviar fica bloqueado; é um aviso a
+mais, não uma trava.
+
+**CSP.** A política de segurança de conteúdo do site (`vercel.json`)
+tinha `connect-src 'self'` — sem isso corrigido, o navegador
+bloquearia a chamada `fetch()` à BrasilAPI silenciosamente (sem erro
+visível no console para quem não abrisse o DevTools), e a consulta de
+situação simplesmente nunca funcionaria em produção mesmo passando em
+teste local sem CSP. Adicionei `https://brasilapi.com.br` ao
+`connect-src`.
+
+**Verificação.** `test_ui.py` ganhou cobertura nova: um CNPJ com
+dígitos aleatórios/errados (bloqueia), um CNPJ numérico
+válido — `11.222.333/0001-81`, o CNPJ de teste público mais usado no
+Brasil — (aceita e formata certo), um CNPJ alfanumérico
+válido — `12ABC34501DE35`, formata como `12.ABC.345/01DE-35` — (aceita)
+e o mesmo com DVs errados (bloqueia). Pra consulta de situação, mocko
+a resposta da BrasilAPI (`page.route`) em vez de depender da API real
+no teste — situação "ATIVA" mostra nota verde, "BAIXADA" mostra nota
+de atenção sem invalidar o campo, e uma falha simulada (conexão
+abortada) confirma que a nota some em silêncio sem quebrar nada.
+Rebuild completo, `preflight.py`/`audit.py`/`audit_deep.py`/
+`design_audit.py` sem apontamentos novos, suíte inteira de
+`test_ui.py` passando.

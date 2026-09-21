@@ -2024,6 +2024,13 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
 .field__err { font-size: var(--t-micro); color: var(--danger); display: none; }
 .field[data-invalid="true"] .field__err { display: block; }
 
+/* Nota informativa (ex.: situação do CNPJ na Receita Federal) — mesmo
+   tamanho de fonte do erro, mas nunca some o campo nem trava o envio;
+   [hidden] no JS controla se aparece, não display. */
+.field__note { font-size: var(--t-micro); margin-top: 4px; }
+.field__note--ok { color: var(--ok); }
+.field__note--warn { color: var(--danger); }
+
 /* Select customizado: mesma caixa dos outros campos do formulário, com a
    lista de opções desenhada no estilo do site — o navegador não deixa
    estilizar o menu nativo do <select>. O <select> real continua no DOM,

@@ -365,6 +365,85 @@ def run():
         check("\"Prazo desejado\" e \"Faturamento anual\" começam na mesma altura (rótulos do mesmo tamanho, sem quebrar linha um e não o outro)",
               abs(prazo_top - fat_top) < 2, f"{prazo_top} vs {fat_top}")
 
+        print("\n[validação de CNPJ: checksum real, não só contagem de dígitos]")
+        pg.goto(f"{BASE}/pronampe-2026.html", wait_until="networkidle")
+        # Bloqueia a consulta à BrasilAPI pra manter este bloco determinístico
+        # — aqui o alvo é só o checksum local (isValidCNPJ/isValidCPF), que
+        # roda antes e independe de rede.
+        pg.route("https://brasilapi.com.br/**", lambda route: route.abort())
+
+        pg.fill("#pn-cnpj", "11444777000000")  # 14 dígitos, mas verificadores errados
+        pg.locator("#pn-cnpj").blur()
+        pg.wait_for_timeout(200)
+        check("CNPJ com dígitos verificadores errados é rejeitado (checksum mod-11, não só contagem)",
+              pg.get_attribute("#pn-cnpj", "aria-invalid") == "true")
+
+        pg.fill("#pn-cnpj", "11222333000181")  # CNPJ numérico com checksum correto
+        pg.locator("#pn-cnpj").blur()
+        pg.wait_for_timeout(200)
+        check("CNPJ numérico com checksum correto é aceito",
+              pg.get_attribute("#pn-cnpj", "aria-invalid") == "false")
+        check("máscara formata como 00.000.000/0000-00",
+              pg.input_value("#pn-cnpj") == "11.222.333/0001-81", pg.input_value("#pn-cnpj"))
+
+        # Formato alfanumérico (vigente desde 07/2026): letras maiúsculas nas
+        # 12 primeiras posições, dígitos verificadores sempre numéricos.
+        pg.fill("#pn-cnpj", "12ABC34501DE35")
+        pg.locator("#pn-cnpj").blur()
+        pg.wait_for_timeout(200)
+        check("CNPJ alfanumérico com checksum correto é aceito",
+              pg.get_attribute("#pn-cnpj", "aria-invalid") == "false")
+        check("máscara alfanumérica formata como AA.AAA.AAA/AAAA-00",
+              pg.input_value("#pn-cnpj") == "12.ABC.345/01DE-35", pg.input_value("#pn-cnpj"))
+
+        pg.fill("#pn-cnpj", "12ABC34501DE00")  # mesma raiz, DVs trocados
+        pg.locator("#pn-cnpj").blur()
+        pg.wait_for_timeout(200)
+        check("CNPJ alfanumérico com dígitos verificadores errados é rejeitado",
+              pg.get_attribute("#pn-cnpj", "aria-invalid") == "true")
+
+        print("\n[consulta de situação do CNPJ na BrasilAPI: informativa, nunca trava]")
+        # Mocka a resposta da BrasilAPI (sem SLA, gratuita) pra não depender de
+        # rede real neste teste. Confirma que a nota some/aparece com o tom
+        # certo e que, mesmo com uma situação desfavorável, o campo continua
+        # validando normalmente — a checagem é só um aviso, não um bloqueio.
+        def mock_cnpj_status(situacao):
+            def handler(route):
+                route.fulfill(status=200, content_type="application/json",
+                               body=f'{{"descricao_situacao_cadastral": "{situacao}"}}')
+            return handler
+
+        pg.unroute("https://brasilapi.com.br/**")
+        pg.route("https://brasilapi.com.br/api/cnpj/v1/**", mock_cnpj_status("ATIVA"))
+        pg.fill("#pn-cnpj", "11222333000181")
+        pg.locator("#pn-cnpj").blur()
+        pg.wait_for_timeout(500)
+        check("CNPJ ativo mostra nota positiva",
+              "ativo" in pg.inner_text("#pn-cnpj-note").lower())
+        check("nota positiva não marca o campo como inválido",
+              pg.get_attribute("#pn-cnpj", "aria-invalid") == "false")
+        pg.unroute("https://brasilapi.com.br/api/cnpj/v1/**")
+
+        pg.route("https://brasilapi.com.br/api/cnpj/v1/**", mock_cnpj_status("BAIXADA"))
+        pg.fill("#pn-cnpj", "12ABC34501DE35")  # CNPJ diferente, pra não bater no cache do anterior
+        pg.locator("#pn-cnpj").blur()
+        pg.wait_for_timeout(500)
+        check("CNPJ baixado mostra nota de atenção",
+              "baixada" in pg.inner_text("#pn-cnpj-note").lower())
+        check("nota de atenção sobre situação cadastral NÃO marca o campo como inválido nem trava o envio",
+              pg.get_attribute("#pn-cnpj", "aria-invalid") == "false")
+        pg.unroute("https://brasilapi.com.br/api/cnpj/v1/**")
+
+        # Falha de rede/API (timeout, erro etc.): a nota deve simplesmente
+        # sumir em silêncio, sem quebrar a validação do campo.
+        pg.route("https://brasilapi.com.br/api/cnpj/v1/**", lambda route: route.abort())
+        pg.fill("#pn-cnpj", "11444777000161")
+        pg.locator("#pn-cnpj").blur()
+        pg.wait_for_timeout(500)
+        check("falha na consulta não deixa nenhuma nota visível nem invalida o campo",
+              not pg.is_visible("#pn-cnpj-note") and pg.get_attribute("#pn-cnpj", "aria-invalid") == "false")
+        pg.unroute("https://brasilapi.com.br/api/cnpj/v1/**")
+
         print("\n[teclado e foco]")
         pg.goto(f"{BASE}/index.html", wait_until="networkidle")
         pg.keyboard.press("Tab")

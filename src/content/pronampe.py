@@ -42,7 +42,7 @@ import build as B
 
 # ---------------------------------------------------------------- formulário
 def _field(id_, name, label, kind="text", placeholder="", mask=None, validate=None,
-           required=True, err="Preencha este campo.", full=False):
+           required=True, err="Preencha este campo.", full=False, note=False):
     attrs = f'type="{kind}" id="{id_}" name="{name}" aria-describedby="{id_}-err"'
     if placeholder:
         attrs += f' placeholder="{placeholder}"'
@@ -55,10 +55,14 @@ def _field(id_, name, label, kind="text", placeholder="", mask=None, validate=No
     if kind == "tel":
         attrs += ' inputmode="numeric"'
     cls = "field field--full" if full else "field"
+    # note=True acrescenta um <span> pra mensagens informativas não-bloqueantes
+    # (hoje usado só pelo CNPJ: situação cadastral consultada na BrasilAPI em
+    # tempo real, nunca impede o envio do formulário).
+    note_html = f'\n      <span class="field__note" id="{id_}-note" aria-live="polite" hidden></span>' if note else ""
     return f"""<div class="{cls}">
       <label for="{id_}">{label}</label>
       <input {attrs}>
-      <span class="field__err" id="{id_}-err">{err}</span>
+      <span class="field__err" id="{id_}-err">{err}</span>{note_html}
     </div>"""
 
 
@@ -89,7 +93,7 @@ def lead_form(path):
       <div class="fgrid fgrid--2" style="gap:1rem">
         {_field("pn-nome", "nome", "Nome completo", placeholder="Ex: João Silva", err="Informe seu nome completo.")}
         {_field("pn-telefone", "telefone", "Telefone / WhatsApp", kind="tel", placeholder="(00) 00000-0000", mask="phone", validate="phone", err="Informe um número com DDD.")}
-        {_field("pn-cnpj", "cnpj", "CNPJ da empresa", placeholder="00.000.000/0000-00", mask="doc", validate="doc", err="Informe um CNPJ válido.", full=True)}
+        {_field("pn-cnpj", "cnpj", "CNPJ da empresa", placeholder="00.000.000/0000-00", mask="doc", validate="doc", err="Informe um CNPJ válido.", full=True, note=True)}
         {_select("pn-faturamento", "faturamento_mensal", "Faturamento médio mensal", REVENUE_OPTIONS, full=True)}
       </div>
 
