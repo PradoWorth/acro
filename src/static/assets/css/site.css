@@ -2283,12 +2283,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
 .foot__rating-stars svg { width: .85rem; height: .85rem; fill: var(--iris); }
 .foot__rating-score { font-size: var(--t-sm); color: var(--paper); }
 .foot__seal-row { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem; }
-.foot__seal { margin-top: 0; }
+.foot__seal { margin-top: 0; flex-shrink: 0; }
 .foot__seal img { display: block; width: 79px; height: 40px; opacity: .9; }
-.foot__devcredit { display: flex; align-items: center; gap: .5rem; font-size: var(--t-micro); color: var(--slate-2); }
-.foot__devcredit a { display: inline-flex; opacity: .85; transition: opacity .15s; }
+.foot__devcredit { display: flex; flex-wrap: nowrap; flex-shrink: 0; align-items: center; gap: .5rem; font-size: var(--t-micro); color: var(--slate-2); white-space: nowrap; }
+.foot__devcredit a { display: inline-flex; flex-shrink: 0; opacity: .85; transition: opacity .15s; }
 .foot__devcredit a:hover, .foot__devcredit a:focus-visible { opacity: 1; }
-.foot__devcredit img { display: block; width: 21px; height: 22px; }
+.foot__devcredit img { display: block; width: 21px; height: 22px; flex-shrink: 0; }
 
 /* ---------- 19. Contato discreto ---------- */
 /* Botão circular com a foto da fundadora (pedido do cliente), em vez do

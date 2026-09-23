@@ -9553,3 +9553,18 @@ e rodar `build.py` de novo.
 Verificado com `preflight.py`/`audit.py`/`audit_deep.py` (limpos) e
 `test_ui.py` (todos os testes passaram), além de print manual do
 bloco renderizado conferindo a posição ao lado do selo RA1000.
+
+**Ajuste depois do relato da cliente ("ficou tudo bugado"):** print
+mostrando o texto "Site desenvolvido por" numa linha e o logo "A"
+sozinho embaixo, em vez de lado a lado. Varri a página de 300px a
+1300px de largura, com e sem a fonte da marca carregada, e não
+consegui reproduzir localmente — o bloco sempre ficou na mesma
+linha. Mesmo sem achar a causa exata (suspeito de cache de CSS
+antigo no navegador dela, de uma janela de carregamento sem estilo,
+ou de alguma particularidade do Chrome/Windows dela que não
+reproduzi aqui), deixei o bloco à prova de falha: `.foot__devcredit`
+ganhou `flex-wrap: nowrap`, `white-space: nowrap` e `flex-shrink: 0`
+no texto/logo, então mesmo que o espaço fique curto, o bloco inteiro
+pula pra linha de baixo como uma unidade só (do jeito que já
+acontecia com o selo RA1000), nunca mais quebrando o texto de um
+lado e o logo do outro.
