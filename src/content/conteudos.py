@@ -1152,6 +1152,8 @@ def article_page(a):
                        primary=(a.get("cta_primary", "Solicitar uma análise"), a.get("cta_href", "contato.html")),
                        secondary=None, tone="ink")
 
+    body += B.comments_section(a["slug"])
+
     # Título de SEO com corte pelo total (não só pelo título do artigo): o
     # sufixo " | Acrópole Capital" tem 20 caracteres, e o limite de exibição
     # do Google gira em torno de 60. O corte antigo permitia até 71

@@ -27,7 +27,7 @@
         },
         {
           "key": "Cross-Origin-Opener-Policy",
-          "value": "same-origin"
+          "value": "same-origin-allow-popups"
         },
         {
           "key": "Cross-Origin-Resource-Policy",
@@ -39,7 +39,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-ZgJ/9cZvBcopPujC0dNkNBIADm61KxmwQn3caGhA6m0=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jHxSW8+VFbvqVcgsTzpB7Q7rtbFD9DZcUh7QWWB/q0I=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-sd37R0kod+x8mG/i2DxLUHT5rQqrRIOx2o5kahUhEk4=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s='; connect-src 'self' https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; img-src 'self' data: https://i.ytimg.com https://lh3.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-ZgJ/9cZvBcopPujC0dNkNBIADm61KxmwQn3caGhA6m0=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jHxSW8+VFbvqVcgsTzpB7Q7rtbFD9DZcUh7QWWB/q0I=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-sd37R0kod+x8mG/i2DxLUHT5rQqrRIOx2o5kahUhEk4=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s=' https://accounts.google.com; connect-src 'self' https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud https://accounts.google.com; frame-src https://accounts.google.com; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
         }
       ]
     },

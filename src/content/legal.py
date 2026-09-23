@@ -80,6 +80,12 @@ def privacidade():
             ("Cookies e ferramentas de medição", [
                 "Este site pode utilizar cookies e ferramentas de análise para entender o uso das páginas e melhorar a experiência de navegação. Você pode gerenciar cookies diretamente nas configurações do seu navegador.",
             ]),
+            ("Comentários e login com Google", [
+                "Nos artigos da seção Conteúdos, é possível comentar após entrar com uma conta Google. Ao fazer login, coletamos o nome, o e-mail e a foto de perfil associados à sua conta Google, além do texto do comentário que você publicar.",
+                "Esses dados são usados para identificar o autor de cada comentário e permitir que ele gerencie a própria participação, incluindo a exclusão do próprio comentário a qualquer momento, diretamente na página do artigo.",
+                "Comentários publicados ficam visíveis publicamente para qualquer visitante do site. Podemos remover comentários que violem a lei, os Termos de Uso ou direitos de terceiros.",
+                "Os dados de comentário são mantidos enquanto o comentário permanecer publicado, e eliminados quando você o excluir ou quando solicitar sua remoção pelos canais de contato informados nesta política.",
+            ]),
             ("Retenção", [
                 "Os dados são mantidos pelo prazo necessário ao atendimento da solicitação e ao cumprimento de obrigações legais e regulatórias, sendo eliminados ou anonimizados quando cessarem essas finalidades.",
             ]),

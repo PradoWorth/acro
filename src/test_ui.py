@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Testes de interação: navegação, gaveta, acordeão, índice de soluções,
 busca do blog, etapas e validação do formulário, teclado e foco."""
+import base64
 import http.server
 import json
 import os
@@ -624,6 +625,108 @@ def run():
             tp2 = {}
         check("atribuição sobrevive à navegação entre páginas (sem UTM novo na URL)",
               tp2.get("utm_source") == "google" and tp2.get("gclid") == "abc123", tp2)
+
+        print("\n[comentários (login Google) nos artigos de Conteúdos]")
+        ARTICLE = "credito-empresarial-como-funciona"
+        # Sem googleClientId configurado (estado real hoje, até a cliente
+        # publicar o backend PHP na Hostinger e preencher config.js), a
+        # seção inteira tem que ficar oculta — nunca aparecer quebrada
+        # (sem login, sem comentário nenhum carregando).
+        pg.goto(f"{BASE}/conteudos/{ARTICLE}.html", wait_until="networkidle")
+        check("sem googleClientId configurado, a seção de comentários fica oculta",
+              pg.get_attribute("[data-comments]", "hidden") is not None)
+
+        # A partir daqui, simula o recurso já publicado: intercepta
+        # config.js pra injetar um googleClientId de teste, o script do GIS
+        # (nunca o real — sem rede externa aqui, e não precisamos da UI
+        # oficial do Google pra testar NOSSA lógica) por uma versão fake
+        # mínima que só expõe initialize/renderButton/disableAutoSelect, e
+        # os 3 endpoints PHP (não existe backend PHP nesse servidor de
+        # teste, que só serve os arquivos estáticos de dist/).
+        real_config_js = open(os.path.join(DIST, "assets", "js", "config.js"), encoding="utf-8").read()
+        fake_config_js = real_config_js.replace('googleClientId:""', 'googleClientId:"test-client-id.apps.googleusercontent.com"')
+        assert fake_config_js != real_config_js, "não achou a linha googleClientId em config.js pra substituir no teste"
+        pg.route("**/assets/js/config.js*", lambda route: route.fulfill(
+            status=200, content_type="application/javascript", body=fake_config_js))
+
+        fake_gsi_js = """
+        window.google = { accounts: { id: {
+          initialize: function (opts) { window.__acropoleGsiCallback = opts.callback; },
+          renderButton: function () {},
+          disableAutoSelect: function () {}
+        } } };
+        """
+        pg.route("https://accounts.google.com/gsi/client", lambda route: route.fulfill(
+            status=200, content_type="application/javascript", body=fake_gsi_js))
+
+        posted = []
+
+        def mock_comments_list(route):
+            route.fulfill(status=200, content_type="application/json",
+                           body=json.dumps({"ok": True, "comments": posted}))
+
+        def mock_comments_post(route):
+            body = json.loads(route.request.post_data or "{}")
+            comment = {
+                "id": len(posted) + 1, "body": body.get("body", ""),
+                "created_at": "2026-01-01T12:00:00Z",
+                "google_sub": "g-sub-teste", "name": "Fulano de Teste",
+                "avatar_url": "https://lh3.googleusercontent.com/fake",
+            }
+            posted.append(comment)
+            route.fulfill(status=200, content_type="application/json",
+                           body=json.dumps({"ok": True, "comment": comment}))
+
+        def mock_comments_delete(route):
+            body = json.loads(route.request.post_data or "{}")
+            posted[:] = [c for c in posted if c["id"] != body.get("id")]
+            route.fulfill(status=200, content_type="application/json", body='{"ok":true}')
+
+        pg.route("**/api/comments-list.php*", mock_comments_list)
+        pg.route("**/api/comments-post.php", mock_comments_post)
+        pg.route("**/api/comments-delete.php", mock_comments_delete)
+
+        pg.goto(f"{BASE}/conteudos/{ARTICLE}.html", wait_until="networkidle")
+        pg.wait_for_timeout(300)
+        check("com googleClientId configurado, a seção de comentários aparece",
+              pg.get_attribute("[data-comments]", "hidden") is None)
+        check("sem estar logado, o formulário de comentário fica oculto",
+              pg.get_attribute(".comments__form", "hidden") is not None)
+
+        # Fake JWT (header.payload.assinatura) só pra exercitar a
+        # decodificação client-side do payload (nome/foto pra exibir) — a
+        # prova de identidade de verdade é sempre o backend revalidando
+        # com o Google, nunca esse decode local.
+        payload = base64.urlsafe_b64encode(json.dumps({
+            "sub": "g-sub-teste", "name": "Fulano de Teste",
+            "email": "fulano@example.com", "picture": "https://lh3.googleusercontent.com/fake",
+        }).encode()).decode().rstrip("=")
+        fake_jwt = f"eyJhbGciOiJSUzI1NiJ9.{payload}.assinatura-fake"
+        pg.evaluate(f"() => window.__acropoleGsiCallback({{credential: {json.dumps(fake_jwt)}}})")
+        pg.wait_for_timeout(200)
+        check("depois do login (simulado), o formulário de comentário aparece",
+              pg.get_attribute(".comments__form", "hidden") is None)
+        check("depois do login, o nome da conta aparece", pg.text_content(".comments__username") == "Fulano de Teste")
+
+        pg.fill(".comments__form textarea", "Ótimo artigo, muito claro!")
+        pg.click(".comments__form .comments__submit")
+        pg.wait_for_timeout(300)
+        check("comentário enviado aparece na lista", pg.text_content(".comments__item-text") == "Ótimo artigo, muito claro!")
+        check("nome do autor aparece junto do comentário", pg.text_content(".comments__item-name") == "Fulano de Teste")
+        check("botão de excluir aparece (comentário é do próprio usuário logado)",
+              pg.is_visible(".comments__item-delete"))
+
+        pg.click(".comments__item-delete")
+        pg.wait_for_timeout(300)
+        check("depois de excluir, a lista volta a ficar vazia", pg.locator(".comments__item").count() == 0)
+        check("mensagem de 'seja a primeira pessoa' volta a aparecer", pg.is_visible(".comments__empty"))
+
+        pg.unroute("**/assets/js/config.js*")
+        pg.unroute("https://accounts.google.com/gsi/client")
+        pg.unroute("**/api/comments-list.php*")
+        pg.unroute("**/api/comments-post.php")
+        pg.unroute("**/api/comments-delete.php")
+
         ctx.close()
 
         # ----------------------------------------------------------- mobile

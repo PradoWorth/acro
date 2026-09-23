@@ -395,6 +395,64 @@ def newsletter_box(path):
     </div>"""
 
 
+def comments_section(slug):
+    """
+    Comentários por artigo de Conteúdos, atrás de login com Google (pedido
+    da cliente). Sem endpoint serverless nativo (o site é estático), então
+    isto fala com deploy-extra/api/comments-*.php — hospedagem que roda PHP
+    (Hostinger compartilhada, ver README item 181) com um banco MySQL
+    próprio (deploy-extra/sql/schema.sql). Enquanto ACROPOLE_CONFIG.googleClientId
+    não estiver preenchido, initComments() (site.js) mostra um aviso
+    discreto no lugar do botão de login, em vez de uma seção quebrada/vazia.
+
+    Publicação é automática, sem fila de moderação (decisão da cliente) —
+    por isso cada pessoa só pode excluir o próprio comentário (endpoint
+    comments-delete.php confere o "sub" do Google contra o autor do
+    comentário) e existe um endpoint separado de exclusão por admin
+    (comments-admin-delete.php, protegido por token) como válvula de
+    segurança manual, sem precisar mexer direto no banco.
+    """
+    field_id = f"comment-body-{slug}"
+    # A seção nasce com [hidden]: o HTML é gerado no build e não sabe se
+    # ACROPOLE_CONFIG.googleClientId (config.js) e o backend em PHP já
+    # estão configurados de verdade — initComments() (site.js) só tira o
+    # [hidden] depois de confirmar os dois, em vez de arriscar mostrar a
+    # seção quebrada (sem login, sem comentário nenhum carregando) antes da
+    # cliente terminar de publicar o backend na Hostinger.
+    return f"""<section class="band comments" id="comentarios" data-comments data-article="{slug}" hidden>
+  <div class="shell">
+    <h2 class="comments__heading">Comentários</h2>
+    <p class="comments__sub">Entre com sua conta Google para comentar. Comentários publicados ficam visíveis para outros leitores.</p>
+
+    <div class="comments__auth">
+      <div class="comments__gsi"></div>
+      <div class="comments__signedin" hidden>
+        <img class="comments__avatar" alt="" width="32" height="32" loading="lazy">
+        <span class="comments__username"></span>
+        <button type="button" class="btn btn--line btn--sm comments__signout">Sair</button>
+      </div>
+    </div>
+
+    <form class="comments__form" novalidate hidden>
+      <div class="field">
+        <label for="{field_id}" class="sr-only">Seu comentário</label>
+        <textarea id="{field_id}" name="body" maxlength="2000" placeholder="Escreva seu comentário..." required></textarea>
+        <span class="field__err">Escreva um comentário antes de publicar.</span>
+      </div>
+      <button type="submit" class="btn btn--sm comments__submit">
+        <span class="spinner" aria-hidden="true"></span>Publicar comentário
+      </button>
+      {form_status("ok", "Comentário publicado.")}
+      {form_status("err", "Não foi possível publicar agora. Tente novamente em instantes.")}
+    </form>
+
+    <ul class="comments__list" aria-live="polite"></ul>
+    <p class="comments__empty" hidden>Seja a primeira pessoa a comentar.</p>
+    <p class="comments__loaderr" hidden>Não foi possível carregar os comentários agora.</p>
+  </div>
+</section>"""
+
+
 def video_grid(path):
     """
     Vitrine de vídeos do YouTube (ver content.site.VIDEOS). Cada cartão linka
@@ -1770,9 +1828,9 @@ def write_htaccess(dist):
         "Options -Indexes",
         "",
         "# Nega acesso via navegador a qualquer arquivo de config local com segredo",
-        "# (ex.: api/config.local.php) — defesa em profundidade, mesmo que o PHP",
-        "# em si já não vaze o conteúdo se for executado normalmente.",
-        '<FilesMatch "(^|\\.)env$|config\\.local\\.php$|\\.log$">',
+        "# (ex.: api/config.local.php, api/db.local.php) — defesa em profundidade,",
+        "# mesmo que o PHP em si já não vaze o conteúdo se for executado normalmente.",
+        '<FilesMatch "(^|\\.)env$|\\.local\\.php$|\\.log$">',
         "  <IfModule mod_authz_core.c>",
         "    Require all denied",
         "  </IfModule>",

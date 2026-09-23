@@ -2031,6 +2031,29 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
 .field__note--ok { color: var(--ok); }
 .field__note--warn { color: var(--danger); }
 
+/* Comentários por artigo (login com Google), ver B.comments_section em
+   build.py e initComments() em site.js. */
+.comments { padding-top: 0; }
+.comments .shell { max-width: 760px; }
+.comments__heading { font-family: var(--display); font-weight: 700; font-size: var(--t-h3); color: var(--ink); }
+.comments__sub { margin-top: .25rem; font-size: var(--t-sm); color: var(--slate); }
+.comments__auth { margin-top: 1.25rem; display: flex; align-items: center; gap: .75rem; min-height: 40px; }
+.comments__signedin { display: flex; align-items: center; gap: .625rem; }
+.comments__avatar { border-radius: 50%; display: block; background: var(--paper-2); }
+.comments__username { font-size: var(--t-sm); font-weight: 600; color: var(--ink); }
+.comments__form { margin-top: 1rem; display: grid; gap: .75rem; max-width: 32rem; }
+.comments__form[hidden] { display: none; }
+.comments__list { margin-top: 1.5rem; display: grid; gap: 1.25rem; list-style: none; padding: 0; }
+.comments__item { display: flex; gap: .75rem; }
+.comments__item-avatar { width: 36px; height: 36px; border-radius: 50%; flex: 0 0 auto; background: var(--paper-2); }
+.comments__item-body { flex: 1 1 auto; min-width: 0; }
+.comments__item-head { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+.comments__item-name { font-size: var(--t-sm); font-weight: 600; color: var(--ink); }
+.comments__item-date { font-size: var(--t-micro); color: var(--slate-2); }
+.comments__item-text { margin-top: .25rem; font-size: var(--t-sm); color: var(--ink); line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comments__item-delete { margin-top: .25rem; font-size: var(--t-micro); color: var(--danger); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.comments__empty, .comments__loaderr { margin-top: 1.5rem; font-size: var(--t-sm); color: var(--slate); }
+
 /* Select customizado: mesma caixa dos outros campos do formulário, com a
    lista de opções desenhada no estilo do site — o navegador não deixa
    estilizar o menu nativo do <select>. O <select> real continua no DOM,

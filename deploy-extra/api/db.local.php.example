@@ -1,0 +1,36 @@
+<?php
+/**
+ * Copie este arquivo pra "db.local.php" (mesma pasta) e preencha com os
+ * dados do banco MySQL criado no hPanel da Hostinger (Bancos de Dados →
+ * MySQL). NUNCA suba db.local.php pro Git nem compartilhe em texto puro —
+ * é o único lugar onde a senha do banco fica de verdade. O .htaccess da
+ * raiz do site já nega acesso via navegador a qualquer "*.local.php".
+ */
+
+// Normalmente "localhost" na Hostinger — confirme no hPanel, na tela do
+// banco de dados criado (às vezes vem um host diferente).
+define('DB_HOST', 'localhost');
+
+// Nome do banco (na Hostinger costuma vir prefixado com o usuário, tipo
+// "uXXXXXXXX_comentarios").
+define('DB_NAME', 'COLE_AQUI_O_NOME_DO_BANCO');
+
+// Usuário do banco (mesmo prefixo, tipo "uXXXXXXXX_app").
+define('DB_USER', 'COLE_AQUI_O_USUARIO');
+
+// Senha do usuário do banco.
+define('DB_PASS', 'COLE_AQUI_A_SENHA_REAL');
+
+// Client ID do OAuth do Google (o mesmo valor que vai em
+// assets/js/config.js -> googleClientId) — o backend também confere esse
+// valor ao validar cada token, pra garantir que o token foi emitido
+// especificamente pra esta aplicação.
+define('GOOGLE_CLIENT_ID', 'SEU-CLIENT-ID.apps.googleusercontent.com');
+
+// Token secreto próprio (invente uma string longa e aleatória) pra
+// autorizar a exclusão de QUALQUER comentário via comments-admin-delete.php
+// — uma válvula de segurança manual, já que a publicação é automática, sem
+// fila de moderação. Guarde esse valor num lugar seguro (gerenciador de
+// senhas), você vai precisar dele quando quiser remover um comentário
+// problemático.
+define('COMMENTS_ADMIN_TOKEN', 'INVENTE_UM_TOKEN_LONGO_E_ALEATORIO_AQUI');

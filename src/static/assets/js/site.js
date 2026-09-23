@@ -1268,7 +1268,251 @@
     document.addEventListener('submit', function () { preencherCampos(); }, true);
   }
 
-  function boot() { initTrackingParams(); bindGlobal(); bindPage(document); }
+  /* ------------------------------------------- comentários (login Google)
+     Só existe um bloco [data-comments] nas páginas de artigo de Conteúdos
+     (ver B.comments_section em build.py). Fala com deploy-extra/api/
+     comments-*.php (PHP + MySQL na Hostinger, ver README) — não existe
+     nada disso na Vercel, então a seção nasce [hidden] no HTML e só
+     aparece se ACROPOLE_CONFIG.googleClientId estiver preenchido (sinal de
+     que a cliente já terminou de publicar o backend). Publicação de
+     comentário é automática (sem fila de moderação, decisão da cliente):
+     cada pessoa só pode excluir o próprio comentário, o servidor confere
+     isso comparando o "sub" do Google, nunca confia em nada vindo só do
+     navegador. */
+  function initComments() {
+    var section = $('[data-comments]');
+    if (!section) return;
+    var cfg = window.ACROPOLE_CONFIG || {};
+    if (!cfg.googleClientId) return; // continua [hidden]: recurso ainda não publicado
+
+    var slug = section.getAttribute('data-article') || '';
+    var list = $('.comments__list', section);
+    var emptyEl = $('.comments__empty', section);
+    var loaderrEl = $('.comments__loaderr', section);
+    var gsiBox = $('.comments__gsi', section);
+    var signedInBox = $('.comments__signedin', section);
+    var avatarImg = $('.comments__avatar', section);
+    var usernameEl = $('.comments__username', section);
+    var signoutBtn = $('.comments__signout', section);
+    var form = $('.comments__form', section);
+    var textarea = $('textarea', form);
+    var okState = $('.formstate--ok', form);
+    var errState = $('.formstate--err', form);
+    var submitBtn = $('.comments__submit', form);
+
+    var STORAGE_KEY = 'acropole_comment_session';
+    var currentUser = null; // { idToken, sub, name, picture }
+    var currentItems = [];
+
+    var readStoredSession = function () {
+      try {
+        var raw = sessionStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    };
+    var writeStoredSession = function (session) {
+      try {
+        if (session) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+        else sessionStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+    };
+
+    // Decodifica só a parte pública do JWT (payload), sem checar
+    // assinatura nenhuma — isso é só pra preencher nome/foto na hora,
+    // nunca é usado como prova de identidade: a prova de verdade é o
+    // backend revalidar o próprio token com o Google em cada requisição.
+    var decodeJwtPayload = function (token) {
+      try {
+        var part = token.split('.')[1];
+        var b64 = part.replace(/-/g, '+').replace(/_/g, '/');
+        var json = decodeURIComponent(atob(b64).split('').map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(json);
+      } catch (e) { return null; }
+    };
+
+    var setSignedInUI = function (user) {
+      currentUser = user;
+      if (user) {
+        avatarImg.src = user.picture || '';
+        usernameEl.textContent = user.name || user.email || '';
+        signedInBox.hidden = false;
+        gsiBox.hidden = true;
+        form.hidden = false;
+      } else {
+        signedInBox.hidden = true;
+        gsiBox.hidden = false;
+        form.hidden = true;
+      }
+    };
+
+    var applySession = function (idToken) {
+      var payload = decodeJwtPayload(idToken);
+      if (!payload) return;
+      var user = {
+        idToken: idToken, sub: payload.sub, name: payload.name || payload.email,
+        email: payload.email, picture: payload.picture,
+      };
+      writeStoredSession(user);
+      setSignedInUI(user);
+      renderList(); // reflete o botão "Excluir" nos comentários já carregados, se algum for do próprio usuário
+    };
+
+    window.acropoleHandleGoogleSignIn = function (response) {
+      if (response && response.credential) applySession(response.credential);
+    };
+
+    signoutBtn.addEventListener('click', function () {
+      writeStoredSession(null);
+      setSignedInUI(null);
+      try { window.google && google.accounts.id.disableAutoSelect(); } catch (e) {}
+    });
+
+    // O script do GIS (Google Identity Services) só é inserido no DOM
+    // aqui, em vez de sair fixo no HTML de todo artigo — assim uma visita
+    // a qualquer artigo, antes de ACROPOLE_CONFIG.googleClientId estar
+    // preenchido, nunca baixa esse script de terceiro à toa. Espera ficar
+    // pronto antes de inicializar, em vez de assumir que "window.google"
+    // já existe só porque acabou de ser inserido.
+    if (!$('script[data-gsi-loader]')) {
+      var gsiScript = document.createElement('script');
+      gsiScript.src = 'https://accounts.google.com/gsi/client';
+      gsiScript.async = true;
+      gsiScript.defer = true;
+      gsiScript.setAttribute('data-gsi-loader', '1');
+      document.head.appendChild(gsiScript);
+    }
+    var tries = 0;
+    (function waitGsi() {
+      tries++;
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        google.accounts.id.initialize({ client_id: cfg.googleClientId, callback: window.acropoleHandleGoogleSignIn });
+        google.accounts.id.renderButton(gsiBox, { type: 'standard', shape: 'pill', theme: 'outline', size: 'medium' });
+        return;
+      }
+      if (tries < 50) setTimeout(waitGsi, 100);
+    })();
+
+    var stored = readStoredSession();
+    if (stored && stored.idToken) setSignedInUI(stored);
+
+    function renderList() {
+      $$('.comments__item', list).forEach(function (li) { li.remove(); });
+      var items = currentItems;
+      emptyEl.hidden = items.length !== 0;
+      items.forEach(function (c) {
+        var li = document.createElement('li');
+        li.className = 'comments__item';
+        var img = document.createElement('img');
+        img.className = 'comments__item-avatar';
+        img.alt = '';
+        img.width = 36; img.height = 36; img.loading = 'lazy';
+        img.src = c.avatar_url || '';
+        var body = document.createElement('div');
+        body.className = 'comments__item-body';
+        var head = document.createElement('div');
+        head.className = 'comments__item-head';
+        var name = document.createElement('span');
+        name.className = 'comments__item-name';
+        name.textContent = c.name || '';
+        var date = document.createElement('span');
+        date.className = 'comments__item-date';
+        try { date.textContent = new Date(c.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }); } catch (e) {}
+        head.appendChild(name); head.appendChild(date);
+        var text = document.createElement('p');
+        text.className = 'comments__item-text';
+        text.textContent = c.body || ''; // textContent sempre — nunca innerHTML com dado de comentário
+        body.appendChild(head); body.appendChild(text);
+        if (currentUser && c.google_sub && currentUser.sub === c.google_sub) {
+          var del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'comments__item-delete';
+          del.textContent = 'Excluir';
+          del.addEventListener('click', function () { deleteComment(c.id, li); });
+          body.appendChild(del);
+        }
+        li.appendChild(img); li.appendChild(body);
+        list.appendChild(li);
+      });
+    }
+
+    function loadComments() {
+      fetch('/api/comments-list.php?article=' + encodeURIComponent(slug), { headers: { Accept: 'application/json' } })
+        .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+        .then(function (data) {
+          currentItems = (data && data.comments) || [];
+          loaderrEl.hidden = true;
+          renderList();
+        })
+        .catch(function () {
+          loaderrEl.hidden = false;
+          emptyEl.hidden = true;
+        });
+    }
+
+    function deleteComment(id, li) {
+      if (!currentUser) return;
+      fetch('/api/comments-delete.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, id_token: currentUser.idToken }),
+      }).then(function (r) {
+        if (r.ok) {
+          li.remove();
+          currentItems = currentItems.filter(function (c) { return c.id !== id; });
+          emptyEl.hidden = (currentItems.length !== 0);
+        }
+      }).catch(function () {});
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (form.classList.contains('is-loading')) return;
+      okState.setAttribute('data-show', 'false');
+      errState.setAttribute('data-show', 'false');
+      var body = textarea.value.trim();
+      var errEl = $('.field__err', form);
+      var fieldEl = textarea.closest('.field');
+      if (!body) {
+        fieldEl.setAttribute('data-invalid', 'true');
+        textarea.focus();
+        return;
+      }
+      fieldEl.setAttribute('data-invalid', 'false');
+      if (!currentUser) return;
+
+      form.classList.add('is-loading');
+      submitBtn.setAttribute('aria-disabled', 'true');
+
+      fetch('/api/comments-post.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article: slug, body: body, id_token: currentUser.idToken }),
+      })
+        .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+        .then(function (data) {
+          form.classList.remove('is-loading');
+          submitBtn.removeAttribute('aria-disabled');
+          if (!data || !data.ok || !data.comment) throw new Error('resposta inesperada');
+          textarea.value = '';
+          okState.setAttribute('data-show', 'true');
+          currentItems = currentItems.concat([data.comment]);
+          emptyEl.hidden = true;
+          renderList();
+        })
+        .catch(function () {
+          form.classList.remove('is-loading');
+          submitBtn.removeAttribute('aria-disabled');
+          errState.setAttribute('data-show', 'true');
+        });
+    });
+
+    section.hidden = false;
+    loadComments();
+  }
+
+  function boot() { initTrackingParams(); initComments(); bindGlobal(); bindPage(document); }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {

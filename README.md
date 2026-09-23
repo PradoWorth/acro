@@ -9375,3 +9375,138 @@ inteira de `test_ui.py` passando (o `.htaccess` não é exercitado pelos
 testes automatizados, já que eles rodam contra um servidor Python
 simples, não Apache — validado manualmente com `php -l` e um servidor
 PHP local, como descrito acima).
+
+## 182. Comentários nos artigos de Conteúdos, atrás de login com Google
+
+**Pedido da cliente.** "Colocar uma área de fazer login com o Google no
+site" para adicionar um campo de comentários logo abaixo de cada
+artigo/conteúdo do blog.
+
+**Decisões tomadas com a cliente antes de implementar** (perguntei, porque
+o pedido tocava em arquitetura, moderação e escopo — as três coisas
+mudam bastante o tamanho do trabalho): sistema próprio (não um serviço
+terceiro tipo Disqus), publicação automática sem fila de moderação, e só
+nos artigos de Conteúdos (não em outras páginas do site).
+
+**Por que sistema próprio muda o site de "estático" pra "tem banco de
+dados".** Até aqui, todo o site era HTML/CSS/JS gerado em build, sem
+nada guardado em lugar nenhum entre uma visita e outra (a exceção era o
+webhook de leads, que só repassa pra frente, não guarda nada aqui).
+Comentário é o primeiro dado que o próprio site passa a armazenar e
+reexibir pra qualquer visitante — isso exige um banco de verdade
+(MySQL, na hospedagem Hostinger que estamos migrando, ver item 181) e
+muda o que a Política de Privacidade precisa dizer (ver abaixo).
+
+**Login com Google, do lado do navegador.** Uso a biblioteca oficial
+Google Identity Services (`accounts.google.com/gsi/client`) — mas essa
+tag só é inserida no DOM programaticamente por `initComments()`
+(`site.js`), nunca fixa no HTML de cada artigo: assim, enquanto
+`ACROPOLE_CONFIG.googleClientId` (`config.js`) estiver vazio — que é o
+estado de hoje, antes da cliente configurar o Google Cloud e terminar a
+migração pra Hostinger —, nenhum visitante baixa esse script de
+terceiro à toa, e a seção inteira (`B.comments_section`, `build.py`)
+nasce com `hidden` no HTML, em vez de aparecer quebrada (sem login, sem
+comentário carregando). Client ID de OAuth não é segredo — é público
+por design —, então fica normal em `config.js`, ao contrário do token
+do webhook (item 180), que nunca pode ir pra lá.
+
+**Backend em PHP + MySQL** (`deploy-extra/api/comments-*.php`,
+`deploy-extra/sql/schema.sql`), pelo mesmo motivo do proxy do webhook: a
+hospedagem de destino é compartilhada, sem função serverless. Duas
+tabelas (`comment_users`, `comments`, ver schema.sql). A verificação do
+token do Google acontece sempre no servidor
+(`deploy-extra/api/google-verify.php`), a cada requisição que grava ou
+apaga algo — nunca confiamos em nome/e-mail/foto que o navegador
+declare sozinho, só no que volta da checagem contra o próprio Google
+(endpoint oficial de tokeninfo, evita ter que implementar verificação
+de assinatura JWT na mão em PHP puro). Sem fila de moderação (decisão
+da cliente), então cada pessoa só pode excluir o próprio comentário — o
+servidor confere o "sub" do Google contra o autor guardado no banco,
+nunca confia em quem o navegador diz que é. Como válvula de segurança
+manual pra remover comentário problemático sem mexer direto no banco,
+existe `comments-admin-delete.php`, protegido por um token fixo
+(`COMMENTS_ADMIN_TOKEN`) que a cliente define — sem nenhum link no
+site, só pra uso direto (ex.: um `curl`) quando precisar.
+
+**CSP e outros headers, ajustados pro Google.** `script-src` e
+`connect-src` ganharam `https://accounts.google.com` (o botão de login
+e o fluxo do GIS conversam com esse domínio), `frame-src` é uma
+diretiva nova (o GIS desenha o botão de login dentro de um iframe
+próprio), e `img-src` ganhou `https://lh3.googleusercontent.com` (foto
+de perfil do Google). Troquei também `Cross-Origin-Opener-Policy` de
+`same-origin` pra `same-origin-allow-popups` — o GIS às vezes usa uma
+janela popup pra parte do fluxo de login, e `same-origin` estrito quebra
+a comunicação dessa janela de volta pra página (`postMessage`) em
+alguns navegadores; a perda de isolamento é mínima e é o ajuste que o
+próprio Google recomenda pra sites que usam login deles. Como o
+`.htaccess` da Hostinger é gerado a partir do `vercel.json` (item 181),
+essa mudança vale pros dois hosts automaticamente.
+
+**Por que o usuário permanece "logado" ao navegar entre artigos.**
+Sendo um site com página cheia (sem roteador de single-page-app), cada
+artigo é um carregamento de página novo — sem guardar o login em algum
+lugar do navegador, a pessoa teria que entrar de novo em CADA artigo
+que quisesse comentar. `initComments()` guarda o token do Google em
+`sessionStorage` (dura enquanto a aba/sessão do navegador estiver
+aberta, nunca é lido de volta por nós no servidor — só serve de
+conveniência local) e o backend revalida esse token do zero a cada
+publicação/exclusão de comentário, então mesmo que o token guardado
+esteja velho ou tenha expirado (validade de ~1h, padrão do Google), o
+pior que acontece é pedir login de novo — nunca aceita um comentário
+sem prova válida.
+
+**Atualização da Política de Privacidade** (`legal.py`): nova seção
+"Comentários e login com Google" explicando que a Acrópole passa a
+coletar nome/e-mail/foto (vindos da conta Google) e o texto do
+comentário, que fica público pra qualquer visitante, que a pessoa pode
+excluir o próprio comentário a qualquer momento, e que a Acrópole pode
+remover comentário que viole lei ou os Termos de Uso.
+
+**Verificação.** Testei os 5 endpoints PHP de ponta a ponta contra um
+MySQL local de teste (servidor MariaDB local, banco/schema importado de
+`schema.sql`) e um servidor fake do endpoint de tokeninfo do Google
+(`google-verify.php` aceita a URL base por variável de ambiente só pra
+isso, nunca em produção): publicar comentário válido, token ausente ou
+inválido (401), origem de outro domínio (403), artigo com caractere
+inválido tipo path traversal (400), excluir o próprio comentário (200)
+vs. excluir comentário alheio (404, sem revelar se é "não existe" ou
+"não é seu"), exclusão por admin com token certo/errado (200/403), e
+rate limit (429 depois de várias tentativas seguidas). Também descobri
+e corrigi, no processo: a tag do GIS carregada direto no HTML de todo
+artigo travava a suíte de `design_audit.py` inteira, porque o ambiente
+de teste não tem acesso à internet externa e a página nunca terminava
+de "network idle" esperando aquela requisição — resolvido movendo o
+carregamento do script pro JS, condicional a `googleClientId`
+configurado (o mesmo motivo, aliás, que evita gastar a banda de visitante
+real à toa antes da funcionalidade estar publicada).
+
+Novo bloco de teste em `test_ui.py` cobre a jornada inteira no
+navegador (com o backend PHP, o script do Google e os 3 endpoints todos
+simulados via `page.route`, sem bater em nada real): seção some sem
+`googleClientId`, aparece configurada, formulário fica oculto até
+"logar", nome da conta aparece depois do login simulado, comentário
+publicado aparece na lista, botão de excluir aparece só no próprio
+comentário, excluir remove da lista. Rebuild completo,
+`preflight.py`/`audit.py`/`audit_deep.py`/`design_audit.py` sem
+apontamentos novos, suíte inteira de `test_ui.py` passando.
+
+**Pendente do lado da cliente, antes do recurso aparecer pra
+visitantes de verdade:**
+1. Criar um projeto no Google Cloud Console (ou usar um já existente),
+   configurar a "tela de consentimento OAuth" (nome do app, e-mail de
+   suporte, domínio) e criar um "ID do cliente OAuth" do tipo
+   "Aplicativo da Web", com `https://acropolecapital.com.br` e
+   `https://www.acropolecapital.com.br` em "Origens JavaScript
+   autorizadas". Isso me dá o Client ID (não o Secret — não precisamos
+   dele nesse fluxo) pra preencher em `config.js`.
+2. Criar o banco MySQL no hPanel da Hostinger (Bancos de Dados →
+   MySQL), importar `deploy-extra/sql/schema.sql` (via phpMyAdmin do
+   próprio hPanel), e preencher `deploy-extra/api/db.local.php`
+   (copiado de `db.local.php.example`) com host/nome/usuário/senha
+   desse banco — esse arquivo nunca vai pro Git, é preenchido direto no
+   servidor.
+3. Inventar e guardar um `COMMENTS_ADMIN_TOKEN` (mesmo arquivo acima)
+   — é a válvula de remoção manual de comentário problemático.
+4. Me avisar o Client ID do passo 1 pra eu preencher `googleClientId`
+   em `config.js` e publicar — a seção só aparece pros visitantes
+   depois dessa última etapa.

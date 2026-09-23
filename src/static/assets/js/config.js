@@ -10,5 +10,13 @@ window.ACROPOLE_CONFIG = {
   // "-test") quando o fluxo no n8n estiver validado e pronto pra produção.
   endpoint: "https://n8n.srv1800205.hstgr.cloud/webhook-test/recebimento-de-leads",
   // Preparado para analytics. Nenhum script de terceiro é carregado sem preencher isto.
-  analytics: { provider: "", id: "" }
+  analytics: { provider: "", id: "" },
+  // Client ID do OAuth do Google (Google Cloud Console → Credenciais → ID do
+  // cliente OAuth → Aplicativo da Web), usado só para o login com Google nos
+  // comentários dos artigos de Conteúdos (ver initComments em site.js e
+  // deploy-extra/api/ no repo). Não é segredo — client ID de OAuth é público
+  // por design, só o token gerado a partir dele é que nunca deve ir pra
+  // lugar nenhum além do backend. Enquanto ficar vazio, o botão de login não
+  // aparece e um aviso discreto substitui o lugar dele.
+  googleClientId: ""
 };
