@@ -9568,3 +9568,20 @@ no texto/logo, então mesmo que o espaço fique curto, o bloco inteiro
 pula pra linha de baixo como uma unidade só (do jeito que já
 acontecia com o selo RA1000), nunca mais quebrando o texto de um
 lado e o logo do outro.
+
+## 184. Logo do rodapé virau SVG (troca por causa da nota de performance mobile)
+
+Cliente reportou queda de 100 pra 99 no PageSpeed mobile depois do
+item 183. `assets/img/dev-credit-logo.png` era um PNG de ~7,7KB —
+um pedido HTTP a mais, e raster (perde nitidez em zoom/telas muito
+densas). Rastreei o contorno do logo com `potrace` (mesmo princípio
+do `ra1000.svg`, que já era vetor) e troquei por
+`assets/img/dev-credit-logo.svg`, ~1,6KB, sem nenhuma perda visual
+(conferido lado a lado por print). `dev_credit_block()` em
+`build.py` só mudou a extensão do arquivo referenciado.
+
+Não fica garantido que isso sozinho devolve o ponto no PageSpeed —
+a métrica varia de execução pra execução mesmo sem nenhuma mudança
+no site — mas remove a causa mais óbvia e concreta que esse item
+introduziu (peso e uma requisição a mais), então é a correção certa
+independente do número exato que aparecer na próxima medição.

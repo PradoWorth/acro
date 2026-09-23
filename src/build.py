@@ -1205,7 +1205,7 @@ def dev_credit_block(path):
     return f"""<div class="foot__devcredit">
       <span>Site desenvolvido por</span>
       <a href="{SITE['whatsapp_dev_href']}" target="_blank" rel="noopener" aria-label="Falar no WhatsApp sobre desenvolvimento de sites">
-        <img src="{rel(path, 'assets/img/dev-credit-logo.png')}" width="21" height="22" loading="lazy" alt="">
+        <img src="{rel(path, 'assets/img/dev-credit-logo.svg')}" width="21" height="22" loading="lazy" alt="">
       </a>
     </div>"""
 
