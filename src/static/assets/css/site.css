@@ -2282,8 +2282,13 @@ input:focus, select:focus, textarea:focus { border-color: var(--petrol); outline
 .foot__rating-stars { display: inline-flex; gap: .25rem; }
 .foot__rating-stars svg { width: .85rem; height: .85rem; fill: var(--iris); }
 .foot__rating-score { font-size: var(--t-sm); color: var(--paper); }
-.foot__seal { margin-top: 1.25rem; }
+.foot__seal-row { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem; }
+.foot__seal { margin-top: 0; }
 .foot__seal img { display: block; width: 79px; height: 40px; opacity: .9; }
+.foot__devcredit { display: flex; align-items: center; gap: .5rem; font-size: var(--t-micro); color: var(--slate-2); }
+.foot__devcredit a { display: inline-flex; opacity: .85; transition: opacity .15s; }
+.foot__devcredit a:hover, .foot__devcredit a:focus-visible { opacity: 1; }
+.foot__devcredit img { display: block; width: 21px; height: 22px; }
 
 /* ---------- 19. Contato discreto ---------- */
 /* Botão circular com a foto da fundadora (pedido do cliente), em vez do

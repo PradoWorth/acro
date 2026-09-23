@@ -219,6 +219,15 @@ _tel = CONTATO["telefone"]
 WHATSAPP_LEAD_MSG = ("Oi, estou buscando capital de giro para minha empresa e "
                       "quero entender como vocês podem ajudar.")
 
+# Mensagem do link "Site desenvolvido por" no rodapé (ver dev_credit_block()
+# em build.py). Vai para o mesmo número de WhatsApp do site (pedido da
+# cliente), com um texto voltado a quem tem interesse em contratar um site
+# parecido para a própria empresa — não confundir com WHATSAPP_LEAD_MSG,
+# que é sobre capital de giro.
+WHATSAPP_DEV_MSG = ("Olá! Vi o site da Acrópole Capital e gostei muito do "
+                     "design. Sou empresário e tenho interesse em ter um site "
+                     "assim para o meu negócio. Pode me apresentar as opções?")
+
 import urllib.parse as _urlparse
 
 SITE = {
@@ -231,6 +240,8 @@ SITE = {
     "whatsapp_href": f"https://wa.me/{''.join(c for c in str(_wa) if c.isdigit())}" if _wa else None,
     "whatsapp_lead_href": (f"https://wa.me/{''.join(c for c in str(_wa) if c.isdigit())}"
                             f"?text={_urlparse.quote(WHATSAPP_LEAD_MSG)}") if _wa else None,
+    "whatsapp_dev_href": (f"https://wa.me/{''.join(c for c in str(_wa) if c.isdigit())}"
+                           f"?text={_urlparse.quote(WHATSAPP_DEV_MSG)}") if _wa else None,
     "phone_label": _fmt_phone(_tel),
     "phone_href": f"tel:{_tel}" if _tel else None,
     "email": CONTATO["email"],

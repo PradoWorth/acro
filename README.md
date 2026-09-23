@@ -9510,3 +9510,46 @@ visitantes de verdade:**
 4. Me avisar o Client ID do passo 1 pra eu preencher `googleClientId`
    em `config.js` e publicar — a seção só aparece pros visitantes
    depois dessa última etapa.
+
+## 183. "Site desenvolvido por" no rodapé, com link pro WhatsApp
+
+Pedido da cliente: um crédito de "Site desenvolvido por" no rodapé,
+ao lado do selo RA1000, usando o logo (marca "A") que ela enviou. O
+logo é clicável e abre o WhatsApp com uma mensagem já escrita,
+pensada pra quem é empresário e tem interesse em contratar um site
+parecido pro próprio negócio — não é o mesmo link/mensagem usado
+pra captar lead de capital de giro no resto do site.
+
+- `dev_credit_block(path)` em `build.py`: gera o bloco (texto + link
+  com a imagem), só aparece se `SITE['whatsapp_dev_href']` estiver
+  preenchido (nunca some silenciosamente sem motivo — segue o mesmo
+  padrão de `seal_block`/`social_block`).
+- `WHATSAPP_DEV_MSG` e `SITE['whatsapp_dev_href']` em
+  `content/site.py`: mesma lógica de `WHATSAPP_LEAD_MSG` /
+  `whatsapp_lead_href` já usada no modal de captação, mas com texto
+  e propósito diferentes. Usa o mesmo número de WhatsApp já
+  configurado em `CONTATO['whatsapp']` (pedido explícito da
+  cliente — é o número dela mesma, o `(43) 98432-1492`).
+- `assets/img/dev-credit-logo.png`: o logo enviado pela cliente,
+  recortado na área com conteúdo (removendo a margem transparente)
+  e redimensionado pra um ícone pequeno (115×120px de origem,
+  renderizado a 21×22px no rodapé — resolução alta o bastante pra
+  ficar nítido em tela retina).
+- Link com `target="_blank" rel="noopener"` (abre em aba nova, sem
+  dar ao WhatsApp acesso à aba do site) e `aria-label` descrevendo o
+  destino pra quem usa leitor de tela, já que a imagem sozinha
+  (`alt=""`) não descreve a ação.
+- Posicionamento: `.foot__seal-row` (novo) agrupa o selo RA1000 e o
+  crédito lado a lado, mesma linha — antes o selo RA1000 ficava
+  sozinho num bloco próprio (`.foot__seal`), sem essa necessidade de
+  agrupamento.
+
+Mensagem enviada ao clicar: *"Olá! Vi o site da Acrópole Capital e
+gostei muito do design. Sou empresário e tenho interesse em ter um
+site assim para o meu negócio. Pode me apresentar as opções?"* — pra
+trocar o texto, é só editar `WHATSAPP_DEV_MSG` em `content/site.py`
+e rodar `build.py` de novo.
+
+Verificado com `preflight.py`/`audit.py`/`audit_deep.py` (limpos) e
+`test_ui.py` (todos os testes passaram), além de print manual do
+bloco renderizado conferindo a posição ao lado do selo RA1000.

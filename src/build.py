@@ -1192,6 +1192,24 @@ def seal_block(path):
     </div>"""
 
 
+def dev_credit_block(path):
+    """'Site desenvolvido por' no rodapé: crédito de quem fez o site, com o
+    logo como link. O clique abre o WhatsApp já com uma mensagem pronta
+    (SITE['whatsapp_dev_href'], ver WHATSAPP_DEV_MSG em content/site.py),
+    voltada a quem tem interesse em contratar um site parecido para a
+    própria empresa — não é o mesmo link/mensagem usado para captar leads
+    de capital de giro no resto do site.
+    """
+    if is_placeholder(SITE.get("whatsapp_dev_href")):
+        return ""
+    return f"""<div class="foot__devcredit">
+      <span>Site desenvolvido por</span>
+      <a href="{SITE['whatsapp_dev_href']}" target="_blank" rel="noopener" aria-label="Falar no WhatsApp sobre desenvolvimento de sites">
+        <img src="{rel(path, 'assets/img/dev-credit-logo.png')}" width="21" height="22" loading="lazy" alt="">
+      </a>
+    </div>"""
+
+
 def social_block():
     """Só publica o ícone quando existe URL real. Placeholder não vira link."""
     out = []
@@ -1256,7 +1274,10 @@ def footer(path):
         </ul>
         {social_block()}
         {rating_block()}
-        {seal_block(path)}
+        <div class="foot__seal-row">
+          {seal_block(path)}
+          {dev_credit_block(path)}
+        </div>
       </div>
     </div>
     <div class="foot__legal">
