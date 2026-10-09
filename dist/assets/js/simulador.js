@@ -903,6 +903,7 @@ const leadStore = {
   toCrmPayload() {
     return {
       ...leadState,
+      ...buildCrmReadableFields(leadState),
       etapa: 'completo',
       dataHoraSimulacao: new Date().toISOString(),
       // Recaptura na hora do envio (não usa um valor guardado antes) pra
@@ -913,6 +914,27 @@ const leadStore = {
     };
   },
 };
+
+
+/** Campos legíveis para o CRM: nome também em `name`, valores em R$ com pontuação e um título pronto. */
+function buildCrmReadableFields(lead) {
+  const brl = (v) => (v === null || v === undefined || v === '' ? '' : formatCurrencyBRL(Number(v)).replace(/\u00a0/g, ' '));
+  const nome = String(lead.nome || '').trim();
+  const valorRef = lead.valorDesejado || lead.valorImovel || null;
+  const valor = brl(valorRef);
+  return {
+    name: nome,
+    phone: lead.whatsapp || '',
+    valor,
+    valor_numerico: valorRef,
+    valorImovelFormatado: brl(lead.valorImovel),
+    valorDesejadoFormatado: brl(lead.valorDesejado),
+    rendaMensalFormatada: brl(lead.rendaMensal),
+    estimativaCreditoFormatada: brl(lead.estimativaCredito),
+    parcelaEstimadaFormatada: brl(lead.parcelaEstimada),
+    titulo: (nome ? nome + ' | ' : '') + 'Home Equity' + (valor ? ' - ' + valor : ''),
+  };
+}
 
 /** Bloco de notas com TODOS os dados do lead, para o campo de notas do CRM (via n8n). */
 function buildLeadNotes(lead) {
