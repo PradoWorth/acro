@@ -1,0 +1,2221 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Simulador Home Equity | Acrópole Capital</title>
+<meta name="description" content="Descubra em poucos minutos uma estimativa de crédito usando seu imóvel como garantia." />
+<meta name="robots" content="noindex, follow" />
+<meta name="acropole-version" content="1.2" />
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icons/favicon-48.png" sizes="48x48" type="image/png">
+<link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="canonical" href="https://www.acropolecapital.com.br/simulador-home-equity" />
+<script src="assets/js/simulador-gtm.js?v=49db1de582"></script>
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/manrope-700.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Inter";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/inter-var.woff2) format("woff2")}@font-face{font-family:"Manrope";font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/manrope-700.woff2) format("woff2")}
+/* =========================================================================
+   Simulador Home Equity — Acrópole
+   Design tokens: navy / teal / gold, tipografia Manrope, mobile-first
+   ========================================================================= */
+
+:root {
+  /* Tokens do site (assets/css/site.css): o simulador usa a mesma paleta,
+     tipografia e raios do restante da Acrópole. Os nomes antigos continuam
+     existindo para não mexer no resto da folha de estilo. */
+  --navy-900: #0c1e2c;   /* --ink-soft */
+  --navy-800: #13283a;
+  --navy-700: #1b2630;   /* --surface-ink */
+  --teal-600: #0c5e52;   /* --accent-ink (texto sobre fundo claro, AA) */
+  --teal-500: #149d88;   /* --iris (acento) */
+  --teal-100: #e7f1ef;   /* --accent-wash */
+  /* Verde do botão final do resultado (leva ao WhatsApp): mantido de propósito. */
+  --green-700: #0a7a3d;
+  --green-600: #12a150;
+  --green-500: #22c55e;
+  --green-400: #4ade80;
+  --gold-500: #c9a35b;
+  --gold-100: #f6eeda;
+  --bg: #f1f5f9;         /* --cloud */
+  --surface: #ffffff;
+  --border: #e0e5e9;     /* --mist */
+  --text-primary: #262b31; /* --ink */
+  --text-secondary: #596269; /* --iron: 5,7:1 sobre --bg */
+  --text-muted: #596269;   /* antes #8b98ab (2,9:1, abaixo do AA) */
+  --success: #009639;    /* --ok */
+  --danger: #b4231a;     /* --danger */
+  --cta-grad: linear-gradient(90deg, #1c585d, #118372); /* --cta-grad */
+
+  /* Espaçamento padronizado (escala 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Raios e sombras (--r-input 6, --r-card 16, --r-button 40) */
+  --radius-sm: 6px;
+  --radius-md: 16px;
+  --radius-lg: 16px;
+  --radius-btn: 40px;
+  --shadow-sm: rgba(0,0,0,.08) 0 1px 2px 0, rgba(0,0,0,.06) 0 4px 8px 0;
+  --shadow-md: rgba(0,0,0,.08) 0 1px 2px 0, rgba(0,0,0,.06) 0 4px 8px 0;
+  --shadow-lg: rgba(0,0,0,.08) 0 12px 24px 0, rgba(0,0,0,.06) 0 2px 4px 0;
+
+  /* Tipografia: Inter no texto, Manrope 700 nos títulos (como no site) */
+  --font-base: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Transições */
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-base);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------- Layout raiz ---------- */
+
+#app {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.screen {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  animation: fadeSlideIn 0.35s var(--ease);
+}
+
+.screen.is-active {
+  display: flex;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.screen-inner {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  /* padding-bottom maior que o normal (--space-16 + --space-8 = 96px) —
+     é isso que deixa o botão "um pouco mais pra cima", igual em toda
+     página, já que o step-body acima (flex:1) sempre preenche o resto
+     do espaço até aqui. Nunca ajustar a posição do botão encolhendo o
+     step-body: isso o deixa em alturas diferentes por página. */
+  padding: var(--space-6) var(--space-5) calc(var(--space-16) + var(--space-8));
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  /* Nunca fica "auto" aqui: quem rola de verdade é o .step-body (ou o
+     .screen-inner.end-screen abaixo) — dois scrollers aninhados no mesmo
+     eixo é o gatilho clássico de um bug de repaint em navegadores móveis
+     baseados em WebKit (linha "fantasma"/esmaecida durante o scroll). */
+  overflow: hidden;
+  position: relative;
+}
+
+/* ---------- Indicador de rolagem (removido) ---------- */
+/* O degradê/blur que ficava por cima do conteúdo pra indicar "tem mais
+   abaixo" foi removido a pedido: atrapalhava mais do que ajudava. Os
+   elementos ainda são injetados via JS (ui-components.js), mas ficam sem
+   nenhum efeito visual — quem indica que dá pra rolar é o próprio corte
+   natural do conteúdo/scrollbar. */
+.scroll-fade {
+  display: none;
+}
+
+/* ---------- Cabeçalho fixo do quiz (com progresso) ---------- */
+
+.quiz-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(246, 248, 251, 0.92);
+  backdrop-filter: blur(6px);
+  padding: var(--space-4) var(--space-5) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.quiz-header-inner {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.quiz-back-btn {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--navy-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s var(--ease), transform 0.1s var(--ease);
+}
+
+.quiz-back-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.quiz-back-btn:hover {
+  background: var(--border);
+}
+
+.quiz-back-btn:active {
+  transform: scale(0.92);
+}
+
+.quiz-progress-wrap {
+  flex: 1;
+}
+
+.quiz-step-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.progress-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal-600), var(--teal-500));
+  border-radius: 999px;
+  transition: width 0.4s var(--ease);
+}
+
+/* ---------- Logo / marca ---------- */
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 800;
+  color: var(--navy-900);
+  letter-spacing: -0.01em;
+}
+
+.brand-mark .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-500);
+}
+
+/* ---------- Landing (hero) ---------- */
+
+.hero {
+  padding-top: var(--space-10);
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--teal-100);
+  color: var(--teal-600);
+  font-size: 12px;
+  font-weight: 800;
+  padding: var(--space-2) var(--space-4);
+  border-radius: 999px;
+  margin: 0 auto var(--space-6);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.hero-badge svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 6vw, 40px);
+  line-height: 1.15;
+  font-weight: 800;
+  color: var(--navy-900);
+  margin: 0 0 var(--space-4);
+  letter-spacing: -0.02em;
+}
+
+.hero h1 .highlight {
+  color: var(--teal-600);
+}
+
+.hero p.subheadline {
+  font-size: 17px;
+  color: var(--text-secondary);
+  margin: 0 auto var(--space-8);
+  max-width: 440px;
+}
+
+/* ---------- Benefícios (entre a subheadline e o CTA) ---------- */
+
+/* Lista de benefícios na horizontal: ícone à esquerda, texto à direita,
+   uma linha por benefício (em vez da grade de 3 colunas com ícone em
+   cima do texto, que ficava apertada demais em telas estreitas). */
+.benefit-grid {
+  margin: 0 auto;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  text-align: left;
+}
+
+.benefit-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  text-align: left;
+}
+
+.benefit-icon-circle {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--teal-100);
+  color: var(--teal-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.benefit-icon-circle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.benefit-title {
+  overflow-wrap: break-word;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--navy-900);
+  line-height: 1.3;
+}
+
+@media (max-width: 360px) {
+  .benefit-grid {
+    gap: var(--space-2);
+  }
+}
+
+/* ---------- Botões ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  /* Altura padrão de todo botão do app — medi a proporção da marcação
+     verde que o Lucas desenhou sobre o botão "Continuar" (~35% mais alto
+     que o padrão anterior de 56px) e apliquei aqui. As reduções em
+     telas baixas (.step-footer .btn / .end-actions .btn, mais abaixo)
+     escalam na mesma proporção, então a altura continua igual em todos
+     os botões e passos, só que agora maior. */
+  min-height: 76px;
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s var(--ease);
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Indicador de foco por teclado, no mesmo tom (teal) usado nos campos de
+   texto — sem isso, quem navega por teclado ficava só com o contorno
+   padrão do navegador (inconsistente entre navegadores e desalinhado do
+   border-radius dos botões). :focus-visible garante que só apareça na
+   navegação por teclado, nunca ao clicar com o mouse/touch. */
+.btn:focus-visible {
+  outline: 3px solid var(--teal-500);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, var(--navy-900), var(--navy-700));
+  color: #ffffff;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-teal {
+  /* CTA principal do resultado: verde mais forte que o teal padrão do
+     app, com um degradê animado bem sutil (a cor muda de leve, tipo uma
+     respiração lenta) — nada de correr rápido pela tela nem usar um
+     verde claro/neon; fica só numa faixa de verdes mais fechados/fortes
+     (700 a 600), então o efeito é discreto, quase imperceptível à
+     primeira vista, mas dá vida ao botão com o tempo. */
+  background: linear-gradient(90deg, var(--green-700), var(--green-600), var(--green-700));
+  background-size: 200% 100%;
+  color: #ffffff;
+  box-shadow: var(--shadow-md), 0 0 0 0 rgba(18, 161, 80, 0.35);
+  animation: btnTealGradientMove 9s ease-in-out infinite, btnTealGlowPulse 5s ease-in-out infinite;
+}
+
+.btn-teal:hover {
+  animation-play-state: paused, paused;
+  box-shadow: var(--shadow-lg), 0 0 0 5px rgba(18, 161, 80, 0.16);
+}
+
+@keyframes btnTealGradientMove {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes btnTealGlowPulse {
+  0%,
+  100% {
+    box-shadow: var(--shadow-md), 0 0 0 0 rgba(18, 161, 80, 0.35);
+  }
+  50% {
+    box-shadow: var(--shadow-md), 0 0 0 6px rgba(18, 161, 80, 0);
+  }
+}
+
+/* Pessoas com sensibilidade a movimento (prefers-reduced-motion) recebem
+   o botão com a mesma cor mais forte, só sem a animação contínua. */
+@media (prefers-reduced-motion: reduce) {
+  .btn-teal {
+    animation: none;
+    background-position: 0% 50%;
+  }
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--navy-900);
+  border: 1.5px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--navy-700);
+}
+
+/* ---------- Passos do quiz ---------- */
+
+.step-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--navy-900);
+  margin: var(--space-6) 0 var(--space-2);
+  letter-spacing: -0.01em;
+}
+
+.step-subtitle {
+  color: var(--text-secondary);
+  font-size: 15px;
+  margin: 0 0 var(--space-6);
+}
+
+.step-body {
+  /* flex:1 SEMPRE — o step-body ocupa todo o espaço disponível entre o
+     cabeçalho e o botão, então o botão fica numa posição fixa (a mesma
+     distância da borda inferior, ver padding-bottom de .screen-inner),
+     igual em toda página, não importa quanto conteúdo tem o passo.
+     Já tentei deixar o step-body encolher pro tamanho do próprio
+     conteúdo (pra "subir" o botão nos passos mais curtos), mas isso
+     fazia o botão ficar numa altura DIFERENTE em cada página — exatamente
+     o oposto do que foi pedido. A posição "mais pra cima, mas padronizada"
+     é resolvida só pelo padding-bottom de .screen-inner (mais abaixo),
+     nunca por aqui. */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--space-2);
+  position: relative;
+}
+
+.step-footer {
+  flex-shrink: 0;
+  margin-top: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Texto de apoio dentro do step-footer (ex.: uma linha antes do botão de
+   CTA, como na tela de resultado): zera a margem própria do
+   .step-subtitle pra sobrar só o gap do .step-footer (--space-3) entre o
+   texto e o botão — o mesmo espaçamento usado entre quaisquer outros
+   elementos do rodapé, em qualquer tela. Usar sempre esta classe (nunca
+   margin inline) quando um novo passo precisar de um texto assim no
+   rodapé. */
+.step-footer-note {
+  margin-bottom: 0;
+}
+
+/* ---------- Campos ---------- */
+
+.field {
+  margin-bottom: var(--space-5);
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy-900);
+  margin-bottom: var(--space-2);
+}
+
+.input-currency-wrap {
+  position: relative;
+}
+
+.input-large {
+  width: 100%;
+  min-height: 64px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-5);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--navy-900);
+  background: var(--surface);
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.input-large::placeholder {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.input-large:focus {
+  outline: none;
+  border-color: var(--teal-500);
+  box-shadow: 0 0 0 4px var(--teal-100);
+}
+
+.input-standard {
+  width: 100%;
+  min-height: 56px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-4);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--navy-900);
+  background: var(--surface);
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.input-standard:focus {
+  outline: none;
+  border-color: var(--teal-500);
+  box-shadow: 0 0 0 4px var(--teal-100);
+}
+
+/* Campo de cidade: mesmo padrão de texto do input-standard (fonte que
+   cabe um nome de cidade inteiro sem cortar), só um pouco mais alto por
+   ser o campo principal da etapa. */
+.input-city {
+  min-height: 60px;
+}
+
+.field-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: var(--space-2);
+}
+
+.field-error {
+  font-size: 13px;
+  color: var(--danger);
+  margin-top: var(--space-2);
+  display: none;
+}
+
+/* Erro de envio "solto" (não ligado a um campo específico, ex.: falha ao
+   enviar o lead na última etapa): sempre visível e centralizado, ao
+   contrário do .field-error padrão (que só aparece dentro de .has-error).
+   Reaproveita as mesmas variáveis de espaçamento do .field-error normal —
+   nunca usar style inline pra isso em telas novas, criar/reaproveitar uma
+   classe como essa. */
+.field-error-standalone {
+  display: block;
+  text-align: center;
+}
+
+/* Segundo bloco de campo dentro do mesmo passo (ex.: renda + titularidade
+   na etapa 5): gap total de --space-8 entre os dois grupos (soma do
+   margin-bottom padrão de .field, --space-5, com este --space-3) — usar
+   esta classe sempre que um novo passo precisar empilhar mais de um
+   grupo de campo, em vez de um margin-top inline "no olho". */
+.field-group-secondary {
+  margin-top: var(--space-3);
+}
+
+.field.has-error .input-large,
+.field.has-error .input-standard {
+  border-color: var(--danger);
+}
+
+.field.has-error .field-error {
+  display: block;
+}
+
+.city-search-wrap {
+  position: relative;
+}
+
+.city-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  max-height: 280px;
+  overflow-y: auto;
+  animation: fadeSlideIn 0.15s var(--ease);
+}
+
+.city-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy-900);
+  text-align: left;
+}
+
+.city-result-item:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.city-result-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.city-result-item:hover,
+.city-result-item:active {
+  background: var(--teal-100);
+}
+
+.city-result-uf {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--teal-600);
+  background: var(--teal-100);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.city-results-empty {
+  padding: var(--space-4);
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  background: var(--teal-100);
+  border: 1.5px solid var(--teal-500);
+  border-radius: var(--radius-md);
+  animation: fadeSlideIn 0.25s var(--ease);
+}
+
+.address-card-icon {
+  flex-shrink: 0;
+  color: var(--teal-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.address-card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.address-card-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.address-card-street {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--navy-900);
+  margin-bottom: 2px;
+  overflow-wrap: break-word;
+}
+
+.address-card-meta {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ---------- Cards de opção (perguntas de múltipla escolha) ---------- */
+
+.option-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+.option-grid.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Grade compacta: usada quando há muitas opções (ex.: etapa 6, com 7
+   itens) e o objetivo é caber tudo na tela sem precisar rolar, em vez de
+   cair pra uma coluna só em telas estreitas como o cols-2 normal faz. */
+.option-grid-compact {
+  gap: var(--space-2);
+}
+
+.option-grid-compact .option-card {
+  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
+  gap: var(--space-2);
+  font-size: 12.5px;
+}
+
+/* Numa grade de 2 colunas tão estreita, o ícone rouba a largura que o
+   texto precisa pra não quebrar no meio da palavra — melhor manter a
+   grade só com texto + marcador de seleção aqui.
+   (especificidade extra de propósito: precisa vencer ".option-card
+   .option-icon", que define display:flex mais abaixo no arquivo) */
+.option-grid-compact .option-card .option-icon {
+  display: none;
+}
+
+.option-grid-compact .option-check {
+  width: 17px;
+  height: 17px;
+}
+
+.option-grid-compact .option-check svg {
+  width: 9px;
+  height: 9px;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy-900);
+  min-height: 60px;
+  min-width: 0;
+  width: 100%;
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease), transform 0.1s var(--ease);
+}
+
+/* Mesmo indicador de foco por teclado do .btn (ver acima) — os cards de
+   opção são <button> mas têm sua própria classe, então não herdam a regra
+   de .btn:focus-visible sozinhos. */
+.option-card:focus-visible {
+  outline: 3px solid var(--teal-500);
+  outline-offset: 2px;
+}
+
+.option-card .option-label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.option-card:active {
+  transform: scale(0.98);
+}
+
+.option-card:hover {
+  border-color: var(--teal-500);
+}
+
+.option-card.is-selected {
+  border-color: var(--teal-500);
+  background: var(--teal-100);
+}
+
+.option-card .option-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--teal-100);
+  color: var(--teal-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.option-card .option-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.option-card.is-selected .option-icon {
+  background: var(--teal-500);
+  color: #fff;
+}
+
+.option-card .option-check {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.option-card .option-check svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0;
+  transition: opacity 0.15s var(--ease);
+}
+
+.option-card.is-selected .option-check {
+  border-color: var(--teal-500);
+  background: var(--teal-500);
+}
+
+.option-card.is-selected .option-check svg {
+  opacity: 1;
+}
+
+/* ---------- Cards de opção com "foto" (ex.: etapa 3, múltipla escolha) ---------- */
+
+.option-photo-grid {
+  display: grid;
+  /* Sempre 2 colunas, em qualquer largura de tela: com só 4 opções na
+     etapa 1 (casa, apartamento, terreno, outros), fica em 2 linhas de 2 —
+     um grid de 3 colunas deixaria a última linha com só 1 card sozinho. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  /* .step-body é flex-column com overflow-y:auto: por padrão, um item flex
+     pode encolher (flex-shrink:1) quando o conteúdo total (grade + aviso
+     "não trabalhamos com esse tipo") passa da altura disponível. Sem isso,
+     as fotos ficavam menores só quando o aviso aparecia. flex-shrink:0
+     trava o tamanho da grade sempre no mesmo padrão — se faltar espaço,
+     quem rola é o step-body, nunca as fotos. */
+  flex-shrink: 0;
+  /* Largura máxima igual em todas as etapas com cards de foto (tipo de
+     imóvel e localização): antes, a grade de 4 cards (tipo de imóvel)
+     esticava até os 560px do .screen-inner, enquanto a de 2 cards
+     (localização) ficava limitada a 420px por uma regra à parte —
+     resultando em cards MENORES na etapa de localização. Aqui o teto é
+     igual ao próprio .screen-inner (560px): a grade de localização deixa
+     de ser menor e passa a ocupar a mesma largura da de tipo de imóvel,
+     então os cards saem do mesmo tamanho (o maior) em qualquer etapa. */
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.option-photo-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease), transform 0.1s var(--ease);
+}
+
+
+.option-photo-card:hover {
+  border-color: var(--teal-500);
+}
+
+.option-photo-card:active {
+  transform: scale(0.98);
+}
+
+/* Mesmo indicador de foco por teclado das outras opções (ver .option-card
+   e .btn acima). */
+.option-photo-card:focus-visible {
+  outline: 3px solid var(--teal-500);
+  outline-offset: 2px;
+}
+
+.option-photo-card.is-selected {
+  border-color: var(--teal-500);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
+}
+
+.option-photo-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 120 / 84;
+  display: block;
+  /* Sem isso, o tamanho mínimo automático do item flex (calculado a
+     partir da imagem interna) vence o aspect-ratio quando a proporção é
+     reduzida via media query — a altura real fica maior que a
+     configurada. overflow:hidden zera esse mínimo automático. */
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Bloqueia download/arraste das fotos dos imóveis (etapa 1): impede que o
+   usuário arraste a imagem para fora, desativa o menu de toque longo do
+   celular ("Salvar imagem") e o clique-direito. pointer-events:none faz o
+   clique "atravessar" a imagem e cair no botão do card (o clique do card
+   continua funcionando normalmente). */
+.option-photo-media img {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+.option-photo-media svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.option-photo-media > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: filter 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+/* Opções aceitas (não desabilitadas): ficam com a imagem um pouco
+   dessaturada/apagada por padrão, pra sugerir visualmente que ainda não
+   foi escolhida — bem mais sutil que o cinza das opções não aceitas.
+   Ao selecionar, a imagem recupera a cor original, reforçando a marcação. */
+.option-photo-card:not(.is-disabled):not(.is-selected) .option-photo-media > img {
+  filter: saturate(0.35);
+  opacity: 0.88;
+}
+
+.option-photo-card.is-selected .option-photo-media > img {
+  filter: saturate(1);
+  opacity: 1;
+}
+
+.option-photo-badge {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  display: inline-block;
+  line-height: 1.6;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(11, 30, 58, 0.25);
+}
+
+.option-photo-badge.is-yes {
+  background: var(--teal-600);
+}
+
+.option-photo-badge.is-no {
+  background: var(--danger);
+  color: #fff;
+}
+
+.option-photo-check {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #fff;
+  color: var(--teal-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.7);
+  box-shadow: 0 1px 3px rgba(11, 30, 58, 0.35);
+  transition: opacity 0.15s var(--ease), transform 0.15s var(--ease), background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+/* Nas opções que podem ser marcadas, a bolinha branca fica sempre visível
+   (vazia), pra deixar claro pro lead que ali é clicável/selecionável —
+   não só depois que ele já marcou. */
+.option-photo-card:not(.is-disabled) .option-photo-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.option-photo-check svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0;
+  transition: opacity 0.15s var(--ease);
+}
+
+.option-photo-card.is-selected .option-photo-check {
+  background: var(--teal-500);
+  border-color: var(--teal-500);
+  color: #fff;
+}
+
+.option-photo-card.is-selected .option-photo-check svg {
+  opacity: 1;
+}
+
+.option-photo-label {
+  padding: var(--space-2) var(--space-3);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--navy-900);
+  overflow-wrap: break-word;
+}
+
+.option-photo-card.is-disabled {
+  cursor: not-allowed;
+}
+
+.option-photo-card.is-disabled .option-photo-media > svg,
+.option-photo-card.is-disabled .option-photo-media > img {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.option-photo-card.is-disabled .option-photo-label {
+  color: var(--text-muted);
+}
+
+.option-photo-card.is-disabled:hover {
+  border-color: var(--border);
+}
+
+/* ---------- Tela de resultado ---------- */
+
+.result-card {
+  background: linear-gradient(160deg, var(--navy-900), var(--navy-700));
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-6);
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.result-card .result-label {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gold-100);
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+}
+
+.result-card .result-value {
+  /* Antes era um número único e curto ("R$ 600.000"); agora mostra uma
+     faixa ("R$ 400.000 – R$ 600.000"), bem mais longa — fonte reduzida
+     pra caber confortavelmente numa ou duas linhas em qualquer largura. */
+  font-size: clamp(22px, 5.6vw, 34px);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.01em;
+}
+
+.result-card .result-note {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Uma caixa só (menos "peso" visual que duas caixas separadas), mas
+   dividida em grupos com título (.result-breakdown-group-title) — deixa
+   claro que "resumo do imóvel" e "simulação de parcela" são assuntos
+   diferentes, sem duplicar bordas/fundo pra cada um. */
+.result-breakdown {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+/* Todo item direto da caixa (linha de dado OU título de grupo), exceto o
+   primeiro, ganha uma linha divisória fina acima — cada um lê como item
+   separado, nunca como texto corrido colado no de cima/baixo. */
+.result-breakdown > * {
+  border-top: 1px solid var(--border);
+}
+
+.result-breakdown > *:first-child {
+  border-top: none;
+}
+
+.result-breakdown-group-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: var(--space-2) 0 var(--space-1);
+}
+
+.result-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding: var(--space-2) 0;
+}
+
+.result-breakdown-row strong {
+  color: var(--navy-900);
+  font-weight: 700;
+  text-align: right;
+}
+
+.disclaimer-box {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--border);
+}
+
+/* ---------- Tela final (calculando / desqualificado) ---------- */
+
+.end-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* Só padding-top aqui — "padding: Xpx 0" (shorthand) zerava o padding
+     lateral de 20px herdado de .screen-inner, colando o texto na borda
+     da tela (bug relatado: conteúdo do "Obrigado pelo seu interesse!"
+     ia até a beirada). padding-top isolado nunca mexe no padding-left/right
+     já definido em .screen-inner. O padding-bottom NÃO é sobrescrito aqui
+     de propósito: precisa continuar sendo o mesmo valor de .screen-inner
+     (ver comentário lá) para o botão ficar exatamente na mesma posição
+     fixa em relação à borda inferior, igual a todas as outras telas. */
+  padding-top: var(--space-8);
+  /* Estas telas não têm um .step-body interno, então aqui (e só aqui)
+     o próprio .screen-inner é quem precisa rolar. */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* .end-message envolve ícone/título/texto (tudo, exceto botão) e é quem
+   centraliza verticalmente esse bloco — não mais o .end-screen inteiro.
+   Assim, se uma tela final ganhar um .end-actions no futuro, ele fica fora
+   da centralização, sobrando como último item do flex, na mesma posição
+   fixa (mesma distância da borda inferior) que o .step-footer nas outras
+   telas. Hoje nenhuma tela final (calculando, desqualificado) tem botão
+   próprio, então .end-message ocupa 100% do .end-screen (flex:1) e
+   centraliza o conteúdo dentro dele. */
+.end-message {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+}
+
+.end-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-6);
+}
+
+.end-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.end-icon.neutral {
+  background: var(--teal-100);
+  color: var(--teal-600);
+}
+
+.end-icon.success {
+  background: var(--teal-100);
+  color: var(--teal-600);
+}
+
+.end-icon.success svg {
+  stroke-width: 3;
+}
+
+/* Botão de fechar (X) no canto superior direito da tela de desqualificado —
+   a pessoa foi desqualificada e não tem mais nenhuma etapa a seguir, então
+   oferecemos um jeito explícito de fechar a aba/janela em vez de deixá-la
+   parada numa tela sem saída. position: absolute usa o position: relative
+   já existente em .screen-inner (ver acima), sem afetar o layout flex do
+   restante do conteúdo. */
+.screen-close-btn {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.screen-close-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.screen-close-btn:hover {
+  background: var(--border);
+  color: var(--navy-900);
+}
+
+/* ---------- Anel de progresso da tela "calculando" ---------- */
+
+.calc-ring-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto var(--space-6);
+}
+
+.calc-ring {
+  width: 96px;
+  height: 96px;
+  transform: rotate(-90deg);
+}
+
+.calc-ring-track {
+  fill: none;
+  stroke: var(--teal-100);
+  stroke-width: 6;
+}
+
+.calc-ring-progress {
+  fill: none;
+  stroke: var(--teal-500);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 213.6;
+  stroke-dashoffset: 213.6;
+  transition: stroke-dashoffset 0.2s linear;
+}
+
+.calc-percent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy-900);
+}
+
+#calc-status-text {
+  min-height: 1.5em;
+  transition: opacity 0.2s var(--ease);
+}
+
+.end-screen h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy-900);
+  margin: 0 0 var(--space-3);
+}
+
+.end-screen p {
+  color: var(--text-secondary);
+  font-size: 15px;
+  max-width: 400px;
+  margin: 0 0 var(--space-2);
+}
+
+.end-screen .end-actions {
+  flex-shrink: 0;
+  margin-top: var(--space-8);
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---------- Privacidade ---------- */
+
+.privacy-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--space-4);
+  line-height: 1.5;
+}
+
+.privacy-note a {
+  color: var(--teal-600);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ---------- Loading / spinner ---------- */
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+
+.spinner.dark {
+  border-color: rgba(11, 30, 58, 0.2);
+  border-top-color: var(--navy-900);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Utilitários ---------- */
+
+.hidden {
+  display: none !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* ---------- Responsivo ---------- */
+
+@media (min-width: 640px) {
+  .hero {
+    padding-top: var(--space-16);
+  }
+
+  .screen-inner {
+    padding-top: var(--space-10);
+  }
+
+}
+
+@media (max-width: 480px) {
+  .option-grid.cols-2:not(.option-grid-compact) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 340px) {
+  /* Coluna estreita demais mesmo sem ícone: aperta ainda mais o texto
+     pra continuar em 2 colunas sem precisar rolar a tela. */
+  .option-grid-compact .option-card {
+    padding: 6px var(--space-2);
+    gap: 6px;
+    font-size: 11.5px;
+    min-height: 38px;
+  }
+
+  .option-grid-compact .option-check {
+    width: 15px;
+    height: 15px;
+  }
+
+  .option-grid-compact .option-check svg {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  .screen-inner {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+
+  .hero h1 {
+    font-size: 26px;
+  }
+}
+
+/* Celular (2 colunas x 3 linhas): espaçamento um pouco mais compacto do
+   que o padrão (pensado pra telas largas em 3 colunas) pra dar folga
+   extra às 3 linhas, sem precisar reduzir a proporção da foto aqui —
+   isso só acontece nas faixas de altura mais baixa, logo abaixo. */
+@media (max-width: 639px) {
+  .option-photo-grid {
+    gap: var(--space-2);
+  }
+
+  .option-photo-label {
+    padding: 6px var(--space-3);
+    font-size: 12px;
+  }
+}
+
+/* ---------- Responsivo por altura de tela ---------- */
+/* Cada faixa de altura tem seu próprio "padrão fixo" de espaçamento, para
+   que o conteúdo caiba sem precisar rolar sempre que a janela for mais
+   baixa (preview embutido, celular em paisagem, navegador com barra de
+   endereço grande etc). A rolagem interna continua existindo como reforço
+   para telas com muitas opções (ex.: a etapa 6), nunca como o plano A. */
+
+/* Faixa fina (761–900px de altura) que só existe por causa do aumento da
+   altura padrão dos botões (56px -> 76px) e do padding-bottom extra da
+   ".screen-inner" (pra deixar o botão "um pouco mais pra cima" — ver
+   comentário lá): telas nessa faixa (ex.: iPhone 13/14 390x844, iPhone
+   11 414x896) sobravam confortáveis antes, mas com essas duas mudanças
+   passaram a faltar espaço pra caber sem rolagem. Em vez de puxar a
+   compactação inteira da faixa "max-height:760" (que também reduz cabeçalho,
+   botão de voltar etc. — compactação demais pra quem só precisa de um
+   pouco de espaço), só a foto de cada card encolhe um pouco. */
+@media (max-height: 900px) and (min-height: 761px) {
+  .option-photo-media {
+    aspect-ratio: 120 / 71;
+  }
+}
+
+@media (max-height: 760px) {
+  .screen-inner {
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-5);
+  }
+
+  .hero {
+    padding-top: var(--space-4);
+  }
+
+  .hero-badge {
+    margin-bottom: var(--space-4);
+  }
+
+  .hero h1 {
+    margin-bottom: var(--space-3);
+  }
+
+  .hero p.subheadline {
+    margin-bottom: var(--space-5);
+  }
+
+  .step-title {
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-1);
+  }
+
+  .step-subtitle {
+    margin-bottom: var(--space-2);
+  }
+
+  .step-footer {
+    margin-top: var(--space-3);
+  }
+
+  .option-card {
+    min-height: 52px;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .option-grid {
+    gap: var(--space-2);
+  }
+
+  /* Celular com tela mais baixa: aperta ainda mais a grade de fotos
+     (3 linhas x 2 colunas) pra continuar cabendo sem rolagem interna. */
+  .quiz-header {
+    padding: var(--space-2) var(--space-5) var(--space-2);
+  }
+
+  .quiz-back-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .option-photo-grid {
+    gap: var(--space-2);
+  }
+
+  .option-photo-media {
+    aspect-ratio: 120 / 68;
+  }
+
+  .option-photo-label {
+    padding: var(--space-1) var(--space-2);
+    font-size: 12px;
+  }
+
+  .step-footer {
+    margin-top: var(--space-2);
+  }
+
+  /* Se algum dia uma tela final (.end-actions) tiver botão próprio, precisa
+     do mesmo ajuste que .step-footer, senão o botão fica com uma altura
+     diferente dos outros passos nessa faixa de altura de tela. */
+  .step-footer .btn,
+  .end-actions .btn {
+    min-height: 60px;
+  }
+}
+
+@media (max-height: 640px) {
+  .screen-inner {
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+  }
+
+  .hero {
+    padding-top: var(--space-2);
+  }
+
+  .hero-badge {
+    padding: 5px var(--space-3);
+    font-size: 11px;
+    margin-bottom: var(--space-3);
+  }
+
+  .hero h1 {
+    font-size: clamp(22px, 6vw, 30px);
+    margin-bottom: var(--space-2);
+  }
+
+  .hero p.subheadline {
+    font-size: 14px;
+    margin-bottom: var(--space-4);
+  }
+
+  .benefit-grid {
+    gap: var(--space-2);
+  }
+
+  .benefit-icon-circle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .benefit-icon-circle svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .benefit-title {
+    font-size: 13.5px;
+  }
+
+  .step-title {
+    font-size: 20px;
+  }
+
+  .input-large {
+    min-height: 56px;
+  }
+
+  /* Aperta mais ainda a grade de fotos (3 linhas x 2 colunas) em telas de
+     celular mais baixas, pra caber sem rolagem interna — junto com o
+     cabeçalho, o espaçamento antes do título e o botão de continuar, que
+     também precisam ceder espaço nesses aparelhos mais compactos. */
+  .quiz-header {
+    padding: var(--space-2) var(--space-5) var(--space-2);
+  }
+
+  .quiz-back-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .step-title {
+    margin-top: var(--space-2);
+    margin-bottom: 2px;
+  }
+
+  .step-subtitle {
+    margin-bottom: var(--space-2);
+  }
+
+  .option-photo-grid {
+    gap: var(--space-2);
+  }
+
+  .option-photo-media {
+    aspect-ratio: 120 / 60;
+  }
+
+  .option-photo-label {
+    padding: 4px var(--space-2);
+    font-size: 11.5px;
+  }
+
+  .step-footer {
+    margin-top: var(--space-1);
+  }
+
+  .step-footer .btn,
+  .end-actions .btn {
+    min-height: 56px;
+  }
+
+  .end-screen {
+    /* Mesmo cuidado da regra base: só padding-top, nunca zerar o padding
+       lateral herdado de .screen-inner, e nunca sobrescrever o
+       padding-bottom (precisa continuar igual ao de .screen-inner nessa
+       mesma faixa de altura, pra manter o botão na mesma posição fixa). */
+    padding-top: var(--space-4);
+  }
+
+  .end-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: var(--space-4);
+  }
+
+  .end-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .calc-ring-wrap {
+    width: 76px;
+    height: 76px;
+    margin-bottom: var(--space-4);
+  }
+
+  .calc-ring {
+    width: 76px;
+    height: 76px;
+  }
+}
+
+@media (max-height: 520px) {
+  .screen-inner {
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-6);
+  }
+
+  .step-title {
+    font-size: 18px;
+    margin-top: var(--space-2);
+  }
+
+  .step-subtitle {
+    font-size: 13px;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-footer {
+    margin-top: var(--space-2);
+  }
+
+  .option-grid-compact .option-card {
+    min-height: 34px;
+    padding: 6px var(--space-2);
+    font-size: 11px;
+  }
+
+  .option-grid-compact {
+    gap: 6px;
+  }
+}
+
+
+/* ===== v1.2: alinhamento ao design system do site ===== */
+h1, .step-title, .result-value, .end-message h2, .end-message h1 { font-family: var(--font-display); font-weight: 700; }
+.btn { border-radius: var(--radius-btn); }
+.btn-primary { background: var(--cta-grad); }
+.input-large, .input-standard { border-radius: var(--radius-sm); }
+.input-large:focus, .input-standard:focus, .input-city:focus { border-color: var(--teal-500); box-shadow: 0 0 0 3px rgba(20,157,136,.25); }
+.btn:focus-visible, .option-photo-card:focus-visible, .option-card:focus-visible, .quiz-back-btn:focus-visible, .screen-close-btn:focus-visible, .city-result-item:focus-visible { outline: 2px solid var(--teal-500); outline-offset: 3px; }
+.quiz-header { background: rgba(241, 245, 249, 0.92); }
+/* aviso de cookies (só quando o simulador é aberto fora do site) */
+.cookiebar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; max-width: 26rem; margin-left: auto; display: none; flex-direction: column; gap: 12px; padding: 16px; background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); font-size: 14px; line-height: 1.5; }
+.cookiebar[data-show="true"] { display: flex; }
+.cookiebar p { margin: 0; color: var(--text-secondary); }
+.cookiebar a { color: var(--text-primary); }
+.cookiebar__actions { display: flex; gap: 8px; }
+.cookiebar__actions button { flex: 1 1 0; min-height: 44px; border-radius: var(--radius-btn); border: 1px solid var(--text-primary); background: transparent; color: var(--text-primary); font: inherit; font-weight: 600; cursor: pointer; }
+.cookiebar__actions button:hover { background: var(--text-primary); color: #fff; }
+html.is-embed .cookiebar { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .screen { animation: none; } }
+</style>
+</head>
+<body>
+
+<main id="app">
+
+  <!-- Cabeçalho do quiz: barra de progresso + voltar -->
+  <header id="quiz-header" class="quiz-header hidden">
+    <div class="quiz-header-inner">
+      <button type="button" id="quiz-back-btn" class="quiz-back-btn" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
+      </button>
+      <div class="quiz-progress-wrap">
+        <div id="quiz-step-label" class="quiz-step-label">Etapa 1 de 9</div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== LANDING ===================== -->
+  <section id="screen-landing" class="screen is-active">
+    <div class="screen-inner">
+      <div class="hero">
+        <div class="step-body">
+          <div class="hero-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"></path></svg>
+            <span>Leva cerca de 2 minutos</span>
+          </div>
+          <h1>Descubra quanto você pode conseguir usando <span class="highlight">seu imóvel</span> como garantia</h1>
+          <p class="subheadline">
+            Faça uma simulação gratuita e veja uma estimativa de quanto seu
+            imóvel pode liberar em crédito.
+          </p>
+
+          <div class="benefit-grid">
+            <div class="benefit-card">
+              <span class="benefit-icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"></path></svg>
+              </span>
+              <span class="benefit-title">Você continua usando o seu imóvel</span>
+            </div>
+            <div class="benefit-card">
+              <span class="benefit-icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"></ellipse><path d="M5 6v5c0 1.7 3.1 3 7 3s7-1.3 7-3V6"></path><path d="M5 11v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"></path></svg>
+              </span>
+              <span class="benefit-title">Use o valor como quiser</span>
+            </div>
+            <div class="benefit-card">
+              <span class="benefit-icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+              </span>
+              <span class="benefit-title">Acompanhamento do início ao fim</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-footer">
+          <button type="button" id="start-quiz-btn" class="btn btn-primary">
+            Quero descobrir meu valor
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 2: VALOR DO IMÓVEL ===================== -->
+  <section id="screen-property-value" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Qual é o valor aproximado do seu imóvel?</h2>
+        <p class="step-subtitle">Usamos esse valor só para calcular sua estimativa.</p>
+
+        <div id="field-property-value" class="field">
+          <label for="input-property-value">Valor do imóvel</label>
+          <div class="input-currency-wrap">
+            <input
+              type="text"
+              id="input-property-value" aria-describedby="error-property-value"
+              class="input-large"
+              placeholder="R$ 0,00"
+              autocomplete="off"
+            />
+          </div>
+          <div id="error-property-value" class="field-error" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-property-value-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 3: CIDADE ===================== -->
+  <section id="screen-city" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Em qual cidade o imóvel está localizado?</h2>
+        <p class="step-subtitle">Comece a digitar e selecione sua cidade na lista.</p>
+
+        <div id="field-city" class="field">
+          <label for="input-city">Cidade</label>
+          <div class="city-search-wrap">
+            <input
+              type="text"
+              id="input-city" aria-describedby="error-city"
+              class="input-standard input-city"
+              placeholder="Digite o nome da sua cidade"
+              autocomplete="off"
+            />
+            <div id="city-results" class="city-results hidden"></div>
+          </div>
+          <div id="city-selected-card" class="address-card hidden">
+            <span class="address-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            </span>
+            <div class="address-card-text">
+              <div id="city-selected-name" class="address-card-street"></div>
+              <div class="address-card-meta">Cidade selecionada</div>
+            </div>
+          </div>
+          <div id="error-city" class="field-error" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-city-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 1: TIPO DO IMÓVEL ===================== -->
+  <section id="screen-property-type" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Qual é o tipo do imóvel?</h2>
+        <p class="step-subtitle">Selecione a opção que descreve o seu imóvel.</p>
+
+        <div id="options-property-type" class="option-photo-grid"></div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-property-type-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUBETAPA: LOCALIZAÇÃO DA CASA (só se "Casa" selecionada) ============ -->
+  <section id="screen-location-casa" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Sua casa é de rua ou em condomínio?</h2>
+        <p class="step-subtitle">Essa resposta não interfere na sua simulação. É só para conhecermos melhor o seu imóvel.</p>
+
+        <div id="options-location-casa" class="option-photo-grid options-location"></div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-location-casa-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUBETAPA: LOCALIZAÇÃO DO TERRENO (só se "Terreno" selecionado) ============ -->
+  <section id="screen-location-terreno" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Seu terreno é de rua ou em condomínio?</h2>
+        <p class="step-subtitle">Essa resposta não interfere na sua simulação. É só para conhecermos melhor o seu imóvel.</p>
+
+        <div id="options-location-terreno" class="option-photo-grid options-location"></div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-location-terreno-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 4: SITUAÇÃO DO IMÓVEL ===================== -->
+  <section id="screen-property-status" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Qual é a situação de financiamento do imóvel?</h2>
+        <p class="step-subtitle">Isso nos ajuda a entender melhor a sua operação.</p>
+
+        <div id="options-property-status" class="option-grid"></div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-property-status-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 5: RENDA E TITULARIDADE ===================== -->
+  <section id="screen-income-ownership" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Mais dois dados para a sua análise</h2>
+        <p class="step-subtitle">Isso ajuda a personalizar a sua estimativa de crédito.</p>
+
+        <div id="field-income" class="field">
+          <label for="input-income">Renda mensal</label>
+          <div class="input-currency-wrap">
+            <input
+              type="text"
+              id="input-income" aria-describedby="error-income"
+              class="input-large"
+              placeholder="R$ 0,00"
+              autocomplete="off"
+            />
+          </div>
+          <div id="error-income" class="field-error" role="alert"></div>
+        </div>
+
+        <div id="field-ownership" class="field field-group-secondary">
+          <label>O imóvel está no CPF ou no CNPJ?</label>
+          <div id="options-ownership" class="option-grid"></div>
+          <div id="error-ownership" class="field-error" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-income-ownership-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 6: VALOR DESEJADO ===================== -->
+  <section id="screen-desired-amount" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Quanto você gostaria de conseguir em crédito?</h2>
+        <p class="step-subtitle">Assim comparamos com o valor que seu imóvel pode liberar.</p>
+
+        <div id="field-desired-amount" class="field">
+          <label for="input-desired-amount">Valor desejado</label>
+          <div class="input-currency-wrap">
+            <input
+              type="text"
+              id="input-desired-amount" aria-describedby="error-desired-amount"
+              class="input-large"
+              placeholder="R$ 0,00"
+              autocomplete="off"
+            />
+          </div>
+          <div id="error-desired-amount" class="field-error" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-desired-amount-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 7: NOME ===================== -->
+  <section id="screen-lead-name" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Qual é o seu nome completo?</h2>
+        <p class="step-subtitle">Vamos usar para identificar sua simulação.</p>
+
+        <div id="field-lead-name" class="field">
+          <label for="input-lead-name">Nome completo</label>
+          <input type="text" id="input-lead-name" aria-describedby="error-lead-name" class="input-standard" placeholder="Seu nome completo" autocomplete="name" />
+          <div id="error-lead-name" class="field-error" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-lead-name-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 8: WHATSAPP ===================== -->
+  <section id="screen-lead-whatsapp" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Qual é o seu WhatsApp?</h2>
+        <p class="step-subtitle">É por esse número que um consultor pode entrar em contato para falar sobre a sua simulação.</p>
+
+        <div id="field-lead-whatsapp" class="field">
+          <label for="input-lead-whatsapp">WhatsApp</label>
+          <input type="tel" id="input-lead-whatsapp" aria-describedby="error-lead-whatsapp" class="input-standard" placeholder="(00) 00000-0000" autocomplete="tel" />
+          <div id="error-lead-whatsapp" class="field-error" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btn-lead-whatsapp-next" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PASSO 9: E-MAIL ===================== -->
+  <section id="screen-lead-email" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Qual é o seu e-mail?</h2>
+        <p class="step-subtitle">Usamos para manter contato sobre a sua simulação, caso seja necessário.</p>
+
+        <div id="field-lead-email" class="field">
+          <label for="input-lead-email">E-mail</label>
+          <input type="email" id="input-lead-email" aria-describedby="error-lead-email" class="input-standard" placeholder="seu@email.com" autocomplete="email" />
+          <div id="error-lead-email" class="field-error" role="alert"></div>
+        </div>
+
+        <p class="privacy-note">
+          Seus dados serão utilizados para analisar sua solicitação e entrar em
+          contato sobre a simulação. <a href="politica-de-privacidade" target="_blank" rel="noopener">Política de Privacidade</a>
+        </p>
+      </div>
+
+      <div class="step-footer">
+        <div id="lead-submit-error" class="field-error field-error-standalone" role="alert"></div>
+        <button type="button" id="btn-lead-email-next" class="btn btn-primary">Ver minha estimativa</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CALCULANDO ===================== -->
+  <section id="screen-calculating" class="screen">
+    <div class="screen-inner end-screen">
+      <div class="end-message">
+        <div class="calc-ring-wrap">
+          <svg class="calc-ring" viewBox="0 0 80 80">
+            <circle class="calc-ring-track" cx="40" cy="40" r="34"></circle>
+            <circle id="calc-ring-progress" class="calc-ring-progress" cx="40" cy="40" r="34"></circle>
+          </svg>
+          <div id="calc-percent" class="calc-percent">0%</div>
+        </div>
+        <h2>Calculando sua estimativa...</h2>
+        <p id="calc-status-text">Validando suas informações...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RESULTADO ===================== -->
+  <section id="screen-result" class="screen">
+    <div class="screen-inner">
+      <div class="step-body">
+        <h2 class="step-title">Pronto! Sua simulação foi calculada.</h2>
+        <p class="step-subtitle">Com base no valor informado para o seu imóvel:</p>
+
+        <div class="result-card">
+          <div class="result-label">Estimativa de crédito</div>
+          <div id="result-estimated-credit" class="result-value">R$ 0</div>
+          <div class="result-note">Valor sujeito à análise</div>
+        </div>
+
+        <div class="result-breakdown">
+          <div class="result-breakdown-group-title">Resumo do imóvel</div>
+          <div class="result-breakdown-row">
+            <span>Valor do imóvel</span>
+            <strong id="result-property-value">R$ 0</strong>
+          </div>
+          <div class="result-breakdown-row">
+            <span>Percentual considerado</span>
+            <strong id="result-percentage">…</strong>
+          </div>
+
+          <div class="result-breakdown-group-title">Simulação de parcela</div>
+          <div class="result-breakdown-row">
+            <span>Valor desejado</span>
+            <strong id="result-desired-amount">R$ 0</strong>
+          </div>
+          <div class="result-breakdown-row">
+            <span id="result-installment-label">Parcela estimada</span>
+            <strong id="result-installment">…</strong>
+          </div>
+          <div class="result-breakdown-row">
+            <span>Taxa</span>
+            <strong id="result-rate">…</strong>
+          </div>
+        </div>
+
+        <div id="result-disclaimer" class="disclaimer-box">
+          Essa é uma estimativa inicial, com taxa a partir de 1,19% ao mês mais IPCA e prazo de até 20 anos.
+          O valor final depende da análise do imóvel, documentação, perfil da operação e
+          critérios da instituição financeira.
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <p class="step-subtitle step-footer-note">Quer saber quanto você realmente pode conseguir?</p>
+        <button type="button" id="btn-result-cta" class="btn btn-teal">Quero falar com um especialista</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DESQUALIFICADO (LOCALIZAÇÃO / FINANCIAMENTO) ===================== -->
+  <section id="screen-disqualified" class="screen">
+    <div class="screen-inner end-screen">
+      <button type="button" id="btn-disqualified-close" class="screen-close-btn" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="end-message">
+        <div class="end-icon neutral">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>
+        </div>
+        <h2 id="disqualified-title">Obrigado pelo seu interesse!</h2>
+        <p id="disqualified-text-1">Agradecemos muito o seu contato.</p>
+        <p id="disqualified-text-2">
+          No momento, infelizmente ainda não atendemos o seu município, por isso
+          não conseguimos realizar uma simulação para a sua região.
+        </p>
+        <p id="disqualified-text-3">Esperamos poder atender você em uma próxima oportunidade.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/consent.js?v=d1c5812ca3" defer></script>
+<script src="assets/js/simulador.js?v=73c9f95693" defer></script>
+<div class="cookiebar" id="cookiebar" data-show="false" role="region" aria-label="Preferências de cookies">
+  <p>Usamos cookies essenciais para o simulador funcionar. Com a sua permissão, também usamos cookies de medição de campanhas. Detalhes na <a href="politica-de-privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</p>
+  <div class="cookiebar__actions">
+    <button type="button" data-cookie-reject>Recusar</button>
+    <button type="button" data-cookie-accept>Aceitar</button>
+  </div>
+</div>
+</body>
+</html>

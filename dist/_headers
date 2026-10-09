@@ -2,23 +2,26 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
   X-Permitted-Cross-Domain-Policies: none
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-ZgJ/9cZvBcopPujC0dNkNBIADm61KxmwQn3caGhA6m0=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jHxSW8+VFbvqVcgsTzpB7Q7rtbFD9DZcUh7QWWB/q0I=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-sd37R0kod+x8mG/i2DxLUHT5rQqrRIOx2o5kahUhEk4=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s='; connect-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-ZgJ/9cZvBcopPujC0dNkNBIADm61KxmwQn3caGhA6m0=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jHxSW8+VFbvqVcgsTzpB7Q7rtbFD9DZcUh7QWWB/q0I=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-sd37R0kod+x8mG/i2DxLUHT5rQqrRIOx2o5kahUhEk4=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s='; connect-src 'self' https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-src 'self'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
 
-# As fontes nunca mudam de conteúdo sob o mesmo nome de arquivo: cache
-# máximo. CSS/JS/imagens/arte podem ser republicados a qualquer deploy,
-# então ficam com um teto mais curto e revalidação, em vez de correr o
-# risco de o navegador prender uma versão velha por um ano.
+# Espelho do .htaccess (a hospedagem oficial é a Hostinger/Apache; este arquivo só
+# vale para Netlify/Cloudflare Pages). CSS e JS são referenciados com ?v=<hash do
+# conteúdo>, então podem ficar em cache por um ano. HTML sempre revalida.
+# Atenção: a CSP própria do simulador (/simulador-home-equity) existe só no
+# .htaccess; numa hospedagem que use este arquivo, ela precisa ser replicada.
 /assets/fonts/*
   Cache-Control: public, max-age=31536000, immutable
 /assets/css/*
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: public, max-age=31536000, immutable
 /assets/js/*
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: public, max-age=31536000, immutable
+/assets/js/*.json
+  Cache-Control: public, max-age=86400
 /assets/img/*
   Cache-Control: public, max-age=604800, must-revalidate
 /assets/art/*

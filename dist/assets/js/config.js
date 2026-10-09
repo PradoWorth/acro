@@ -1,1 +1,1 @@
-window.ACROPOLE_CONFIG={endpoint:"https://n8n.srv1800205.hstgr.cloud/webhook-test/recebimento-de-leads",analytics:{provider:"",id:""},googleClientId:""};
+window.ACROPOLE_CONFIG={version:"1.2",endpoint:"https://n8n.srv1800205.hstgr.cloud/webhook/recebimento-de-leads",analytics:{provider:"",id:""}};

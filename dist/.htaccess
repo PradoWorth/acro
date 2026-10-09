@@ -1,11 +1,35 @@
-# Gerado automaticamente por build.py (write_htaccess) a partir de vercel.json.
-# Não editar à mão — rode `python3 build.py` de novo depois de mudar vercel.json.
+# Acrópole Capital: URLs limpas, cabeçalhos de segurança e proteção de arquivos.
+# Mantido à mão (o gerador original foi descontinuado). Mudou algo aqui? Replique
+# os cabeçalhos em _headers e vercel.json para os três ficarem iguais.
 
 # Nunca listar o conteúdo de uma pasta sem index.
 Options -Indexes
 
+# A página inicial é sempre o index.html deste site. Sem isso, um index.php que
+# tenha sobrado de outra instalação (ex.: WordPress) na mesma pasta teria
+# prioridade e apareceria no lugar da home.
+DirectoryIndex index.html
+
+AddDefaultCharset UTF-8
+<IfModule mod_mime.c>
+  AddType image/avif .avif
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+  AddType application/manifest+json .webmanifest
+  AddCharset UTF-8 .html .css .js .json .xml .txt .webmanifest
+</IfModule>
+
+# Sem isso o Apache redireciona /programas para /programas/ (e os links
+# relativos quebram). A regra de URL limpa abaixo cuida do resto.
+DirectorySlash Off
+
+# As páginas de /programas/, /conteudos/ e /solucoes/ ficam fisicamente em
+# pg-programas/, pg-conteudos/ e pg-solucoes/. Assim nenhuma pasta tem o mesmo
+# nome de uma página (programas.html), que era o que causava o 403.
+# A URL pública não muda.
+
 # Nega acesso via navegador a qualquer arquivo de config local com segredo
-# (ex.: api/config.local.php, api/db.local.php) — defesa em profundidade,
+# (ex.: api/config.local.php) — defesa em profundidade,
 # mesmo que o PHP em si já não vaze o conteúdo se for executado normalmente.
 <FilesMatch "(^|\.)env$|\.local\.php$|\.log$">
   <IfModule mod_authz_core.c>
@@ -17,38 +41,124 @@ Options -Indexes
   </IfModule>
 </FilesMatch>
 
+# Nunca servir arquivos ocultos (exceto /.well-known), backups, mapas, código-fonte
+# e arquivos de projeto que não fazem parte do site.
+<FilesMatch "^\.(?!well-known)|\.(bak|old|orig|swp|sql|map|py|sh|lock|ya?ml|toml|ini|md)$|^(package(-lock)?\.json|composer\.(json|lock)|Dockerfile|Makefile|vercel\.json|_redirects|_headers)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Este site não usa PHP. Bloquear a execução protege contra arquivos .php que
+# tenham sobrado de instalações antigas (ex.: wp-login.php, xmlrpc.php) ou que
+# sejam enviados por engano. Se um dia houver PHP legítimo, remova este bloco.
+<FilesMatch "\.(php[0-9]?|phtml|phar|cgi|pl|asp|aspx|jsp)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+ServerSignature Off
+
 <IfModule mod_headers.c>
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
   Header always set "X-Content-Type-Options" "nosniff"
   Header always set "X-Frame-Options" "SAMEORIGIN"
   Header always set "Referrer-Policy" "strict-origin-when-cross-origin"
-  Header always set "Permissions-Policy" "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+  Header always set "Permissions-Policy" "geolocation=(), microphone=(), camera=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()"
   Header always set "Strict-Transport-Security" "max-age=31536000; includeSubDomains"
-  Header always set "Cross-Origin-Opener-Policy" "same-origin-allow-popups"
+  Header always set "Cross-Origin-Opener-Policy" "same-origin"
   Header always set "Cross-Origin-Resource-Policy" "same-origin"
   Header always set "X-Permitted-Cross-Domain-Policies" "none"
-  Header always set "Content-Security-Policy" "default-src 'self'; img-src 'self' data: https://i.ytimg.com https://lh3.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-ZgJ/9cZvBcopPujC0dNkNBIADm61KxmwQn3caGhA6m0=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jHxSW8+VFbvqVcgsTzpB7Q7rtbFD9DZcUh7QWWB/q0I=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-sd37R0kod+x8mG/i2DxLUHT5rQqrRIOx2o5kahUhEk4=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s=' https://accounts.google.com; connect-src 'self' https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud https://accounts.google.com; frame-src https://accounts.google.com; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+  Header always set "Content-Security-Policy" "default-src 'self'; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-ZgJ/9cZvBcopPujC0dNkNBIADm61KxmwQn3caGhA6m0=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jHxSW8+VFbvqVcgsTzpB7Q7rtbFD9DZcUh7QWWB/q0I=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-sd37R0kod+x8mG/i2DxLUHT5rQqrRIOx2o5kahUhEk4=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s='; connect-src 'self' https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-src 'self'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+</IfModule>
+
+# Simulador Home Equity: página própria com CSP ajustada (GTM do servidor de tags da Acrópole e envio ao n8n).
+<IfModule mod_headers.c>
+  <FilesMatch "^simulador-home-equity\.html$">
+    Header always set "Content-Security-Policy" "default-src 'self'; img-src 'self' data: https://load.sst.acropolecapital.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' https://load.sst.acropolecapital.com.br; connect-src 'self' https://n8n.srv1800205.hstgr.cloud https://load.sst.acropolecapital.com.br; form-action 'self'; frame-src 'none'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+  </FilesMatch>
 </IfModule>
 
 ErrorDocument 404 /404.html
+ErrorDocument 403 /404.html
 
 # HTTPS forçado (a maioria dos hosts já força por padrão, mas sem custo garantir aqui também).
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # Pastas e arquivos ocultos (.git, .svn, .env, .DS_Store...) nunca são servidos,
+  # nem dentro de subpastas. Só /.well-known/ é público (security.txt, validações).
+  RewriteRule (^|/)\.(?!well-known(/|$)) - [R=404,L]
+
+  # Métodos HTTP que um site estático nunca usa.
+  RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK|DELETE|PUT|PATCH|CONNECT)$ [NC]
+  RewriteRule ^ - [F,L]
+  # Tentativas de injeção de script/variáveis PHP pela query string (sem uso legítimo neste site).
+  RewriteCond %{QUERY_STRING} (<|%3C)([^s]*s)+cript.*(>|%3E) [NC,OR]
+  RewriteCond %{QUERY_STRING} (GLOBALS|_REQUEST)(=|\[|%[0-9A-Z]{0,2}) [NC]
+  RewriteRule ^ - [F,L]
   RewriteCond %{HTTPS} off
   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-  # URL limpa (ex.: /contato também serve contato.html) — os links do
-  # próprio site já incluem .html, isso é só um bônus pra quem digita
-  # a URL sem extensão direto no navegador.
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME}\.html -f
-  RewriteRule ^(.*)$ $1.html [L]
+  # Domínio único: todas as tags canônicas, o sitemap e o robots usam o www.
+  # Ative as 2 linhas abaixo (tire o #) DEPOIS de confirmar que
+  # www.acropolecapital.com.br aponta para esta mesma hospedagem, com SSL.
+  # RewriteCond %{HTTP_HOST} ^acropolecapital\.com\.br$ [NC]
+  # RewriteRule ^ https://www.acropolecapital.com.br%{REQUEST_URI} [L,R=301]
+
+  # URLs limpas: o visitante nunca vê ".html".
+  # -1) /pg-programas e /pg-programas/ -> /programas
+  RewriteRule ^pg-(programas|conteudos|solucoes|home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/?$ /$1 [R=301,L]
+
+  # 0) Quem acessar as pastas físicas direto vai para a URL pública
+  RewriteCond %{THE_REQUEST} ^[A-Z]+\s/pg-(programas|conteudos|solucoes|home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/([^\s?/]+?)(\.html)?[\s?] [NC]
+  RewriteRule ^ /%1/%2 [R=301,L]
+
+  # 1) /index.html -> /
+  RewriteCond %{THE_REQUEST} ^[A-Z]+\s/index\.html[\s?] [NC]
+  RewriteRule ^index\.html$ / [R=301,L]
+
+  # 2) /pagina.html -> /pagina (301, só quando o pedido original já tinha .html)
+  RewriteCond %{THE_REQUEST} ^[A-Z]+\s/([^\s?]+?)\.html[\s?] [NC]
+  RewriteRule ^ /%1 [R=301,L]
+
+  # 3) /programas/ -> /programas (pasta que também tem página-mãe .html).
+  #    Sem isso os links relativos quebrariam e a pasta daria 403.
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+  # 4a) /programas/pronampe -> pg-programas/pronampe.html (URL pública igual)
+  RewriteCond %{DOCUMENT_ROOT}/pg-$1/$2.html -f
+  RewriteRule ^(programas|conteudos|solucoes|home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/(?!index$)([^/]+)$ pg-$1/$2.html [L]
+
+  # 4c) /pagina e /programas/pronampe servem o arquivo .html correspondente
+  RewriteCond %{DOCUMENT_ROOT}/$1 !-f
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+)$ $1.html [L]
 </IfModule>
 
 <IfModule mod_headers.c>
+  # HTML sempre revalidado: correções publicadas chegam na próxima visita.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  # CSS e JS são referenciados com ?v=<hash do conteúdo>: cada mudança gera uma
+  # URL nova, então o arquivo pode ficar em cache por um ano sem risco.
   <FilesMatch "\.(css|js)$">
-    Header set Cache-Control "public, max-age=3600, must-revalidate"
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(json|webmanifest|xml|txt)$">
+    Header set Cache-Control "public, max-age=86400"
   </FilesMatch>
   <FilesMatch "\.(woff2?|ttf)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
@@ -56,4 +166,9 @@ ErrorDocument 404 /404.html
   <FilesMatch "\.(avif|webp|png|jpe?g|gif|svg|ico)$">
     Header set Cache-Control "public, max-age=604800, must-revalidate"
   </FilesMatch>
+</IfModule>
+
+# Compressão de texto (JSON da lista de municípios, HTML, CSS e JS).
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/json image/svg+xml application/xml
 </IfModule>
