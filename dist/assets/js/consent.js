@@ -53,7 +53,7 @@
       if(a)a.addEventListener("click",function(){set("accepted")});
       if(r)r.addEventListener("click",function(){set("rejected")});
       bar.addEventListener("keydown",function(e){if(e.key==="Escape"&&get()){show(false)}});
-      if(!get())show(true);
+      if(!get())requestAnimationFrame(function(){show(true)});
     }
     document.addEventListener("click",function(e){
       var t=e.target.closest&&e.target.closest("[data-cookie-open]");
