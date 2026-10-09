@@ -52,3 +52,4 @@ Primeira versão numerada do site.
 - Home: imagem do Home Equity fica acima do texto no mobile/tablet e à esquerda no desktop.
 - Home: seção Home Equity com imagem no topo (mobile) e título/tag junto ao texto, padrão do bloco Simulador gratuito.
 - Política de privacidade: CRM citado entre fornecedores, transferência internacional (Google, Vercel, WhatsApp) e dados de terceiros informados em formulários.
+- Campos validos: destaque verde e check somem ao sair do campo, sem animacao.
