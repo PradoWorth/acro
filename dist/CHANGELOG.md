@@ -48,3 +48,4 @@ Primeira versão numerada do site.
 - Prova social centralizada.
 - Botoes de simulacao Home Equity (home, simbands, topo das paginas, painel Solucoes) abrem o simulador em pop-up (data-sim-open), com link normal como fallback.
 - Pop-up do simulador com fundo desfocado (igual ao modal de contato); clique fora fecha.
+- Home: card avulso de Home Equity substituído por seção completa (#home-equity) com imagem, benefícios, 3 passos e CTA que abre o simulador em pop-up.
