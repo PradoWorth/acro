@@ -2,13 +2,14 @@
    Acessível: foco preso na janela (o resto da página fica inerte), Esc fecha
    e o foco volta para o botão que abriu. */
 (function(){
-  var last=null,ov=null,inerted=[];
+  var last=null,ov=null,bd=null,inerted=[];
   function close(){
     if(!ov)return;
     document.documentElement.classList.remove("sim-open");
     inerted.forEach(function(el){el.inert=false;el.removeAttribute("aria-hidden")});
     inerted=[];
     ov.remove();ov=null;
+    if(bd){bd.remove();bd=null}
     document.removeEventListener("keydown",key);
     if(last&&last.focus){try{last.focus()}catch(e){}}
   }
@@ -25,7 +26,10 @@
     Array.prototype.forEach.call(document.body.children,function(el){
       if(!el.inert&&el.tagName!=="SCRIPT"){el.inert=true;el.setAttribute("aria-hidden","true");inerted.push(el)}
     });
+    bd=document.createElement("div");bd.className="simmodal__backdrop";bd.addEventListener("click",close);
+    document.body.appendChild(bd);
     document.body.appendChild(ov);
+    requestAnimationFrame(function(){if(bd)bd.setAttribute("data-show","true")});
     document.documentElement.classList.add("sim-open");
     ov.querySelector(".simmodal__close").addEventListener("click",close);
     /* Bordas da janela: o foco que sai pelo fim volta ao botão de fechar e o que
