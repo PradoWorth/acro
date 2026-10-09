@@ -44,3 +44,4 @@ Primeira versão numerada do site.
 - Formularios: validacao ao vivo apos o primeiro blur, indicador de campo valido, autocomplete.
 - Barra de cookies compacta no celular.
 - CRM: simulador envia name/phone/valor formatado (R$ 2.000.000), valor_numerico, campos *Formatado e titulo pronto; campo valor das landings com mascara de moeda e valor_numerico no envio.
+- Home: bloco do simulador Home Equity movido para logo apos a lista de Solucoes.
