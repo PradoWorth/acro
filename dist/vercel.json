@@ -70,5 +70,59 @@
     }
    ]
   }
+ ],
+ "rewrites": [
+  {
+   "source": "/programas/:slug",
+   "destination": "/pg-programas/:slug"
+  },
+  {
+   "source": "/conteudos/:slug",
+   "destination": "/pg-conteudos/:slug"
+  },
+  {
+   "source": "/solucoes/:slug",
+   "destination": "/pg-solucoes/:slug"
+  },
+  {
+   "source": "/home-equity/:slug",
+   "destination": "/pg-home-equity/:slug"
+  },
+  {
+   "source": "/credito-com-garantia-de-imovel/:slug",
+   "destination": "/pg-credito-com-garantia-de-imovel/:slug"
+  },
+  {
+   "source": "/situacoes/:slug",
+   "destination": "/pg-situacoes/:slug"
+  },
+  {
+   "source": "/credito-para-empresas/:slug",
+   "destination": "/pg-credito-para-empresas/:slug"
+  },
+  {
+   "source": "/patrimonio-imobiliario/:slug",
+   "destination": "/pg-patrimonio-imobiliario/:slug"
+  },
+  {
+   "source": "/imoveis/:slug",
+   "destination": "/pg-imoveis/:slug"
+  },
+  {
+   "source": "/credito-alto-valor/:slug",
+   "destination": "/pg-credito-alto-valor/:slug"
+  },
+  {
+   "source": "/finalidades/:slug",
+   "destination": "/pg-finalidades/:slug"
+  },
+  {
+   "source": "/cidades/:slug",
+   "destination": "/pg-cidades/:slug"
+  },
+  {
+   "source": "/comparativos/:slug",
+   "destination": "/pg-comparativos/:slug"
+  }
  ]
 }
