@@ -35,3 +35,4 @@ Primeira versão numerada do site.
 - Caixa "Fatos-chave" nas páginas novas, eventos de análise (dataLayer), proteção anti-robô nos formulários.
 - Segurança: cabeçalhos, CSP por hash, bloqueio de arquivos sensíveis e de injeção por URL.
 - Formularios: campos sozinhos na linha agora ocupam a largura toda (Pronampe e 24 paginas); removido bloco de simulacao duplicado logo apos o CTA em Pronampe, Agronegocio e Credito empresarial SP.
+- Globo: contornos dos paises com todos os pontos (antes 1 a cada 4); custo de renderizacao medido igual.
