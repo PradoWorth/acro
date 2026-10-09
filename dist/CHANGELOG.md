@@ -46,3 +46,4 @@ Primeira versão numerada do site.
 - CRM: simulador envia name/phone/valor formatado (R$ 2.000.000), valor_numerico, campos *Formatado e titulo pronto; campo valor das landings com mascara de moeda e valor_numerico no envio.
 - Home: bloco do simulador Home Equity movido para logo apos a lista de Solucoes.
 - Prova social centralizada.
+- Botoes de simulacao Home Equity (home, simbands, topo das paginas, painel Solucoes) abrem o simulador em pop-up (data-sim-open), com link normal como fallback.
