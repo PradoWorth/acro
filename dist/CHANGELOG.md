@@ -37,3 +37,4 @@ Primeira versão numerada do site.
 - Formularios: campos sozinhos na linha agora ocupam a largura toda (Pronampe e 24 paginas); removido bloco de simulacao duplicado logo apos o CTA em Pronampe, Agronegocio e Credito empresarial SP.
 - Globo: contornos dos paises com todos os pontos (antes 1 a cada 4); custo de renderizacao medido igual.
 - Cards 'Aprofunde' em artigos: 2 colunas no desktop (antes 3, apertado ao lado do indice).
+- Simulador: cards de opcao atualizam so o estado ao selecionar (imagens nao sao recriadas), corrigindo o piscar no celular.

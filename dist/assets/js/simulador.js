@@ -1204,6 +1204,19 @@ function updateProgress(fillEl, labelEl, currentStep, totalSteps) {
  * @param {(value: string) => void} onSelect
  */
 function renderOptionCards(containerEl, options, selectedValue, onSelect) {
+  // Se as opções são as mesmas, só atualiza o estado (evita recriar o DOM,
+  // o que fazia ícones e imagens piscarem a cada toque no celular).
+  const sig = 'oc|' + JSON.stringify(options.map((o) => [o.value, o.label, o.icon || '']));
+  if (containerEl.__sig === sig && containerEl.children.length === options.length) {
+    Array.prototype.forEach.call(containerEl.children, (btn, i) => {
+      const on = options[i].value === selectedValue;
+      btn.classList.toggle('is-selected', on);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.__onSelect = onSelect;
+    });
+    return;
+  }
+  containerEl.__sig = sig;
   containerEl.innerHTML = '';
   options.forEach((opt) => {
     const btn = document.createElement('button');
@@ -1221,7 +1234,8 @@ function renderOptionCards(containerEl, options, selectedValue, onSelect) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
       </span>
     `;
-    btn.addEventListener('click', () => onSelect(opt.value));
+    btn.__onSelect = onSelect;
+    btn.addEventListener('click', () => btn.__onSelect(opt.value));
     containerEl.appendChild(btn);
   });
 }
@@ -1243,8 +1257,22 @@ function renderOptionCards(containerEl, options, selectedValue, onSelect) {
  */
 function renderPhotoOptionCards(containerEl, options, selectedValues, onSelect, onBlockedSelect, config = {}) {
   const showBadge = config.showBadge !== false;
-  containerEl.innerHTML = '';
   const selected = selectedValues || [];
+  // Mesmas opções: atualiza só o estado, sem recriar as imagens (evita o
+  // "piscar" a cada toque, principalmente no celular).
+  const sig = 'pc|' + showBadge + JSON.stringify(options.map((o) => [o.value, o.label, o.accepted, o.media || '']));
+  if (containerEl.__sig === sig && containerEl.children.length === options.length) {
+    Array.prototype.forEach.call(containerEl.children, (btn, i) => {
+      const on = selected.includes(options[i].value);
+      btn.classList.toggle('is-selected', on);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.__onSelect = onSelect;
+      btn.__onBlocked = onBlockedSelect;
+    });
+    return;
+  }
+  containerEl.__sig = sig;
+  containerEl.innerHTML = '';
   options.forEach((opt) => {
     const isBlocked = opt.accepted === false;
     const btn = document.createElement('button');
@@ -1264,12 +1292,14 @@ function renderPhotoOptionCards(containerEl, options, selectedValues, onSelect, 
       </span>
       <span class="option-photo-label">${opt.label}</span>
     `;
+    btn.__onSelect = onSelect;
+    btn.__onBlocked = onBlockedSelect;
     btn.addEventListener('click', () => {
       if (isBlocked) {
-        if (onBlockedSelect) onBlockedSelect(opt);
+        if (btn.__onBlocked) btn.__onBlocked(opt);
         return;
       }
-      onSelect(opt.value);
+      btn.__onSelect(opt.value);
     });
     containerEl.appendChild(btn);
   });
