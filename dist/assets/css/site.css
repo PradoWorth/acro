@@ -150,3 +150,5 @@ article .facts ul,.prose .facts ul{columns:1}
 .prose .facts ul,.facts ul{margin:0}
 .prose .facts li:last-child,.facts li:last-child{margin-bottom:0}
 .prose .simband h2,.prose .callout h2,.prose .callout h3,.prose .facts h2{margin-top:0}
+/* sem zoom no toque duplo (celular e tablet); o zoom com dois dedos continua liberado */
+html,body{touch-action:manipulation}
