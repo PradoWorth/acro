@@ -6,6 +6,7 @@ Regra: a numeração só avança com autorização de Lucas Prado. Mudanças peq
 Auditoria completa: segurança, design system, responsividade, acessibilidade, performance, SEO e conteúdo. Nenhuma URL mudou.
 - Segurança: pastas ocultas (.git) e PHP bloqueados; home protegida contra index.php de outra instalação (DirectoryIndex); HTML sempre revalidado e CSS/JS com cache de 1 ano por hash.
 - Formulários: webhook de produção do n8n; sem "sucesso" quando o envio falha ou o endpoint não existe; erro com link direto para o WhatsApp; leads das páginas novas com a origem correta.
+- Desempenho: globo da home pausa quando sai da tela (antes o do topo animava o tempo todo) e começa a 30 fps em telas de toque.
 - Google Analytics 4 (G-RZEN0FRQGB): carrega só após o aceite de cookies; eventos de WhatsApp, CTA e formulário enviados ao GA4; CSP e política de privacidade atualizadas.
 - LGPD: aviso de cookies com Aceitar e Recusar, cookie de campanha só após aceite, Consent Mode v2 no GTM do simulador, "Preferências de cookies" no rodapé, política de privacidade atualizada, newsletter com finalidade explícita.
 - Simulador: JS de 551 KB para 85 KB (cidades vindas do JSON local, fotos como arquivos), tokens do site (cores, Inter e Manrope, botões em pílula), contraste AA, Esc fecha a janela, textos sem promessa.
