@@ -67,6 +67,9 @@ const CONFIG = {
     pipeline: 'home-equity',
     stage: 'novo-lead',
     campaignId: '',
+    // Envia nome + WhatsApp + dados do imóvel ao CRM assim que a pessoa informa o WhatsApp,
+    // marcado como 'parcial' (etapa) e com o mesmo leadId do envio final.
+    sendPartial: true,
   },
 
   // Endpoints de serviços externos.
@@ -836,6 +839,7 @@ function emptyLead() {
     email: '',
 
     // Meta
+    leadId: '',
     status: '',
     dataHoraSimulacao: '',
     origemCampanha: '',
@@ -899,6 +903,7 @@ const leadStore = {
   toCrmPayload() {
     return {
       ...leadState,
+      etapa: 'completo',
       dataHoraSimulacao: new Date().toISOString(),
       // Recaptura na hora do envio (não usa um valor guardado antes) pra
       // pegar fbp/fbc mesmo se o Pixel só tiver terminado de carregar
@@ -1697,6 +1702,7 @@ function showQuestionStep(index) {
   const stepName = QUESTION_STEPS[index];
   updateProgress(el.progressFill, el.stepLabel, index + 1, QUESTION_STEPS.length);
   goToScreen(`screen-${stepName}`);
+  saveProgress(index);
 }
 
 function goBack() {
@@ -1758,10 +1764,14 @@ function bindLandingScreen() {
   el.startBtn.addEventListener('click', () => {
     analytics.track(analytics.EVENTS.QUIZ_STARTED);
     leadStore.reset();
+    leadStore.update({ leadId: newLeadId() });
+    clearProgress();
     leadStore.captureUtms();
     currentQuestionIndex = 0;
     showQuestionStep(0);
   });
+
+  initResume();
 
   el.backBtn.addEventListener('click', () => {
     if (locationSubIndex !== -1) {
@@ -2165,8 +2175,100 @@ function bindLeadWhatsappStep() {
 
     setFieldError(el.leadWhatsappField, el.leadWhatsappError, null);
     leadStore.update({ whatsapp });
+    sendPartialLead();
     showQuestionStep(currentQuestionIndex + 1);
   });
+}
+
+
+// ---------- Progresso salvo (retomar de onde parou) e lead parcial ----------
+
+const PROGRESS_KEY = 'he_progress_v1';
+const PROGRESS_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const RESUME_MAX_STEP = QUESTION_STEPS.indexOf('lead-name');
+
+function newLeadId() {
+  try {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  } catch (_) { /* segue */ }
+  return 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
+// Guarda só as respostas sobre o imóvel (nunca nome, WhatsApp ou e-mail).
+function saveProgress(index) {
+  if (index < 1) return;
+  try {
+    const lead = leadStore.get();
+    lead.nome = '';
+    lead.whatsapp = '';
+    lead.email = '';
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify({ ts: Date.now(), step: index, lead, sel: selections }));
+  } catch (_) { /* localStorage indisponível: sem retomada */ }
+}
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    if (!p || !p.lead || Date.now() - p.ts > PROGRESS_TTL_MS || !(p.step >= 1)) {
+      localStorage.removeItem(PROGRESS_KEY);
+      return null;
+    }
+    return p;
+  } catch (_) {
+    return null;
+  }
+}
+
+function clearProgress() {
+  try { localStorage.removeItem(PROGRESS_KEY); } catch (_) { /* ok */ }
+}
+
+function initResume() {
+  const p = loadProgress();
+  if (!p || !el.startBtn) return;
+  const step = Math.min(p.step, RESUME_MAX_STEP);
+  const box = document.createElement('div');
+  box.className = 'resume-card';
+  box.setAttribute('role', 'group');
+  box.setAttribute('aria-label', 'Retomar simulação');
+  box.innerHTML = '<p class="resume-card__text"><strong>Você parou na etapa ' + (step + 1) + ' de ' + QUESTION_STEPS.length + '.</strong> Quer continuar de onde parou?</p>' +
+    '<div class="resume-card__actions"><button type="button" class="btn btn-primary" data-resume-go>Continuar de onde parei</button>' +
+    '<button type="button" class="btn btn-ghost" data-resume-new>Recomeçar</button></div>';
+  el.startBtn.parentNode.insertBefore(box, el.startBtn);
+  el.startBtn.classList.add('is-secondary-start');
+  box.querySelector('[data-resume-go]').addEventListener('click', () => {
+    leadStore.update(Object.assign({}, p.lead, { nome: '', whatsapp: '', email: '' }));
+    if (!leadStore.get().leadId) leadStore.update({ leadId: newLeadId() });
+    Object.assign(selections, p.sel || {});
+    analytics.track(analytics.EVENTS.QUIZ_STARTED);
+    showQuestionStep(step);
+    // Restaura a seleção visual das etapas de escolha já respondidas.
+    const pick = (container, value) => {
+      const b = container && value ? container.querySelector('[data-value="' + String(value).replace(/"/g, '') + '"]') : null;
+      if (b) b.click();
+    };
+    pick(el.propertyTypeOptions, (p.sel && p.sel.tipoImovel && p.sel.tipoImovel[0]) || '');
+    pick(el.propertyStatusOptions, p.sel && p.sel.situacaoImovel);
+    pick(el.ownershipOptions, p.sel && p.sel.titularidadeImovel);
+  });
+  box.querySelector('[data-resume-new]').addEventListener('click', () => {
+    clearProgress();
+    box.remove();
+    el.startBtn.classList.remove('is-secondary-start');
+  });
+}
+
+// Envia nome + WhatsApp + dados do imóvel quando a pessoa informa o WhatsApp,
+// antes do e-mail, para o time comercial não perder quem desiste no fim.
+let partialSentFor = '';
+function sendPartialLead() {
+  if (!CONFIG.CRM.sendPartial || !CONFIG.CRM.webhookUrl) return;
+  const lead = leadStore.get();
+  if (!lead.leadId || partialSentFor === lead.leadId) return;
+  partialSentFor = lead.leadId;
+  sendLeadToCrm(Object.assign(leadStore.toCrmPayload(), { etapa: 'parcial', status: 'LEAD PARCIAL' })).catch(() => {});
 }
 
 // ---------- Passo 9: e-mail ----------
@@ -2231,6 +2333,7 @@ function animateCalculatingScreen(durationMs) {
 }
 
 function runCalculationAndShowResult() {
+  clearProgress();
   goToScreen('screen-calculating');
   const stopAnimation = animateCalculatingScreen(CALCULATING_DURATION_MS);
 

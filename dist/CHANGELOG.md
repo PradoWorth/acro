@@ -38,3 +38,8 @@ Primeira versão numerada do site.
 - Globo: contornos dos paises com todos os pontos (antes 1 a cada 4); custo de renderizacao medido igual.
 - Cards 'Aprofunde' em artigos: 2 colunas no desktop (antes 3, apertado ao lado do indice).
 - Simulador: cards de opcao atualizam so o estado ao selecionar (imagens nao sao recriadas), corrigindo o piscar no celular.
+- Menu: item Simulador (desktop, painel Solucoes, gaveta) e bloco na home; menu desktop so a partir de 1120px.
+- Simulador: retomar de onde parou (7 dias, sem dados de contato); lead parcial enviado ao informar o WhatsApp (etapa=parcial, leadId); aviso de consentimento; politica atualizada.
+- Prova social (4,9, RA1000, 74+) em Contato, Pronampe e Simular Home Equity.
+- Formularios: validacao ao vivo apos o primeiro blur, indicador de campo valido, autocomplete.
+- Barra de cookies compacta no celular.
