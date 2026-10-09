@@ -179,3 +179,5 @@ html,body{touch-action:manipulation}
 .pagehead__cta{margin-top:1.5rem}
 }
 .shell>.simband{margin-block:0}
+
+.fgrid--2>.field:nth-child(odd):last-child,.fgrid--2>.field:nth-child(odd):has(+.field--full){grid-column:1/-1}
