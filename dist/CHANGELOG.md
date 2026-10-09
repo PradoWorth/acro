@@ -49,3 +49,5 @@ Primeira versão numerada do site.
 - Botoes de simulacao Home Equity (home, simbands, topo das paginas, painel Solucoes) abrem o simulador em pop-up (data-sim-open), com link normal como fallback.
 - Pop-up do simulador com fundo desfocado (igual ao modal de contato); clique fora fecha.
 - Home: card avulso de Home Equity substituído por seção completa (#home-equity) com imagem, benefícios, 3 passos e CTA que abre o simulador em pop-up.
+- Home: imagem do Home Equity fica acima do texto no mobile/tablet e à esquerda no desktop.
+- Home: seção Home Equity com imagem no topo (mobile) e título/tag junto ao texto, padrão do bloco Simulador gratuito.
