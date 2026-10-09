@@ -1,6 +1,7 @@
 (function(){
   var dl=window.dataLayer=window.dataLayer||[];
-  function push(ev,data){var o={event:ev,page_path:location.pathname},k;for(k in data)o[k]=data[k];dl.push(o);}
+  function push(ev,data){var o={event:ev,page_path:location.pathname},k;for(k in data)o[k]=data[k];dl.push(o);
+    if(typeof window.gtag==="function"){var q={};for(k in o){if(k!=="event")q[k]=o[k];}window.gtag("event",ev,q);}}
   document.addEventListener("click",function(e){
     var a=e.target.closest&&e.target.closest("a,button");if(!a)return;
     var href=a.getAttribute("href")||"";
