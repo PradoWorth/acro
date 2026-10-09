@@ -118,10 +118,12 @@ ErrorDocument 403 /404.html
 
   # URLs limpas: o visitante nunca vê ".html".
   # -1) /pg-programas e /pg-programas/ -> /programas
-  RewriteRule ^pg-(programas|conteudos|solucoes|home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/?$ /$1 [R=301,L]
+  # Rota antiga /home-equity (de um app anterior) passa a /emprestimo-home-equity
+  RewriteRule ^home-equity(/.*)?$ /emprestimo-home-equity$1 [R=301,L]
+  RewriteRule ^pg-(programas|conteudos|solucoes|emprestimo-home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/?$ /$1 [R=301,L]
 
   # 0) Quem acessar as pastas físicas direto vai para a URL pública
-  RewriteCond %{THE_REQUEST} ^[A-Z]+\s/pg-(programas|conteudos|solucoes|home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/([^\s?/]+?)(\.html)?[\s?] [NC]
+  RewriteCond %{THE_REQUEST} ^[A-Z]+\s/pg-(programas|conteudos|solucoes|emprestimo-home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/([^\s?/]+?)(\.html)?[\s?] [NC]
   RewriteRule ^ /%1/%2 [R=301,L]
 
   # 1) /index.html -> /
@@ -139,7 +141,7 @@ ErrorDocument 403 /404.html
 
   # 4a) /programas/pronampe -> pg-programas/pronampe.html (URL pública igual)
   RewriteCond %{DOCUMENT_ROOT}/pg-$1/$2.html -f
-  RewriteRule ^(programas|conteudos|solucoes|home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/(?!index$)([^/]+)$ pg-$1/$2.html [L]
+  RewriteRule ^(programas|conteudos|solucoes|emprestimo-home-equity|credito-com-garantia-de-imovel|situacoes|credito-para-empresas|patrimonio-imobiliario|imoveis|credito-alto-valor|finalidades|cidades|comparativos)/(?!index$)([^/]+)$ pg-$1/$2.html [L]
 
   # 4c) /pagina e /programas/pronampe servem o arquivo .html correspondente
   RewriteCond %{DOCUMENT_ROOT}/$1 !-f

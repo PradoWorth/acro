@@ -85,8 +85,8 @@
    "destination": "/pg-solucoes/:slug"
   },
   {
-   "source": "/home-equity/:slug",
-   "destination": "/pg-home-equity/:slug"
+   "source": "/emprestimo-home-equity/:slug",
+   "destination": "/pg-emprestimo-home-equity/:slug"
   },
   {
    "source": "/credito-com-garantia-de-imovel/:slug",
@@ -123,6 +123,18 @@
   {
    "source": "/comparativos/:slug",
    "destination": "/pg-comparativos/:slug"
+  }
+ ],
+ "redirects": [
+  {
+   "source": "/home-equity",
+   "destination": "/emprestimo-home-equity",
+   "permanent": true
+  },
+  {
+   "source": "/home-equity/:slug",
+   "destination": "/emprestimo-home-equity/:slug",
+   "permanent": true
   }
  ]
 }

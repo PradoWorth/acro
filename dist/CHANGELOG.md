@@ -6,6 +6,9 @@ Regra: a numeração só avança com autorização de Lucas Prado. Mudanças peq
 Auditoria completa: segurança, design system, responsividade, acessibilidade, performance, SEO e conteúdo. Nenhuma URL mudou.
 - Segurança: pastas ocultas (.git) e PHP bloqueados; home protegida contra index.php de outra instalação (DirectoryIndex); HTML sempre revalidado e CSS/JS com cache de 1 ano por hash.
 - Formulários: webhook de produção do n8n; sem "sucesso" quando o envio falha ou o endpoint não existe; erro com link direto para o WhatsApp; leads das páginas novas com a origem correta.
+- Rota do tema Home Equity mudou de /home-equity para /emprestimo-home-equity (15 páginas), com redirecionamento 301 das URLs antigas, para não conflitar com a pasta antiga da Hostinger.
+- Auditoria completa: página 404 com caminhos absolutos (não perde o estilo em URLs profundas), máscara de moeda do simulador em reais inteiros (digitar 800000 vira R$ 800.000), foco no diálogo em telas de toque, landmarks de acessibilidade, favicon.svg leve, descrição do hub encurtada.
+- Botão "Fazer a simulação" corrigido (rolagem suave não briga mais com o clique), bloco de simulação com contraste escuro, botão "Simular em 2 minutos" no topo das páginas, espaçamentos finos no celular.
 - Desempenho: globo da home pausa quando sai da tela (antes o do topo animava o tempo todo) e começa a 30 fps em telas de toque.
 - Google Analytics 4 (G-RZEN0FRQGB): carrega só após o aceite de cookies; eventos de WhatsApp, CTA e formulário enviados ao GA4; CSP e política de privacidade atualizadas.
 - LGPD: aviso de cookies com Aceitar e Recusar, cookie de campanha só após aceite, Consent Mode v2 no GTM do simulador, "Preferências de cookies" no rodapé, política de privacidade atualizada, newsletter com finalidade explícita.

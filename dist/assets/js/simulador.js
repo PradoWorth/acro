@@ -318,23 +318,26 @@ function getAttributionJSON() {
 
 // ---------- Máscaras ----------
 
-/** Formata dígitos como moeda brasileira (R$ 0,00) enquanto o usuário digita. */
+/** Formata dígitos como moeda brasileira em reais inteiros (R$ 800.000) enquanto o usuário digita.
+ *  Digitar 800000 vira R$ 800.000. Valores colados com centavos (800.000,00) perdem os centavos. */
 function maskCurrencyInput(rawValue) {
-  const digits = rawValue.replace(/\D/g, '');
+  const digits = String(rawValue).replace(/,\d{1,2}\s*$/, '').replace(/\D/g, '');
   if (!digits) return '';
-  const number = parseInt(digits, 10) / 100;
+  const number = parseInt(digits, 10);
   return number.toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 }
 
-/** Converte string de moeda formatada em número (float). */
+/** Converte string de moeda formatada em número (reais inteiros). */
 function parseCurrencyToNumber(formatted) {
   if (!formatted) return 0;
-  const digits = formatted.replace(/\D/g, '');
+  const digits = String(formatted).replace(/,\d{1,2}\s*$/, '').replace(/\D/g, '');
   if (!digits) return 0;
-  return parseInt(digits, 10) / 100;
+  return parseInt(digits, 10);
 }
 
 /** Formata telefone/WhatsApp brasileiro: (00) 00000-0000. */
