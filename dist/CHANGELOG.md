@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Soluções: a trava da seção só engata em rolagem lenta e perto da posição; rolagem rápida passa direto e não puxa mais a tela de volta.
 - Contato (celular): o menu lateral usa o mesmo cartão de Home Equity das demais páginas; a faixa do topo continua com os avisos da página.
 - Celular: com o teclado aberto, se a pessoa rolar a página de volta ao topo, o menu reaparece.
 - Acessibilidade: o nome acessível da faixa de anúncio agora inclui o texto visível (auditoria Lighthouse em 7 páginas: acessibilidade 97 a 100, desempenho 98 a 100 no celular).
