@@ -116,7 +116,7 @@
     var c=init();if(!c)return;
     if(c.state==="closed"){reset();return}
     if(c.state!=="running"){if(c.resume)c.resume().then(function(){if(c.state==="running")window.acTick(kind)}).catch(function(){reset()});return}
-    var t=c.currentTime,n=performance.now();if(kind==="hover"){if(n-moved>100)return;lastHover=n}else if(kind==="step"&&n-lastHover<350)return;if(n-last<90)return;last=n;if(cur){try{cur.stop()}catch(e){}cur=null}
+    var t=c.currentTime,n=performance.now();if(kind==="hover"){if(n-moved>350)return;lastHover=n}else if(kind==="step"&&n-lastHover<350)return;if(n-last<90)return;last=n;if(cur){try{cur.stop()}catch(e){}cur=null}
     toggle=!toggle;
     var src=c.createBufferSource();src.buffer=noise;
     var f=c.createBiquadFilter();f.type="bandpass";f.frequency.value=toggle?3400:2500;f.Q.value=6;
