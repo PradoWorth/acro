@@ -219,3 +219,5 @@ html,body{touch-action:manipulation}
 .drawer__sim:hover .annbar__arrow{transform:translateX(3px)}
 .drawer__sim__t .rot{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:380px){.drawer__sim{padding-inline:1rem;gap:.5rem}.drawer__sim__btn{padding:0 .65rem}.drawer__sim .annbar__arrow{display:none}}
+.solloop .solindex__list{overflow:hidden;height:var(--solh,auto);-webkit-mask-image:linear-gradient(transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(transparent,#000 7%,#000 93%,transparent);overscroll-behavior:contain}
+.solloop .soldetail{position:relative;top:auto}
