@@ -1,5 +1,5 @@
 /* Google Analytics 4. So carrega depois do aceite de cookies (LGPD); recusar mantem o GA desligado.
-   O ID vem de assets/js/config.js (ACROPOLE_CONFIG.analytics). */
+   O ID vem de assets/js/core/config.js (ACROPOLE_CONFIG.analytics). */
 (function(){
   var started=false,id="";
   function cfg(){

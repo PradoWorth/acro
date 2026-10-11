@@ -121,7 +121,27 @@ const EVENTS = {
   WHATSAPP_CLICKED: 'whatsapp_clicked',
 };
 
+/* Eventos padronizados do funil (GA4): simulation_start, simulation_complete e generate_lead.
+   Os eventos originais continuam sendo enviados, então tags já criadas no GTM não quebram. */
+const FUNNEL_ALIAS = {
+  quiz_started: 'simulation_start',
+  simulation_generated: 'simulation_complete',
+  lead_submitted: 'generate_lead',
+};
+const FUNNEL_SEEN = {};
+
 function dispatch(eventName, payload = {}) {
+  const alias = FUNNEL_ALIAS[eventName];
+  if (alias && !FUNNEL_SEEN[alias + (window.__HE_LEAD__ || '')]) {
+    FUNNEL_SEEN[alias + (window.__HE_LEAD__ || '')] = 1;
+    let origin = '';
+    try { origin = new URLSearchParams(location.search).get('utm_source') || document.referrer.split('/')[2] || 'direto'; } catch (_) {}
+    dispatchRaw(alias, { form_name: 'simulador-home-equity', funnel: 'home-equity', traffic_source: origin });
+  }
+  dispatchRaw(eventName, payload);
+}
+
+function dispatchRaw(eventName, payload = {}) {
   const data = {
     event: eventName,
     timestamp: new Date().toISOString(),
@@ -442,7 +462,7 @@ function normalize(value) {
 let __munPromise = null;
 function loadMunicipios() {
   if (!__munPromise) {
-    __munPromise = fetch('assets/js/municipios.json', { credentials: 'same-origin' })
+    __munPromise = fetch('assets/js/simulador/municipios.json', { credentials: 'same-origin' })
       .then((r) => { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
       .catch((e) => { __munPromise = null; throw e; });
   }
