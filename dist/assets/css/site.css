@@ -254,7 +254,8 @@ html::-webkit-scrollbar-thumb:hover{background:var(--iris)}
 .drawer__panel::-webkit-scrollbar-thumb:hover{background:var(--iris)}
 @supports not selector(::-webkit-scrollbar){html{scrollbar-width:thin;scrollbar-color:var(--petrol-deep) var(--obsidian)}*{scrollbar-width:thin;scrollbar-color:rgba(12,94,82,.5) transparent}.drawer__panel{scrollbar-color:rgba(138,206,196,.4) transparent}}
 @media (min-width:940px) and (max-height:800px){.solpanel__art{margin-bottom:.75rem}.solpanel>h3,.solpanel>.solpanel__t{margin-bottom:.5rem}.solpanel>.muted{margin-bottom:.5rem;font-size:var(--t-sm);line-height:1.45}.solpanel__facts{margin:.5rem 0!important;gap:.4rem}.solpanel__facts>*{padding-block:.3rem}}
-@media (min-width:940px) and (max-height:860px){.solpanel__art .diagram{aspect-ratio:520/332}}
+@media (min-width:940px){.solpanel__art .diagram{aspect-ratio:520/340}}
 .annbar__btn,.drawer__sim__btn{height:auto;padding:0;border:0;border-radius:0;background:none!important;color:var(--iris-on-dark);font-size:var(--t-micro);font-weight:700;letter-spacing:.07em;text-transform:uppercase;gap:.35rem;box-shadow:none}
 .annbar:hover .annbar__btn,.annbar:focus-visible .annbar__btn,.drawer__sim:hover .drawer__sim__btn,.drawer__sim:focus-visible .drawer__sim__btn{background:none!important;color:var(--white);border:0}
 .annbar,.drawer__sim{font-size:var(--t-micro);gap:.5rem 1.25rem}
+.solloop .solrow:focus-visible{outline:0;border-radius:var(--r-input);box-shadow:inset 0 0 0 1px rgba(138,206,196,.55)}
