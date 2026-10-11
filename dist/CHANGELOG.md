@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Contato: a faixa do topo (e o card do menu mobile) passa a ser um aviso fixo, sem link: "Quase lá. Preencha os campos e retornamos em até 2 minutos, em horário comercial."
 - Cabeçalho de todas as páginas internas com a mesma altura do hero da home (altura da janela no desktop), com a imagem ocupando a coluna inteira.
 - Fundo escuro atrás da página: ao puxar além do topo ou do fim no celular não aparece mais faixa branca.
 - Cabeçalhos das páginas internas: espaçamentos e tipografia proporcionais à altura da janela (svh) no desktop, para que título, texto e quadro de dados caibam na primeira tela, sem achatar.

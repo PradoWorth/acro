@@ -281,3 +281,7 @@ html{background-color:var(--obsidian)}
 }
 @media (min-width:900px){.pagehead:has(+ .band .factrail){min-height:calc(100svh - var(--fr-h,9.5rem))}}
 @media (min-width:900px){.pronampe-hero{min-height:calc(100vh - 5rem - var(--bar-h));min-height:calc(100svh - 5rem - var(--bar-h));display:flex;align-items:center}.pronampe-hero>.shell{width:100%}}
+.annbar--static{cursor:default}
+.annbar__msg{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drawer__sim--static{cursor:default;justify-content:flex-start}
+.drawer__sim__msg{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

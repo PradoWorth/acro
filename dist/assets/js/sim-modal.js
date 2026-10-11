@@ -56,7 +56,7 @@
 (function(){
   var bar=document.querySelector(".annbar");if(!bar)return;
   var root=document.documentElement;
-  bar.addEventListener("click",function(){
+  if(!bar.classList.contains("annbar--static"))bar.addEventListener("click",function(){
     var dl=window.dataLayer=window.dataLayer||[];
     var d={page_path:location.pathname,placement:"top_bar",cta_target:bar.getAttribute("href")||"",viewport:window.innerWidth<768?"mobile":"desktop"};
     var o={event:"announcement_click"},k;for(k in d)o[k]=d[k];dl.push(o);
