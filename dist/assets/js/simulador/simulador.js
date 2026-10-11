@@ -151,45 +151,7 @@ document.addEventListener('click', (e) => {
   if (t && !t.disabled) haptic(8);
 }, true);
 
-/* Som discreto de conclusão ao gerar a simulação (1,5 s, volume baixo, só após toque do visitante). */
-const CHIME_SRC = 'assets/audio/concluido.mp3';
-let chimeAudio = null;
-let chimeLast = 0;
-function chimeUrl() {
-  if (/^data:/.test(CHIME_SRC)) return CHIME_SRC;
-  const s = document.querySelector('script[src*="simulador/simulador.js"]');
-  return s && s.src ? s.src.replace(/js\/simulador\/simulador\.js.*$/, '') + 'audio/concluido.mp3' : CHIME_SRC;
-}
-function chimeMake() {
-  if (chimeAudio) return chimeAudio;
-  try { chimeAudio = new Audio(chimeUrl()); chimeAudio.preload = 'auto'; chimeAudio.volume = 0.3; } catch (_) { chimeAudio = null; }
-  return chimeAudio;
-}
-function chimeUnlock() {
-  document.removeEventListener('pointerdown', chimeUnlock, true);
-  document.removeEventListener('touchend', chimeUnlock, true);
-  const x = chimeMake();
-  if (!x) return;
-  try {
-    x.muted = true;
-    const p = x.play();
-    const done = () => { try { x.pause(); x.currentTime = 0; x.muted = false; } catch (_) {} };
-    if (p && p.then) p.then(done).catch(() => { x.muted = false; }); else done();
-  } catch (_) {}
-}
-document.addEventListener('pointerdown', chimeUnlock, true);
-document.addEventListener('touchend', chimeUnlock, true);
-function chime() {
-  const n = Date.now();
-  if (n - chimeLast < 1500 || document.hidden) return;
-  chimeLast = n;
-  const x = chimeMake();
-  if (!x) return;
-  try { x.muted = false; x.volume = 0.3; x.currentTime = 0; const p = x.play(); if (p && p.catch) p.catch(() => {}); } catch (_) {}
-}
-
 function dispatch(eventName, payload = {}) {
-  if (eventName === 'simulation_generated') chime();
   if (eventName === 'simulation_generated') haptic([14, 50, 14]);
   if (eventName === 'location_disqualified' || eventName === 'financing_disqualified') haptic([40, 40, 40]);
   const alias = FUNNEL_ALIAS[eventName];
