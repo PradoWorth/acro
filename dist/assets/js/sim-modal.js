@@ -50,3 +50,30 @@
     if(e.data&&e.data.type==="acropole:sim-close")close();
   });
 })();
+
+/* Faixa de anuncio: evento de clique para o GA4 (so chega ao Google com cookies aceitos)
+   e, no celular, esconde ao rolar para baixo e volta ao rolar para cima. */
+(function(){
+  var bar=document.querySelector(".annbar");if(!bar)return;
+  var root=document.documentElement;
+  bar.addEventListener("click",function(){
+    var dl=window.dataLayer=window.dataLayer||[];
+    var d={page_path:location.pathname,placement:"top_bar",cta_target:bar.getAttribute("href")||"",viewport:window.innerWidth<768?"mobile":"desktop"};
+    var o={event:"announcement_click"},k;for(k in d)o[k]=d[k];dl.push(o);
+    if(typeof window.gtag==="function")window.gtag("event","announcement_click",d);
+  },true);
+  var mq=window.matchMedia("(max-width: 47.99rem)"),tick=false,pt=document.querySelector(".partners");
+  function past(){
+    var y=window.pageYOffset||0;
+    if(pt){return pt.getBoundingClientRect().top<=window.innerHeight*.75}
+    return y>window.innerHeight*.9;
+  }
+  function upd(){
+    tick=false;
+    if(mq.matches&&past()){root.classList.add("annbar-hide")}else{root.classList.remove("annbar-hide")}
+  }
+  window.addEventListener("scroll",function(){if(!tick){tick=true;window.requestAnimationFrame(upd)}},{passive:true});
+  window.addEventListener("resize",upd,{passive:true});
+  var mqf=function(){if(!mq.matches)root.classList.remove("annbar-hide")};
+  if(mq.addEventListener)mq.addEventListener("change",mqf);
+})();

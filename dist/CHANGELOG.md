@@ -54,3 +54,7 @@ Primeira versão numerada do site.
 - Política de privacidade: CRM citado entre fornecedores, transferência internacional (Google, Vercel, WhatsApp) e dados de terceiros informados em formulários.
 - Campos validos: destaque verde e check somem ao sair do campo, sem animacao.
 - Pronampe: mais espaco entre a imagem e o texto na secao O custo invisivel.
+- Faixa de anuncio fixa acima do menu em todas as paginas (pergunta curta no mobile, texto longo no desktop, botao Simular que abre o simulador em pop-up); como-funciona recebeu o item Simulador e o pop-up que faltavam.
+- Faixa de anuncio: botao Simular em verde escuro discreto, para nao competir com o botao do menu.
+- Faixa de anuncio: evento announcement_click no GA4, texto desktop com sem consulta a bureau de credito e, no celular, a faixa sobe suavemente ao chegar na secao dos bancos (ou apos a primeira tela nas demais paginas).
+- Home: icones dos cards Objetivo, Estrutura, Patrimonio e garantias e Capacidade e risco redesenhados (traco 2, circulo verde claro, maiores), no padrao do Pronampe.
