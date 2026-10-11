@@ -69,3 +69,4 @@ Primeira versão numerada do site.
 - Conversao: botao da faixa com preenchimento mais claro e seta; seo-events.js em todas as paginas (cta_click, form_start, generate_lead); evento simulator_open com a origem (faixa, menu, secao_home, etc.).
 - Menu: linha fina na base do menu, no mesmo estilo da linha acima dos numeros do hero.
 - Soluções (home): painel lateral fixo abaixo do menu com barra (top com --bar-h) e altura mínima estável ao passar o mouse.
+- Menu mobile: card do simulador movido para o topo do painel, acima da logo, com o mesmo visual da barra de anúncio (fundo verde, texto branco, botão).

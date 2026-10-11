@@ -211,3 +211,11 @@ html,body{touch-action:manipulation}
 .masthead{box-shadow:inset 0 -1px 0 var(--rule-dark)}
 .soldetail{top:calc(6rem + var(--bar-h))}
 @media (min-width:900px){.soldetail{min-height:37rem}}
+.drawer__sim{flex:0 0 auto;margin:0;height:var(--bar-h);padding:0 var(--gut);border:0;border-bottom:1px solid var(--rule-dark-soft);border-radius:0;background:var(--petrol-deep);color:var(--white);font-size:var(--t-micro);font-weight:700;gap:.75rem}
+.drawer__sim:hover,.drawer__sim:focus-visible{background:var(--petrol-deep);border-color:var(--rule-dark-soft)}
+.drawer__sim:focus-visible{outline:2px solid var(--iris-on-dark);outline-offset:-4px}
+.drawer__sim__btn{height:1.9rem;padding:0 .8rem;gap:.25rem;background:rgba(138,206,196,.2);color:var(--white);border:1px solid rgba(138,206,196,.55);font-size:var(--t-micro);font-weight:700;line-height:1;white-space:nowrap;transition:background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease)}
+.drawer__sim:hover .drawer__sim__btn,.drawer__sim:focus-visible .drawer__sim__btn{background:rgba(138,206,196,.34);color:var(--white);border-color:rgba(255,255,255,.7)}
+.drawer__sim:hover .annbar__arrow{transform:translateX(3px)}
+.drawer__sim__t .rot{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:380px){.drawer__sim{padding-inline:1rem;gap:.5rem}.drawer__sim__btn{padding:0 .65rem}.drawer__sim .annbar__arrow{display:none}}
