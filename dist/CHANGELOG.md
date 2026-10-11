@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Volume do tique das Solucoes aumentado (pico de cerca de -15 dBFS, antes cerca de -37 dBFS).
 - /en: bloco de contato sem linha e sem espaco duplo em relacao ao bloco anterior.
 - Pagina em ingles /en (en.html): hreflang, sitemap e link English no rodape de todas as paginas.
 - Menu no celular: trava real da rolagem da pagina com o menu aberto (iPhone) e volta a esconder o menu quando um campo esta em foco.
