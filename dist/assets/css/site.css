@@ -344,3 +344,13 @@ html.is-typing .masthead{transform:translate3d(0,-130%,0);visibility:hidden;poin
 }
 html.is-tv .cookiebar,html.is-tv .rail,html.is-tv .skip{display:none!important}
 html.is-tv,html.is-tv *{cursor:none!important}
+/* Modal do formulário: altura segue a área realmente visível do celular (barra de endereço e de abas do navegador). */
+@supports (height:100dvh){
+.leadmodal{height:100dvh;bottom:auto}
+.leadmodal__dialog{max-height:calc(100dvh - 2*var(--sp-2))}
+}
+@supports not (height:100dvh){
+.leadmodal__dialog{max-height:calc(100% - 2*var(--sp-2))}
+}
+.leadmodal__dialog:focus,.leadmodal__dialog:focus-visible{outline:0}
+.leadmodal{padding:max(var(--sp-2),env(safe-area-inset-top)) max(var(--sp-2),env(safe-area-inset-right)) max(var(--sp-2),env(safe-area-inset-bottom)) max(var(--sp-2),env(safe-area-inset-left))}
