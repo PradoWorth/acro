@@ -71,6 +71,7 @@
   }
   function upd(){
     tick=false;
+    if(root.classList.contains("is-typing"))return;
     if(mq.matches&&past()){root.classList.add("annbar-hide")}else{root.classList.remove("annbar-hide")}
   }
   window.addEventListener("scroll",function(){if(!tick){tick=true;window.requestAnimationFrame(upd)}},{passive:true});
@@ -113,7 +114,7 @@ document.addEventListener("click",function(e){
   var bar=document.querySelector(".annbar"),paused=false;
   if(bar){["mouseenter","focusin","touchstart"].forEach(function(t){bar.addEventListener(t,function(){paused=true},{passive:true})});["mouseleave","focusout"].forEach(function(t){bar.addEventListener(t,function(){paused=false})})}
   function next(){
-    if(paused||document.hidden||root.classList.contains("annbar-hide"))return;
+    if(paused||document.hidden||root.classList.contains("annbar-hide")||root.classList.contains("is-typing"))return;
     var prev=items[i];i=(i+1)%items.length;
     prev.classList.remove("is-on");prev.classList.add("is-out");
     setTimeout(function(){prev.classList.remove("is-out")},800);
@@ -130,3 +131,11 @@ document.addEventListener("click",function(e){
   var dl=window.dataLayer=window.dataLayer||[],x={event:"simulator_open"},k;for(k in d)x[k]=d[k];dl.push(x);
   if(typeof window.gtag==="function")window.gtag("event","simulator_open",d);
 },true);
+
+/* Campo em foco (teclado aberto no celular): congela menu e faixa para nao piscar. */
+(function(){
+  var root=document.documentElement,t=0;
+  function f(e){var n=e.target&&e.target.tagName;return n==="INPUT"||n==="SELECT"||n==="TEXTAREA"}
+  document.addEventListener("focusin",function(e){if(!f(e))return;clearTimeout(t);root.classList.add("is-typing")});
+  document.addEventListener("focusout",function(e){if(!f(e))return;clearTimeout(t);t=setTimeout(function(){root.classList.remove("is-typing")},400)});
+})();

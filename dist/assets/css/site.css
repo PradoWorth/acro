@@ -285,3 +285,6 @@ html{background-color:var(--obsidian)}
 .annbar__msg{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .drawer__sim--static{cursor:default;justify-content:flex-start}
 .drawer__sim__msg{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+html.is-typing .masthead,html.is-typing .annbar{transition:none!important;animation:none!important;will-change:auto}
+html.is-typing .annbar__txt .arot{transition:none!important}
