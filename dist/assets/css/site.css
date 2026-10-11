@@ -240,3 +240,14 @@ html,body{touch-action:manipulation}
 .factrail__cell{padding-inline:var(--sp-1)}
 .factrail__cell:first-child{padding-left:0}
 }
+html::-webkit-scrollbar{width:12px;height:12px}
+html::-webkit-scrollbar-track{background:var(--obsidian);border-left:1px solid var(--rule-dark-soft)}
+html::-webkit-scrollbar-thumb{background:var(--petrol-deep);border:3px solid var(--obsidian);border-radius:100px;min-height:3rem}
+html::-webkit-scrollbar-thumb:hover{background:var(--iris)}
+*::-webkit-scrollbar{width:8px;height:8px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgba(12,94,82,.45);border-radius:100px}
+*::-webkit-scrollbar-thumb:hover{background:var(--accent-ink)}
+.drawer__panel::-webkit-scrollbar-thumb,.hero *::-webkit-scrollbar-thumb{background:rgba(138,206,196,.32)}
+.drawer__panel::-webkit-scrollbar-thumb:hover{background:var(--iris)}
+@supports not selector(::-webkit-scrollbar){html{scrollbar-width:thin;scrollbar-color:var(--petrol-deep) var(--obsidian)}*{scrollbar-width:thin;scrollbar-color:rgba(12,94,82,.5) transparent}.drawer__panel{scrollbar-color:rgba(138,206,196,.4) transparent}}
