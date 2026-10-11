@@ -120,3 +120,12 @@ document.addEventListener("click",function(e){
   }
   timer=setInterval(next,4000);
 })();
+
+/* Mede de onde vem cada abertura do simulador (faixa, menu, secao da home, etc.). */
+document.addEventListener("click",function(e){
+  var t=e.target.closest&&e.target.closest("[data-sim-open]");if(!t)return;
+  var o=t.closest(".annbar")?"faixa":t.closest(".drawer")?"menu_mobile":t.closest(".megapanel")?"menu_desktop":t.closest("#home-equity")?"secao_home":"pagina";
+  var d={page_path:location.pathname,origin:o,viewport:window.innerWidth<768?"mobile":"desktop"};
+  var dl=window.dataLayer=window.dataLayer||[],x={event:"simulator_open"},k;for(k in d)x[k]=d[k];dl.push(x);
+  if(typeof window.gtag==="function")window.gtag("event","simulator_open",d);
+},true);

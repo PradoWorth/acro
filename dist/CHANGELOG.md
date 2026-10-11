@@ -66,3 +66,4 @@ Primeira versão numerada do site.
 - Menu lateral mobile: o card Home Equity alterna 4 mensagens (pergunta, taxa a partir de, prazo, sem bureau) com efeito de virar a caixinha a cada 3 segundos.
 - Faixa de anuncio: 4 mensagens viram a cada 3 segundos (pergunta, taxa a partir de 1,19% + IPCA, prazo e uso do imovel, sem bureau), botao Simular fixo.
 - Faixa e card do menu: troca de mensagens com deslize vertical e fade (no lugar da virada 3D), a cada 4 segundos, com pausa ao passar o mouse, focar ou tocar na faixa.
+- Conversao: botao da faixa com preenchimento mais claro e seta; seo-events.js em todas as paginas (cta_click, form_start, generate_lead); evento simulator_open com a origem (faixa, menu, secao_home, etc.).
