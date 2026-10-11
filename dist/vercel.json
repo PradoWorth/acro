@@ -62,7 +62,7 @@
    ]
   },
   {
-   "source": "/assets/(img|art|icons)/(.*)",
+   "source": "/assets/(img|art|icons|audio)/(.*)",
    "headers": [
     {
      "key": "Cache-Control",

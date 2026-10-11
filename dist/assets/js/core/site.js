@@ -59,3 +59,39 @@
     }
   }).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:["data-show"]});
 })();
+
+;(function(){
+  /* Som discreto de conclusão (1,5 s, volume baixo): formulário enviado com sucesso.
+     Só toca depois de um toque ou clique do visitante; nunca ao abrir ou rolar a página. */
+  var SRC="assets/audio/concluido.mp3",VOL=.3,a=null,ready=false,last=0;
+  function url(){
+    if(/^data:/.test(SRC))return SRC;
+    var s=document.querySelector('script[src*="core/site.js"]');
+    return s&&s.src?s.src.replace(/js\/core\/site\.js.*$/,"")+"audio/concluido.mp3":SRC;
+  }
+  function make(){
+    if(a)return a;
+    try{a=new Audio(url());a.preload="auto";a.volume=VOL}catch(e){a=null}
+    return a;
+  }
+  function unlock(){
+    /* navegadores de celular só liberam o som depois de um primeiro toque: destrava em silêncio */
+    document.removeEventListener("pointerdown",unlock,true);document.removeEventListener("touchend",unlock,true);
+    var x=make();if(!x)return;
+    try{x.muted=true;var p=x.play();
+      var done=function(){try{x.pause();x.currentTime=0;x.muted=false;ready=true}catch(e){}};
+      p&&p.then?p.then(done).catch(function(){x.muted=false}):done();
+    }catch(e){}
+  }
+  document.addEventListener("pointerdown",unlock,true);document.addEventListener("touchend",unlock,true);
+  function chime(){
+    var n=Date.now();if(n-last<1500||document.hidden)return;last=n;
+    var x=make();if(!x)return;
+    try{x.muted=false;x.volume=VOL;x.currentTime=0;var p=x.play();p&&p.catch&&p.catch(function(){})}catch(e){}
+  }
+  window.acChime=chime;
+  if(window.MutationObserver)new MutationObserver(function(list){
+    for(var k=0;k<list.length;k++){var el=list[k].target;
+      if(el.classList&&el.classList.contains("formstate--ok")&&el.getAttribute("data-show")==="true")chime()}
+  }).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:["data-show"]});
+})();

@@ -24,6 +24,8 @@
   Cache-Control: public, max-age=86400
 /assets/img/*
   Cache-Control: public, max-age=604800, must-revalidate
+/assets/audio/*
+  Cache-Control: public, max-age=604800, must-revalidate
 /assets/art/*
   Cache-Control: public, max-age=604800, must-revalidate
 /assets/icons/*
