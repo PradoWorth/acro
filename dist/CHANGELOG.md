@@ -39,6 +39,8 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Menu sempre fixo no celular: removida a regra que o escondia com campo em foco; so a faixa verde some ao rolar.
+- Desempenho: scripts inline da home (estrelas do hero e quadro) movidos para home.js com defer, para a primeira pintura nao esperar por eles.
 - Volume do tique das Solucoes dobrado (+6 dB), ainda discreto.
 - Som das Solucoes validado com CPU lenta (aparelho fraco/bateria baixa); janela de tique por hover ampliada.
 - Som da secao Solucoes volta a funcionar apos sair e voltar para a aba (contexto de audio retomado ou recriado).
