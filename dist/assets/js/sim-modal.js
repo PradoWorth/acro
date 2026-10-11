@@ -109,8 +109,10 @@ document.addEventListener("click",function(e){
   var items=box.querySelectorAll(".arot"),i=0,timer=null,root=document.documentElement;
   var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(items.length<2||reduce)return;
+  var bar=document.querySelector(".annbar"),paused=false;
+  if(bar){["mouseenter","focusin","touchstart"].forEach(function(t){bar.addEventListener(t,function(){paused=true},{passive:true})});["mouseleave","focusout"].forEach(function(t){bar.addEventListener(t,function(){paused=false})})}
   function next(){
-    if(document.hidden||root.classList.contains("annbar-hide"))return;
+    if(paused||document.hidden||root.classList.contains("annbar-hide"))return;
     var prev=items[i];i=(i+1)%items.length;
     prev.classList.remove("is-on");prev.classList.add("is-out");
     setTimeout(function(){prev.classList.remove("is-out")},800);
