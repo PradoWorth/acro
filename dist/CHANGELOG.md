@@ -77,3 +77,4 @@ Primeira versão numerada do site.
 - Soluções (desktop): tela trava ao chegar na seção (alinha abaixo do menu), roda do mouse gira a lista em loop com animação contínua; mouse fora da seção libera a rolagem. Painel compacto em telas baixas.
 - Soluções (desktop): diagrama preenche o quadro sem lacunas laterais; coluna do painel se ajusta à altura da janela.
 - Soluções (desktop): trava volta a funcionar em todas as entradas, descendo ou subindo, quantas vezes a pessoa sair e voltar.
+- Soluções (desktop): colunas equilibradas; diagrama do painel preenche o quadro (recorte leve) e o painel cabe na tela.

@@ -253,5 +253,5 @@ html::-webkit-scrollbar-thumb:hover{background:var(--iris)}
 .drawer__panel::-webkit-scrollbar-thumb,.hero *::-webkit-scrollbar-thumb{background:rgba(138,206,196,.32)}
 .drawer__panel::-webkit-scrollbar-thumb:hover{background:var(--iris)}
 @supports not selector(::-webkit-scrollbar){html{scrollbar-width:thin;scrollbar-color:var(--petrol-deep) var(--obsidian)}*{scrollbar-width:thin;scrollbar-color:rgba(12,94,82,.5) transparent}.drawer__panel{scrollbar-color:rgba(138,206,196,.4) transparent}}
-@media (min-width:940px){.solindex{grid-template-columns:minmax(0,1fr) min(max(19rem,calc((100svh - 26rem)*1.4444)),calc((100% - var(--sp-5))*.458))}}
-@media (min-width:940px) and (max-height:800px){.solindex{grid-template-columns:minmax(0,1fr) min(max(19rem,calc((100svh - 28rem)*1.4444)),calc((100% - var(--sp-5))*.458))}.solpanel__art{margin-bottom:.75rem}.solpanel>h3,.solpanel>.solpanel__t{margin-bottom:.5rem}.solpanel>.muted{margin-bottom:.5rem;font-size:var(--t-sm);line-height:1.45}.solpanel__facts{margin:.5rem 0!important;gap:.4rem}.solpanel__facts>*{padding-block:.3rem}}
+@media (min-width:940px) and (max-height:800px){.solpanel__art{margin-bottom:.75rem}.solpanel>h3,.solpanel>.solpanel__t{margin-bottom:.5rem}.solpanel>.muted{margin-bottom:.5rem;font-size:var(--t-sm);line-height:1.45}.solpanel__facts{margin:.5rem 0!important;gap:.4rem}.solpanel__facts>*{padding-block:.3rem}}
+@media (min-width:940px) and (max-height:860px){.solpanel__art .diagram{aspect-ratio:520/332}}
