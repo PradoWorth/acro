@@ -364,3 +364,6 @@ html.is-tv,html.is-tv *{cursor:none!important}
 .solpanel,.solpanel[data-active=true]{display:block;grid-area:1/1;min-width:0;animation:none!important;transition:none!important}
 .solpanel{opacity:0;visibility:hidden;pointer-events:none}
 .solpanel[data-active=true]{opacity:1;visibility:visible;pointer-events:auto}
+
+/* Pagina /en: bloco de contato continua o bloco anterior, sem linha nem espaco duplo */
+.contactband{background:linear-gradient(180deg,var(--obsidian),#000);border-top:0;padding-top:calc(var(--band) * .5)}
