@@ -64,6 +64,7 @@
   },true);
   var mq=window.matchMedia("(max-width: 47.99rem)"),tick=false,pt=document.querySelector(".partners");
   function past(){
+    if(bar.classList.contains("annbar--static"))return false;
     var y=window.pageYOffset||0;
     if(pt){return pt.getBoundingClientRect().top<=window.innerHeight*.75}
     return y>window.innerHeight*.9;
