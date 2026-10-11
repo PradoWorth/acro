@@ -274,3 +274,10 @@ html::-webkit-scrollbar-thumb:hover{background:var(--iris)}
 @media (min-width:900px){.pagehead h1{max-width:none}.pagehead__meta dd{font-size:var(--t-xs);line-height:1.45}}
 @media (min-width:900px){.pagehead__inner{padding-block:clamp(1rem,5svh,5rem) clamp(.5rem,2svh,4rem)}.pagehead__meta{margin-top:clamp(.75rem,2.6svh,2.5rem)}}
 html{background-color:var(--obsidian)}
+@media (min-width:900px){
+.pagehead{min-height:100vh;min-height:100svh;display:flex;flex-direction:column}
+.pagehead__grid{flex:1 1 auto;align-items:stretch}
+.pagehead__media{align-self:stretch;aspect-ratio:auto;min-height:0}
+}
+@media (min-width:900px){.pagehead:has(+ .band .factrail){min-height:calc(100svh - var(--fr-h,9.5rem))}}
+@media (min-width:900px){.pronampe-hero{min-height:calc(100vh - 5rem - var(--bar-h));min-height:calc(100svh - 5rem - var(--bar-h));display:flex;align-items:center}.pronampe-hero>.shell{width:100%}}
