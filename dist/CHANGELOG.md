@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Som da secao Solucoes volta a funcionar apos sair e voltar para a aba (contexto de audio retomado ou recriado).
 - Vibração nos campos (mobile Android): sem toque por tecla; toque firme duplo em erro, toque leve ao completar o WhatsApp e ao sair de campo válido.
 - Soluções: tique de relógio bem baixinho, um som por interação: computador (passar o mouse, rolar, clicar), celular e tablet (tocar em um item). Nunca sozinho.
 - Vibração leve no celular (Android) em toques de botões e nos resultados de formulário e simulador; respeita "reduzir movimento".

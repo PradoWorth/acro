@@ -93,7 +93,15 @@
     }catch(e){ctx=null}
     return ctx;
   }
-  function wake(){var c=init();if(c&&c.state==="suspended"&&c.resume)c.resume().catch(function(){})}
+  function reset(){try{if(ctx&&ctx.state!=="closed"&&ctx.close)ctx.close().catch(function(){})}catch(e){}ctx=null;noise=null;cur=null}
+  function wake(){
+    var c=init();if(!c)return;
+    if(c.state==="closed"){reset();c=init();if(!c)return}
+    if(c.state!=="running"&&c.resume)c.resume().catch(function(){});
+  }
+  /* Ao voltar de outra aba/tela o navegador suspende (ou "interrompe") o audio: recria ou retoma. */
+  document.addEventListener("visibilitychange",function(){if(!document.hidden&&ctx&&ctx.state!=="running"){if(ctx.state==="closed")reset();else{try{ctx.resume().catch(reset)}catch(e){reset()}}}});
+  window.addEventListener("pageshow",function(){if(ctx&&ctx.state!=="running")reset()});
   ["pointerdown","keydown","touchend"].forEach(function(t){document.addEventListener(t,wake,{capture:true,passive:true})});
   window.acTickWake=wake;
   document.addEventListener("click",function(e){
@@ -106,8 +114,8 @@
   window.acTick=function(kind){
     if(document.hidden)return;
     var c=init();if(!c)return;
-    if(c.state==="suspended"){if(c.resume)c.resume().then(function(){window.acTick(kind)}).catch(function(){});return}
-    if(c.state!=="running")return;
+    if(c.state==="closed"){reset();return}
+    if(c.state!=="running"){if(c.resume)c.resume().then(function(){if(c.state==="running")window.acTick(kind)}).catch(function(){reset()});return}
     var t=c.currentTime,n=performance.now();if(kind==="hover"){if(n-moved>100)return;lastHover=n}else if(kind==="step"&&n-lastHover<350)return;if(n-last<90)return;last=n;if(cur){try{cur.stop()}catch(e){}cur=null}
     toggle=!toggle;
     var src=c.createBufferSource();src.buffer=noise;
