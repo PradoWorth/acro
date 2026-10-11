@@ -40,7 +40,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
 - Rodapé: número da versão atualizado para 1.3 em todas as páginas (a cada versão nova, ele acompanha).
-- Celular: ao tocar em um campo de formulário, o menu e a faixa saem de cena enquanto o teclado está aberto (evita o menu solto no meio da tela) e voltam ao sair do campo.
+- Celular: ao tocar em um campo de formulário, o menu sobe com animação elástica enquanto o teclado está aberto e desce de novo ao sair do campo.
 - Contato: a faixa do topo (e o card do menu mobile) alterna 4 avisos curtos, sem link: quase lá, retorno em até 2 minutos em horário comercial, sem compromisso e sem bureau, atendimento de segunda a sexta. No celular, a faixa fica fixa ao rolar (não esconde).
 - Cabeçalho de todas as páginas internas com a mesma altura do hero da home (altura da janela no desktop), com a imagem ocupando a coluna inteira.
 - Fundo escuro atrás da página: ao puxar além do topo ou do fim no celular não aparece mais faixa branca.

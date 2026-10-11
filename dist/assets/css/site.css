@@ -286,6 +286,10 @@ html{background-color:var(--obsidian)}
 .drawer__sim--static{cursor:default;justify-content:flex-start}
 .drawer__sim__msg{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-html.is-typing .masthead,html.is-typing .annbar{transition:none!important;animation:none!important;will-change:auto}
+html.is-typing .annbar{transition:none!important;animation:none!important}
 html.is-typing .annbar__txt .arot{transition:none!important}
-@media (max-width:47.99rem){html.is-typing .masthead{visibility:hidden;opacity:0;pointer-events:none}}
+@media (max-width:47.99rem){
+.masthead{visibility:visible;transition:transform .9s cubic-bezier(.34,1.45,.64,1),visibility 0s}
+html.is-typing .masthead{transform:translate3d(0,-130%,0);visibility:hidden;pointer-events:none;transition:transform .5s cubic-bezier(.5,-.45,.75,.4),visibility 0s .5s}
+}
+@media (max-width:47.99rem) and (prefers-reduced-motion:reduce){.masthead,html.is-typing .masthead{transition-duration:.01s!important;transition-delay:0s!important}}
