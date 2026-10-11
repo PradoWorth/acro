@@ -73,3 +73,5 @@ Primeira versão numerada do site.
 - Soluções (home): lista 01 a 08 em loop infinito com a roda do mouse (desktop); ao tirar o mouse da lista a página volta a rolar.
 - Home (hero): altura fluida por viewport (svh) para que título, texto, botões e faixa de números caibam inteiros na primeira tela em desktop.
 - Barras de rolagem (página, menu mobile e áreas internas) no padrão visual do site.
+- Soluções (mobile): removida lacuna acima do painel (offset sticky aplicado só no desktop).
+- Soluções (desktop): tela trava ao chegar na seção (alinha abaixo do menu), roda do mouse gira a lista em loop com animação contínua; mouse fora da seção libera a rolagem. Painel compacto em telas baixas.
