@@ -379,3 +379,10 @@ html.is-tv,html.is-tv *{cursor:none!important}
 .masthead,html.annbar-hide .masthead{will-change:transform;transition:transform .7s cubic-bezier(.34,1.6,.64,1),visibility 0s;transition-timing-function:cubic-bezier(.34,1.6,.64,1)}
 @media (min-width:48rem){html.annbar-hide .masthead{transform:translate3d(0,calc(var(--bar-h) * -1),0)}}
 @media (prefers-reduced-motion:reduce){.masthead,html.annbar-hide .masthead{transition-duration:.01s}}
+
+/* Faixa do topo e card do menu lateral: azul petroleo escuro, mais claro no centro */
+.annbar,.drawer__sim,.masthead::before{background:linear-gradient(90deg,#0a1c2e 0,#0e2941 25%,#123553 50%,#0e2941 75%,#0a1c2e 100%)}
+
+/* Chamada em dourado cobre, como na referencia */
+.annbar__btn,.drawer__sim__btn,.annbar__cta{color:#e2b673}
+.annbar:hover .annbar__btn,.annbar:focus-visible .annbar__btn,.drawer__sim:hover .drawer__sim__btn,.drawer__sim:focus-visible .drawer__sim__btn,.annbar:hover .annbar__cta{color:#f0d3a3}
