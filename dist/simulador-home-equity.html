@@ -1831,6 +1831,15 @@ html.is-embed .cookiebar { display: none !important; }
   .hero p.subheadline{font-size:var(--t-sm);margin-bottom:var(--space-4)}
   .benefit-grid{gap:var(--space-2)}
 }
+
+/* Tela inicial: composição centralizada, texto maior e benefícios separados por linha fina. */
+#screen-landing .hero{justify-content:center}
+#screen-landing .hero h1{font-size:clamp(24px,4.7vh,38px)}
+#screen-landing .hero p.subheadline{font-size:clamp(15px,2.9vh,17px);max-width:420px}
+#screen-landing .benefit-grid{gap:0;max-width:440px}
+#screen-landing .benefit-card{padding-block:clamp(5px,1.5vh,14px)}
+#screen-landing .benefit-card+.benefit-card{border-top:1px solid var(--border)}
+#screen-landing .benefit-title{font-size:clamp(14px,2.6vh,16px)}
 </style>
 </head>
 <body>

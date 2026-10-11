@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Simulador: tela inicial centralizada, texto maior e benefícios separados por linha fina.
 - Formulários: campos lado a lado agora compartilham as mesmas linhas (rótulos de 2 linhas não desalinham mais os controles), em todas as páginas.
 - Simulador: tela inicial com respiro natural (título em 2 linhas, espaçamentos proporcionais à altura).
 - Rodapé: número da versão atualizado para 1.3 em todas as páginas (a cada versão nova, ele acompanha).
