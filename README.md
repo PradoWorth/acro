@@ -4,10 +4,17 @@ Site institucional multipáginas, estático, sem framework e sem dependência de
 28 documentos HTML reais, um por rota. Nenhum item de menu rola para uma âncora fingindo ser página.
 
 ```
-src/                        código-fonte e gerador
-dist/                       site pronto para publicar (multipáginas real)
-acropole-navegavel.html     as 28 páginas em arquivo único, para pré-visualizar
+dist/                       site pronto para publicar (Vercel e Hostinger)
+src/                        código-fonte, gerador e vercel.json (src/static)
+tokens/                     tokens de design gerados por src/gerar_tokens.py
+deploy-extra/               API PHP e SQL de comentários (hospedagem com PHP)
+docs/                       design system, relatório de auditoria, pesquisas de fotos
+ferramentas/                scripts avulsos de tratamento de imagens
+material-bruto/             fotos originais por lote, antes do tratamento
+acropole-navegavel.html     o site inteiro em arquivo único, para pré-visualizar
 ```
+
+Regra: tudo que vai ao ar fica em `dist/`. Documentos vão em `docs/`, scripts avulsos em `ferramentas/` e fotos originais em `material-bruto/`. A raiz fica só com o README e essas pastas.
 
 Para ver agora: abra `dist/index.html` no navegador, ou sirva a pasta:
 
@@ -1021,7 +1028,7 @@ já existe. Como não é projeto do zero, o que vale é o modo agente: QA pelas
 regras da skill, sistema de tokens (Etapa 6) e handoff técnico (Etapa 10.1).
 O site não foi redesenhado.
 
-Documento completo em `DESIGN-SYSTEM.md`. Resumo do que mudou no código:
+Documento completo em `docs/DESIGN-SYSTEM.md`. Resumo do que mudou no código:
 
 **Três camadas de token que faltavam.** Movimento, empilhamento e traço
 estavam soltos no CSS. Nenhum valor novo foi inventado: todos saíram do que
@@ -1099,7 +1106,7 @@ remoção quebraria a gramática) do parágrafo de origem para não repetir a
 mesma frase 2 vezes na mesma tela.
 
 **2 thumbnails de `/conteudos` fora do padrão fotográfico.** Ver item 6 em
-`DESIGN-SYSTEM.md` → Pendências. Ilustração cartoon gerada por IA com o
+`docs/DESIGN-SYSTEM.md` → Pendências. Ilustração cartoon gerada por IA com o
 título do artigo desenhado dentro da imagem, destoando das outras 18 capas
 (fotografia sem texto embutido). Não corrigido: não há como gerar
 fotografia real neste ambiente, e reprocessar a ilustração para apagar o
@@ -1201,7 +1208,7 @@ horizontal em todas. Depois da limpeza de CSS, rodada de novo: mesmo
 resultado, e zero erro de console nas 46 páginas em 1440px.
 
 **Pendência sem solução possível neste ambiente.** Item 6 de
-`DESIGN-SYSTEM.md`: as 2 thumbnails ilustradas por IA com texto embutido
+`docs/DESIGN-SYSTEM.md`: as 2 thumbnails ilustradas por IA com texto embutido
 em `/conteudos` seguem fora do padrão fotográfico das outras 18. Continua
 sem correção possível sem fotografia real.
 
@@ -1303,7 +1310,7 @@ acesso (ponto 5) não se aplicam: não há rota de API para limitar — quando
 uma existir (o dia do `endpoint` em `config.js`), essa camada entra
 junto com o próprio backend, não antes dele.
 
-**Pendência.** Nenhuma nova. Segue valendo o item 6 de `DESIGN-SYSTEM.md`
+**Pendência.** Nenhuma nova. Segue valendo o item 6 de `docs/DESIGN-SYSTEM.md`
 (as 2 thumbnails com ilustração de IA).
 
 ## 19. Seta no carrossel mobile do quadro "Como trabalhamos"
@@ -1910,7 +1917,7 @@ título. Mudanças:
 - A Lora ficou sem nenhum uso depois da troca (era só h1/h2), então os
   arquivos `.woff2` dela foram removidos do projeto — peso morto, mesmo
   raciocínio da remoção de dado morto na seção 31.
-- `DESIGN-SYSTEM.md` atualizado para descrever a Manrope no lugar da Lora.
+- `docs/DESIGN-SYSTEM.md` atualizado para descrever a Manrope no lugar da Lora.
 
 **Boas ideias do site antigo.** Antes de aplicar qualquer uma, propus uma
 lista ao cliente para escolha, com a ressalva de que o site antigo é uma
