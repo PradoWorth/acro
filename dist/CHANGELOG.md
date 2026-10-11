@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Simuladores: botao do formulario alinhado ao botao do cartao de resultado (mesma altura no fim da rolagem).
 - Simuladores: o formulario fixo termina exatamente na base do cartao de resultado (margem inferior do cartao removida nesse layout).
 - Simuladores de programas e de capital de giro: formulario fixo (sticky) na coluna esquerda enquanto o resultado e lido, a partir de 900 px.
 - Volume do tique das Solucoes aumentado (pico de cerca de -15 dBFS, antes cerca de -37 dBFS).
