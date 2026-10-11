@@ -39,6 +39,8 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Globo: corrigido acúmulo de ciclos de animação a cada vez que a aba é ocultada e exibida (a causa de o site ficar mais lento com a página aberta por muito tempo); estado adaptativo reiniciado a cada 10 min sem piscar. Teste de 2 min estável (memória e nós do DOM constantes). Modo TV: abrir com ?tv mantém a tela ligada e oculta avisos e cursor.
+- Desempenho: logos dos bancos com versão 1x menor (srcset), 22 KB a menos por visita em telas comuns; globe e scripts revisados (sem alteração necessária).
 - Topo das páginas: tipografia também acompanha a largura em telas de 900 a 1279px e em alturas até 800px; em 1024x768, 1280x720 e 1366x768 todas as páginas cabem na altura da tela (antes 66, 7 e 10 passavam).
 - iPhone: margens seguras (paisagem e barra inferior) para o botão de contato, o aviso de cookies e o conteúdo.
 - Política de Privacidade (rev. 11 out 2026): controladora e encarregado identificados, prazo de 15 dias para solicitações, revogação de consentimento, art. 33 nas transferências internacionais, comunicação de incidentes à ANPD, revisão humana das estimativas do simulador e seção de crianças e adolescentes.

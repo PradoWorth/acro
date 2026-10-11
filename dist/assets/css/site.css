@@ -342,3 +342,5 @@ html.is-typing .masthead{transform:translate3d(0,-130%,0);visibility:hidden;poin
 @media (max-width:47.99rem){.cookiebar{left:max(.5rem,env(safe-area-inset-left));right:max(.5rem,env(safe-area-inset-right))}}
 .foot{padding-bottom:env(safe-area-inset-bottom)}
 }
+html.is-tv .cookiebar,html.is-tv .rail,html.is-tv .skip{display:none!important}
+html.is-tv,html.is-tv *{cursor:none!important}

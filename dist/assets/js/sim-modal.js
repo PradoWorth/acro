@@ -142,3 +142,12 @@ document.addEventListener("click",function(e){
   document.addEventListener("focusout",function(e){if(!f(e))return;clearTimeout(t);t=setTimeout(function(){focused=false;root.classList.remove("is-typing")},400)});
   window.addEventListener("scroll",function(){if(focused&&!raf)raf=requestAnimationFrame(apply)},{passive:true});
 })();
+
+/* Modo TV (acropolecapital.com.br/?tv): tela sempre ligada e sem avisos sobrepostos, para deixar o site aberto o dia todo. */
+(function(){
+  if(!/[?&]tv(=1|=true)?(&|$)/.test(location.search))return;
+  document.documentElement.classList.add("is-tv");
+  var lock=null;
+  function ask(){if(!("wakeLock" in navigator)||document.hidden)return;navigator.wakeLock.request("screen").then(function(l){lock=l;l.addEventListener("release",function(){lock=null})}).catch(function(){})}
+  ask();document.addEventListener("visibilitychange",function(){if(!document.hidden&&!lock)ask()});
+})();
