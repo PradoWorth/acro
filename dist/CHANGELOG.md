@@ -59,3 +59,4 @@ Primeira versão numerada do site.
 - Faixa de anuncio: evento announcement_click no GA4, texto desktop com sem consulta a bureau de credito e, no celular, a faixa sobe suavemente ao chegar na secao dos bancos (ou apos a primeira tela nas demais paginas).
 - Home: icones dos cards Objetivo, Estrutura, Patrimonio e garantias e Capacidade e risco redesenhados (traco 2, circulo verde claro, maiores), no padrao do Pronampe.
 - Faixa de anuncio com texto minimo (desktop e mobile) e card Home Equity no menu lateral do celular, que abre o simulador em pop-up.
+- Faixa no celular: animacao de subida com efeito elastico (transform, mola) e retorno suave; respeita reduzir movimento.
