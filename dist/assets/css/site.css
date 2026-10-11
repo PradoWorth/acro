@@ -320,3 +320,25 @@ html.is-typing .masthead{transform:translate3d(0,-130%,0);visibility:hidden;poin
 @media (max-width:30rem){.campaigncallout .btn{width:100%}.campaigncallout__meta span{padding-inline:.6rem}}
 @media (max-width:30rem){.campaigncallout__meta{font-size:11px;letter-spacing:.03em}.campaigncallout__meta span{padding-inline:.5rem}}
 @media (max-width:30rem){.campaigncallout__meta span:last-child{flex-basis:100%;border-left:0;padding-left:0;padding-top:.2rem;font-weight:600}.campaigncallout__meta{font-size:12px;letter-spacing:.04em}}
+/* Topo das páginas em telas médias (900 a 1279px): a tipografia também acompanha a largura, para manter a altura da tela. */
+@media (min-width:900px) and (max-width:1279px){
+.pagehead h1{font-size:clamp(24px,min(5.2svh,3.2vw),40px)}
+.pagehead .lead{font-size:clamp(14.5px,min(2.5svh,1.7vw),19px);line-height:1.5}
+.pagehead__meta{margin-top:clamp(.6rem,2.2svh,1.5rem);padding-top:clamp(.4rem,1.4svh,1rem)}
+.pagehead__meta dd{font-size:var(--t-micro);line-height:1.4}
+.pagehead__cta{margin-top:clamp(.6rem,2svh,1.25rem)}
+.pagehead .crumbs{font-size:var(--t-micro)}
+}
+@media (min-width:1280px) and (max-height:800px){
+.pagehead h1{font-size:clamp(24px,min(5svh,3vw),38px)}
+.pagehead .lead{font-size:clamp(14.5px,2.4svh,18px);line-height:1.5}
+}
+@media (min-width:1280px) and (max-height:800px){.pagehead__meta{margin-top:clamp(.6rem,2.2svh,1.5rem);padding-top:clamp(.4rem,1.4svh,1rem)}.pagehead__meta dd{line-height:1.4}.pagehead .crumbs{font-size:var(--t-micro)}}
+/* iPhone (viewport-fit=cover): respeita a área segura em paisagem e a barra inferior. */
+@supports (padding:max(0px)){
+.shell{padding-left:max(var(--gut,1rem),env(safe-area-inset-left));padding-right:max(var(--gut,1rem),env(safe-area-inset-right))}
+.rail{bottom:max(clamp(.9rem,2vw,1.6rem),calc(env(safe-area-inset-bottom) + .5rem));right:max(clamp(.9rem,2vw,1.6rem),calc(env(safe-area-inset-right) + .5rem))}
+.cookiebar{bottom:max(.5rem,calc(env(safe-area-inset-bottom) + .25rem))}
+@media (max-width:47.99rem){.cookiebar{left:max(.5rem,env(safe-area-inset-left));right:max(.5rem,env(safe-area-inset-right))}}
+.foot{padding-bottom:env(safe-area-inset-bottom)}
+}
