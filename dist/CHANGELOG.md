@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Faixa verde desce com a mesma animacao elastica pequena com que sobe, e o fundo verde foi esticado para nunca aparecer transparente.
 - Faixa verde do topo some ao passar da primeira secao em todas as telas (antes so no celular) e volta ao subir ao topo.
 - Menu superior mais baixo: altura de 80px para 68px (variavel --mast-h), com hero, cabecalhos de pagina, gaveta e colunas fixas ajustados juntos.
 - Faixa verde do topo (e do menu mobile) com vinheta: bordas laterais mais escuras, centro no verde original.
