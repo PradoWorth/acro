@@ -39,6 +39,8 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Celular: com o teclado aberto, se a pessoa rolar a página de volta ao topo, o menu reaparece.
+- Acessibilidade: o nome acessível da faixa de anúncio agora inclui o texto visível (auditoria Lighthouse em 7 páginas: acessibilidade 97 a 100, desempenho 98 a 100 no celular).
 - Simulador: tela inicial centralizada, texto maior e benefícios separados por linha fina.
 - Formulários: campos lado a lado agora compartilham as mesmas linhas (rótulos de 2 linhas não desalinham mais os controles), em todas as páginas.
 - Simulador: tela inicial com respiro natural (título em 2 linhas, espaçamentos proporcionais à altura).

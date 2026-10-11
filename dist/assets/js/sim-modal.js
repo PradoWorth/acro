@@ -132,10 +132,13 @@ document.addEventListener("click",function(e){
   if(typeof window.gtag==="function")window.gtag("event","simulator_open",d);
 },true);
 
-/* Campo em foco (teclado aberto no celular): congela menu e faixa para nao piscar. */
+/* Campo em foco (teclado aberto no celular): o menu sobe para nao ficar solto no meio da tela.
+   Se a pessoa rolar a pagina de volta ao topo com o campo ainda em foco, o menu volta. */
 (function(){
-  var root=document.documentElement,t=0;
+  var root=document.documentElement,t=0,focused=false,mq=window.matchMedia("(max-width: 47.99rem)"),raf=0;
   function f(e){var n=e.target&&e.target.tagName;return n==="INPUT"||n==="SELECT"||n==="TEXTAREA"}
-  document.addEventListener("focusin",function(e){if(!f(e))return;clearTimeout(t);root.classList.add("is-typing")});
-  document.addEventListener("focusout",function(e){if(!f(e))return;clearTimeout(t);t=setTimeout(function(){root.classList.remove("is-typing")},400)});
+  function apply(){raf=0;var top=(window.pageYOffset||0)<160;root.classList.toggle("is-typing",focused&&!top)}
+  document.addEventListener("focusin",function(e){if(!f(e))return;clearTimeout(t);focused=true;apply()});
+  document.addEventListener("focusout",function(e){if(!f(e))return;clearTimeout(t);t=setTimeout(function(){focused=false;root.classList.remove("is-typing")},400)});
+  window.addEventListener("scroll",function(){if(focused&&!raf)raf=requestAnimationFrame(apply)},{passive:true});
 })();
