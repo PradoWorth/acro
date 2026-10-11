@@ -2,6 +2,44 @@
 
 Regra: a numeração só avança com autorização de Lucas Prado. Mudanças pequenas e correções: 1.0.x. Novas páginas ou funções: 1.x. Mudanças estruturais: 2.0.
 
+## 1.3 (11 out 2026)
+Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeira tela, menu mobile e padronização visual. Nenhuma URL mudou.
+- Home: card avulso de Home Equity substituído por seção completa (#home-equity) com imagem, benefícios, 3 passos e CTA que abre o simulador em pop-up.
+- Home: imagem do Home Equity fica acima do texto no mobile/tablet e à esquerda no desktop.
+- Home: seção Home Equity com imagem no topo (mobile) e título/tag junto ao texto, padrão do bloco Simulador gratuito.
+- Política de privacidade: CRM citado entre fornecedores, transferência internacional (Google, Vercel, WhatsApp) e dados de terceiros informados em formulários.
+- Campos validos: destaque verde e check somem ao sair do campo, sem animacao.
+- Pronampe: mais espaco entre a imagem e o texto na secao O custo invisivel.
+- Faixa de anuncio fixa acima do menu em todas as paginas (pergunta curta no mobile, texto longo no desktop, botao Simular que abre o simulador em pop-up); como-funciona recebeu o item Simulador e o pop-up que faltavam.
+- Faixa de anuncio: botao Simular em verde escuro discreto, para nao competir com o botao do menu.
+- Faixa de anuncio: evento announcement_click no GA4, texto desktop com sem consulta a bureau de credito e, no celular, a faixa sobe suavemente ao chegar na secao dos bancos (ou apos a primeira tela nas demais paginas).
+- Home: icones dos cards Objetivo, Estrutura, Patrimonio e garantias e Capacidade e risco redesenhados (traco 2, circulo verde claro, maiores), no padrao do Pronampe.
+- Faixa de anuncio com texto minimo (desktop e mobile) e card Home Equity no menu lateral do celular, que abre o simulador em pop-up.
+- Faixa no celular: animacao de subida com efeito elastico (transform, mola) e retorno suave; respeita reduzir movimento.
+- Home, Posicionamento: enquadramento da foto ajustado para mostrar o rosto no tablet.
+- Tipografia padronizada: escala reduzida (corpo 17, destaque 19, texto 15, meta 14, legenda 13, micro 12; titulos 28/24/19 no celular e 40/32/20 no desktop) e tamanhos soltos migrados para os tokens. Titulo do hero preservado.
+- Menu lateral mobile: card sem o rotulo Home Equity e botao Simular em verde escuro, para nao competir com Solicitar analise.
+- Menu lateral mobile: o card Home Equity alterna 4 mensagens (pergunta, taxa a partir de, prazo, sem bureau) com efeito de virar a caixinha a cada 3 segundos.
+- Faixa de anuncio: 4 mensagens viram a cada 3 segundos (pergunta, taxa a partir de 1,19% + IPCA, prazo e uso do imovel, sem bureau), botao Simular fixo.
+- Faixa e card do menu: troca de mensagens com deslize vertical e fade (no lugar da virada 3D), a cada 4 segundos, com pausa ao passar o mouse, focar ou tocar na faixa.
+- Conversao: botao da faixa com preenchimento mais claro e seta; seo-events.js em todas as paginas (cta_click, form_start, generate_lead); evento simulator_open com a origem (faixa, menu, secao_home, etc.).
+- Menu: linha fina na base do menu, no mesmo estilo da linha acima dos numeros do hero.
+- Soluções (home): painel lateral fixo abaixo do menu com barra (top com --bar-h) e altura mínima estável ao passar o mouse.
+- Menu mobile: card do simulador movido para o topo do painel, acima da logo, com o mesmo visual da barra de anúncio (fundo verde, texto branco, botão).
+- Soluções (home): lista 01 a 08 em loop infinito com a roda do mouse (desktop); ao tirar o mouse da lista a página volta a rolar.
+- Home (hero): altura fluida por viewport (svh) para que título, texto, botões e faixa de números caibam inteiros na primeira tela em desktop.
+- Barras de rolagem (página, menu mobile e áreas internas) no padrão visual do site.
+- Soluções (mobile): removida lacuna acima do painel (offset sticky aplicado só no desktop).
+- Soluções (desktop): tela trava ao chegar na seção (alinha abaixo do menu), roda do mouse gira a lista em loop com animação contínua; mouse fora da seção libera a rolagem. Painel compacto em telas baixas.
+- Soluções (desktop): diagrama preenche o quadro sem lacunas laterais; coluna do painel se ajusta à altura da janela.
+- Soluções (desktop): trava volta a funcionar em todas as entradas, descendo ou subindo, quantas vezes a pessoa sair e voltar.
+- Soluções (desktop): colunas equilibradas; diagrama do painel preenche o quadro (recorte leve) e o painel cabe na tela.
+- Barra de anúncio: botão removido, ação 'Simular agora →' em texto e barra mais baixa (2,25rem), no card do menu mobile também.
+- Soluções: cantos do quadro do diagrama alinhados e foco da lista sem linhas azuis cortadas.
+- Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
+- Menu: linha do item ativo/hover alinhada ao início e fim do texto.
+- Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+
 ## 1.2 (9 out 2026)
 Auditoria completa: segurança, design system, responsividade, acessibilidade, performance, SEO e conteúdo. Nenhuma URL mudou.
 - Segurança: pastas ocultas (.git) e PHP bloqueados; home protegida contra index.php de outra instalação (DirectoryIndex); HTML sempre revalidado e CSS/JS com cache de 1 ano por hash.
@@ -48,37 +86,3 @@ Primeira versão numerada do site.
 - Prova social centralizada.
 - Botoes de simulacao Home Equity (home, simbands, topo das paginas, painel Solucoes) abrem o simulador em pop-up (data-sim-open), com link normal como fallback.
 - Pop-up do simulador com fundo desfocado (igual ao modal de contato); clique fora fecha.
-- Home: card avulso de Home Equity substituído por seção completa (#home-equity) com imagem, benefícios, 3 passos e CTA que abre o simulador em pop-up.
-- Home: imagem do Home Equity fica acima do texto no mobile/tablet e à esquerda no desktop.
-- Home: seção Home Equity com imagem no topo (mobile) e título/tag junto ao texto, padrão do bloco Simulador gratuito.
-- Política de privacidade: CRM citado entre fornecedores, transferência internacional (Google, Vercel, WhatsApp) e dados de terceiros informados em formulários.
-- Campos validos: destaque verde e check somem ao sair do campo, sem animacao.
-- Pronampe: mais espaco entre a imagem e o texto na secao O custo invisivel.
-- Faixa de anuncio fixa acima do menu em todas as paginas (pergunta curta no mobile, texto longo no desktop, botao Simular que abre o simulador em pop-up); como-funciona recebeu o item Simulador e o pop-up que faltavam.
-- Faixa de anuncio: botao Simular em verde escuro discreto, para nao competir com o botao do menu.
-- Faixa de anuncio: evento announcement_click no GA4, texto desktop com sem consulta a bureau de credito e, no celular, a faixa sobe suavemente ao chegar na secao dos bancos (ou apos a primeira tela nas demais paginas).
-- Home: icones dos cards Objetivo, Estrutura, Patrimonio e garantias e Capacidade e risco redesenhados (traco 2, circulo verde claro, maiores), no padrao do Pronampe.
-- Faixa de anuncio com texto minimo (desktop e mobile) e card Home Equity no menu lateral do celular, que abre o simulador em pop-up.
-- Faixa no celular: animacao de subida com efeito elastico (transform, mola) e retorno suave; respeita reduzir movimento.
-- Home, Posicionamento: enquadramento da foto ajustado para mostrar o rosto no tablet.
-- Tipografia padronizada: escala reduzida (corpo 17, destaque 19, texto 15, meta 14, legenda 13, micro 12; titulos 28/24/19 no celular e 40/32/20 no desktop) e tamanhos soltos migrados para os tokens. Titulo do hero preservado.
-- Menu lateral mobile: card sem o rotulo Home Equity e botao Simular em verde escuro, para nao competir com Solicitar analise.
-- Menu lateral mobile: o card Home Equity alterna 4 mensagens (pergunta, taxa a partir de, prazo, sem bureau) com efeito de virar a caixinha a cada 3 segundos.
-- Faixa de anuncio: 4 mensagens viram a cada 3 segundos (pergunta, taxa a partir de 1,19% + IPCA, prazo e uso do imovel, sem bureau), botao Simular fixo.
-- Faixa e card do menu: troca de mensagens com deslize vertical e fade (no lugar da virada 3D), a cada 4 segundos, com pausa ao passar o mouse, focar ou tocar na faixa.
-- Conversao: botao da faixa com preenchimento mais claro e seta; seo-events.js em todas as paginas (cta_click, form_start, generate_lead); evento simulator_open com a origem (faixa, menu, secao_home, etc.).
-- Menu: linha fina na base do menu, no mesmo estilo da linha acima dos numeros do hero.
-- Soluções (home): painel lateral fixo abaixo do menu com barra (top com --bar-h) e altura mínima estável ao passar o mouse.
-- Menu mobile: card do simulador movido para o topo do painel, acima da logo, com o mesmo visual da barra de anúncio (fundo verde, texto branco, botão).
-- Soluções (home): lista 01 a 08 em loop infinito com a roda do mouse (desktop); ao tirar o mouse da lista a página volta a rolar.
-- Home (hero): altura fluida por viewport (svh) para que título, texto, botões e faixa de números caibam inteiros na primeira tela em desktop.
-- Barras de rolagem (página, menu mobile e áreas internas) no padrão visual do site.
-- Soluções (mobile): removida lacuna acima do painel (offset sticky aplicado só no desktop).
-- Soluções (desktop): tela trava ao chegar na seção (alinha abaixo do menu), roda do mouse gira a lista em loop com animação contínua; mouse fora da seção libera a rolagem. Painel compacto em telas baixas.
-- Soluções (desktop): diagrama preenche o quadro sem lacunas laterais; coluna do painel se ajusta à altura da janela.
-- Soluções (desktop): trava volta a funcionar em todas as entradas, descendo ou subindo, quantas vezes a pessoa sair e voltar.
-- Soluções (desktop): colunas equilibradas; diagrama do painel preenche o quadro (recorte leve) e o painel cabe na tela.
-- Barra de anúncio: botão removido, ação 'Simular agora →' em texto e barra mais baixa (2,25rem), no card do menu mobile também.
-- Soluções: cantos do quadro do diagrama alinhados e foco da lista sem linhas azuis cortadas.
-- Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
-- Menu: linha do item ativo/hover alinhada ao início e fim do texto.
