@@ -370,3 +370,4 @@ html.is-tv,html.is-tv *{cursor:none!important}
 
 /* Simuladores (programas e capital de giro): o formulario acompanha a rolagem enquanto o resultado, mais alto, e lido */
 @media (min-width:900px){.cols--stick>:first-child{position:sticky;top:calc(5rem + var(--bar-h) + 1.5rem);align-self:start}}
+.cols--stick>.callout{margin-bottom:0}
