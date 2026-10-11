@@ -137,7 +137,7 @@ document.addEventListener("click",function(e){
 (function(){
   var root=document.documentElement,t=0,focused=false,mq=window.matchMedia("(max-width: 47.99rem)"),raf=0;
   function f(e){var n=e.target&&e.target.tagName;return n==="INPUT"||n==="SELECT"||n==="TEXTAREA"}
-  function apply(){raf=0;var top=(window.pageYOffset||0)<160;root.classList.toggle("is-typing",focused&&!top)}
+  function apply(){raf=0;var ae=document.activeElement,inp=!!ae&&/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName),top=(window.pageYOffset||0)<160;if(focused&&!inp)focused=false;root.classList.toggle("is-typing",focused&&inp&&!top)}
   document.addEventListener("focusin",function(e){if(!f(e))return;clearTimeout(t);focused=true;apply()});
   document.addEventListener("focusout",function(e){if(!f(e))return;clearTimeout(t);t=setTimeout(function(){focused=false;root.classList.remove("is-typing")},400)});
   window.addEventListener("scroll",function(){if(focused&&!raf)raf=requestAnimationFrame(apply)},{passive:true});
