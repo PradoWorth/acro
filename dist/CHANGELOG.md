@@ -71,3 +71,4 @@ Primeira versão numerada do site.
 - Soluções (home): painel lateral fixo abaixo do menu com barra (top com --bar-h) e altura mínima estável ao passar o mouse.
 - Menu mobile: card do simulador movido para o topo do painel, acima da logo, com o mesmo visual da barra de anúncio (fundo verde, texto branco, botão).
 - Soluções (home): lista 01 a 08 em loop infinito com a roda do mouse (desktop); ao tirar o mouse da lista a página volta a rolar.
+- Home (hero): altura fluida por viewport (svh) para que título, texto, botões e faixa de números caibam inteiros na primeira tela em desktop.

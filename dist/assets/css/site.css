@@ -221,3 +221,22 @@ html,body{touch-action:manipulation}
 @media (max-width:380px){.drawer__sim{padding-inline:1rem;gap:.5rem}.drawer__sim__btn{padding:0 .65rem}.drawer__sim .annbar__arrow{display:none}}
 .solloop .solindex__list{overflow:hidden;height:var(--solh,auto);-webkit-mask-image:linear-gradient(transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(transparent,#000 7%,#000 93%,transparent);overscroll-behavior:contain}
 .solloop .soldetail{position:relative;top:auto}
+@media (min-width:900px){
+.hero__inner{padding-block:clamp(1rem,6svh,5rem) clamp(.75rem,4svh,4rem)}
+.hero h1{font-size:clamp(28px,5.4svh,44px)}
+.hero h1,.hero__sub{margin-bottom:clamp(.5rem,2.2svh,1.5rem)}
+.factrail__cell{padding-block:clamp(.75rem,2.6svh,2rem)}
+.factrail__l{margin-top:clamp(.25rem,1svh,1rem);max-width:30ch}
+}
+@media (min-width:900px){
+.hero__inner{padding-block:clamp(.5rem,5.5svh,5rem) clamp(.5rem,3.5svh,4rem)}
+.hero h1{font-size:clamp(26px,5.4svh,44px)}
+.factrail__cell{padding-block:clamp(.5rem,2.4svh,2rem)}
+.hero__sub{font-size:clamp(15px,2.4svh,19px);line-height:1.5}
+}
+@media (min-width:900px) and (max-width:1099px){
+.hero h1{max-width:22ch;font-size:clamp(26px,5svh,36px)}
+.factrail__l{max-width:none;font-size:var(--t-micro);line-height:1.45}
+.factrail__cell{padding-inline:var(--sp-1)}
+.factrail__cell:first-child{padding-left:0}
+}
