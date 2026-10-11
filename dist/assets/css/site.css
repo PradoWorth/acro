@@ -305,3 +305,18 @@ html.is-typing .masthead{transform:translate3d(0,-130%,0);visibility:hidden;poin
 .fgrid--2>.field>:nth-child(n+3){grid-row:3}
 }}
 .field[data-invalid=true] .field__note{display:none}
+/* Chamada do evento online: diagramação para desktop e celular. */
+.campaigncallout{padding:clamp(1.25rem,4.5vw,2.25rem) clamp(1.25rem,4.5vw,2.5rem)}
+.campaigncallout__meta{display:flex;flex-wrap:wrap;align-items:center;row-gap:.35rem;margin:0 0 1.1rem;font-size:var(--t-micro);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink)}
+.campaigncallout__meta span{white-space:nowrap;padding-inline:.85rem;line-height:1.2}
+.campaigncallout__meta span:first-child{padding-left:0;display:inline-flex;align-items:center;gap:.5rem}
+.campaigncallout__meta span:first-child::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--iris);flex-shrink:0}
+.campaigncallout__meta span+span{border-left:1px solid color-mix(in srgb,var(--accent-ink) 28%,transparent)}
+.campaigncallout h2{font-size:clamp(1.3rem,1.1rem + 1vw,1.75rem);line-height:1.25;margin:0 0 .75rem;text-wrap:balance;max-width:34ch}
+.campaigncallout p{margin:0 0 1.25rem;line-height:1.6;text-wrap:pretty}
+.campaigncallout__checks{gap:.85rem;margin:0 0 1.5rem;max-width:62ch}
+.campaigncallout__checks li{align-items:flex-start;gap:.75rem;font-weight:500;line-height:1.5}
+.campaigncallout__checks svg{margin-top:.18em}
+@media (max-width:30rem){.campaigncallout .btn{width:100%}.campaigncallout__meta span{padding-inline:.6rem}}
+@media (max-width:30rem){.campaigncallout__meta{font-size:11px;letter-spacing:.03em}.campaigncallout__meta span{padding-inline:.5rem}}
+@media (max-width:30rem){.campaigncallout__meta span:last-child{flex-basis:100%;border-left:0;padding-left:0;padding-top:.2rem;font-weight:600}.campaigncallout__meta{font-size:12px;letter-spacing:.04em}}
