@@ -386,3 +386,6 @@ html.is-tv,html.is-tv *{cursor:none!important}
 /* Chamada em dourado cobre, como na referencia */
 .annbar__btn,.drawer__sim__btn,.annbar__cta{color:#e2b673}
 .annbar:hover .annbar__btn,.annbar:focus-visible .annbar__btn,.drawer__sim:hover .drawer__sim__btn,.drawer__sim:focus-visible .drawer__sim__btn,.annbar:hover .annbar__cta{color:#f0d3a3}
+
+/* Ceu do globo: azul mais claro no centro, escurecendo nas bordas (mesmo azul da faixa do topo) */
+.hero__media--globe{background:radial-gradient(ellipse farthest-corner at 50% 50%,#10304c 0,#0f2d46 45%,#0d2840 62%,#0a1d2f 82%,#06121c 100%)}
