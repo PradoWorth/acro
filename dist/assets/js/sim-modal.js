@@ -102,3 +102,19 @@ document.addEventListener("click",function(e){
   if(window.MutationObserver)new MutationObserver(sync).observe(dr,{attributes:true,attributeFilter:["data-open"]});
   sync();
 })();
+
+/* Faixa de anuncio: as mensagens viram a cada 4 s; o botao fica fixo. */
+(function(){
+  var box=document.querySelector(".annbar__txt");if(!box)return;
+  var items=box.querySelectorAll(".arot"),i=0,timer=null,root=document.documentElement;
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(items.length<2||reduce)return;
+  function next(){
+    if(document.hidden||root.classList.contains("annbar-hide"))return;
+    var prev=items[i];i=(i+1)%items.length;
+    prev.classList.remove("is-on");prev.classList.add("is-out");
+    setTimeout(function(){prev.classList.remove("is-out")},800);
+    items[i].classList.add("is-on");
+  }
+  timer=setInterval(next,4000);
+})();
