@@ -262,3 +262,14 @@ html::-webkit-scrollbar-thumb:hover{background:var(--iris)}
 .hesteps li+li{border-top:1px solid var(--rule);padding-top:.75rem}
 @media (min-width:48rem){.hesteps{column-gap:1.25rem}.hesteps li+li{border-top:0;padding-top:0;border-left:1px solid var(--rule);padding-left:1.25rem}}
 .nav__item.is-current>.nav__link::after,.nav__link::before,.nav__link[aria-current=page]::after{left:.5rem;right:.5rem;bottom:.25rem}
+@media (min-width:900px){
+.pagehead__inner{padding-block:clamp(1rem,5.5svh,5rem) clamp(.75rem,3.5svh,4rem)}
+.pagehead .tag{margin-top:clamp(.5rem,2svh,1.5rem)!important}
+.pagehead h1{margin-top:clamp(.5rem,2svh,1.5rem);font-size:clamp(26px,5.2svh,40px)}
+.pagehead .lead{margin-top:clamp(.5rem,1.6svh,1rem);font-size:clamp(15px,2.5svh,19px);line-height:1.55}
+.pagehead__meta{margin-top:clamp(.75rem,3svh,2.5rem);padding-top:clamp(.5rem,2svh,1.5rem)}
+.pagehead__cta{margin-top:clamp(.75rem,2.4svh,1.75rem)}
+}
+@media (min-width:900px){.pagehead h1{max-width:27ch}.pagehead .lead{max-width:68ch}.pagehead__meta{gap:.4rem 1.5rem}.pagehead__meta div{min-width:9rem;flex:1 1 9rem}}
+@media (min-width:900px){.pagehead h1{max-width:none}.pagehead__meta dd{font-size:var(--t-xs);line-height:1.45}}
+@media (min-width:900px){.pagehead__inner{padding-block:clamp(1rem,5svh,5rem) clamp(.5rem,2svh,4rem)}.pagehead__meta{margin-top:clamp(.75rem,2.6svh,2.5rem)}}
