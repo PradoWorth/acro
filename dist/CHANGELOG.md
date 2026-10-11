@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Meteoros do hero não se acumulam mais com a aba em segundo plano ou o hero fora da tela (limite de 2 simultâneos e limpeza ao voltar).
 - Rodapé: começa no azul-escuro #030b12 (igual à seção de cima) e escurece aos poucos até o preto, sem quebra.
 - Rodapé em #070706 (grafite quente); demais cores mantidas. Hub Home Equity com 3 pontos de simulação e rótulo único "Simular em 2 minutos".
 - Teste de CSS crítico inline: sem ganho mensurável de FCP/LCP (1,2 s nos dois), +11 KB por página. Não aplicado. Eventos de funil padronizados no simulador (simulation_start, simulation_complete, generate_lead).
