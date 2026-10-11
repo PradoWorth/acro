@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Hub Home Equity: novas seções "O que define quanto você pode obter" e "Para quem faz sentido" com próximo passo claro; CTA duplicado removido do topo.
 - Formulário em janela (celular): a altura do cartão acompanha a área realmente visível (barra do navegador), com margens iguais nos quatro lados e rolagem interna.
 - Globo: corrigido acúmulo de ciclos de animação a cada vez que a aba é ocultada e exibida (a causa de o site ficar mais lento com a página aberta por muito tempo); estado adaptativo reiniciado a cada 10 min sem piscar. Teste de 2 min estável (memória e nós do DOM constantes). Modo TV: abrir com ?tv mantém a tela ligada e oculta avisos e cursor.
 - Desempenho: logos dos bancos com versão 1x menor (srcset), 22 KB a menos por visita em telas comuns; globe e scripts revisados (sem alteração necessária).
