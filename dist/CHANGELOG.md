@@ -60,3 +60,7 @@ Primeira versão numerada do site.
 - Home: icones dos cards Objetivo, Estrutura, Patrimonio e garantias e Capacidade e risco redesenhados (traco 2, circulo verde claro, maiores), no padrao do Pronampe.
 - Faixa de anuncio com texto minimo (desktop e mobile) e card Home Equity no menu lateral do celular, que abre o simulador em pop-up.
 - Faixa no celular: animacao de subida com efeito elastico (transform, mola) e retorno suave; respeita reduzir movimento.
+- Home, Posicionamento: enquadramento da foto ajustado para mostrar o rosto no tablet.
+- Tipografia padronizada: escala reduzida (corpo 17, destaque 19, texto 15, meta 14, legenda 13, micro 12; titulos 28/24/19 no celular e 40/32/20 no desktop) e tamanhos soltos migrados para os tokens. Titulo do hero preservado.
+- Menu lateral mobile: card sem o rotulo Home Equity e botao Simular em verde escuro, para nao competir com Solicitar analise.
+- Menu lateral mobile: o card Home Equity alterna 4 mensagens (pergunta, taxa a partir de, prazo, sem bureau) com efeito de virar a caixinha a cada 4 segundos.

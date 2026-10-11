@@ -83,3 +83,22 @@ document.addEventListener("click",function(e){
   var t=e.target.closest&&e.target.closest(".drawer [data-sim-open]");if(!t)return;
   var c=document.querySelector(".drawer [data-drawer-close]");if(c)c.click();
 },true);
+
+/* Card do menu lateral: as mensagens viram a cada 4 s enquanto o menu esta aberto. */
+(function(){
+  var dr=document.getElementById("drawer"),box=document.querySelector(".drawer__sim__t");if(!dr||!box)return;
+  var items=box.querySelectorAll(".rot"),i=0,timer=null,reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(items.length<2)return;
+  function show(n){
+    var prev=items[i];i=n;
+    prev.classList.remove("is-on");prev.classList.add("is-out");
+    setTimeout(function(){prev.classList.remove("is-out")},800);
+    items[i].classList.add("is-on");
+  }
+  function reset(){Array.prototype.forEach.call(items,function(el){el.classList.remove("is-on","is-out")});i=0;items[0].classList.add("is-on")}
+  function start(){if(timer||reduce)return;timer=setInterval(function(){show((i+1)%items.length)},4000)}
+  function stop(){if(timer){clearInterval(timer);timer=null}}
+  function sync(){if(dr.getAttribute("data-open")==="true"){start()}else{stop();reset()}}
+  if(window.MutationObserver)new MutationObserver(sync).observe(dr,{attributes:true,attributeFilter:["data-open"]});
+  sync();
+})();
