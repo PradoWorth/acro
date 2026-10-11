@@ -78,3 +78,4 @@ Primeira versão numerada do site.
 - Soluções (desktop): diagrama preenche o quadro sem lacunas laterais; coluna do painel se ajusta à altura da janela.
 - Soluções (desktop): trava volta a funcionar em todas as entradas, descendo ou subindo, quantas vezes a pessoa sair e voltar.
 - Soluções (desktop): colunas equilibradas; diagrama do painel preenche o quadro (recorte leve) e o painel cabe na tela.
+- Barra de anúncio: botão removido, ação 'Simular agora →' em texto e barra mais baixa (2,25rem), no card do menu mobile também.
