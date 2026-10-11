@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Política de Privacidade (rev. 11 out 2026): controladora e encarregado identificados, prazo de 15 dias para solicitações, revogação de consentimento, art. 33 nas transferências internacionais, comunicação de incidentes à ANPD, revisão humana das estimativas do simulador e seção de crianças e adolescentes.
 - Chamada do evento online (Google Meet): diagramação nova (data, canal e horário em linha com separadores, título equilibrado, lista alinhada, botão em largura total no celular).
 - Soluções: a trava da seção só engata em rolagem lenta e perto da posição; rolagem rápida passa direto e não puxa mais a tela de volta.
 - Contato (celular): o menu lateral usa o mesmo cartão de Home Equity das demais páginas; a faixa do topo continua com os avisos da página.
