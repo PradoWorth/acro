@@ -68,3 +68,4 @@ Primeira versão numerada do site.
 - Faixa e card do menu: troca de mensagens com deslize vertical e fade (no lugar da virada 3D), a cada 4 segundos, com pausa ao passar o mouse, focar ou tocar na faixa.
 - Conversao: botao da faixa com preenchimento mais claro e seta; seo-events.js em todas as paginas (cta_click, form_start, generate_lead); evento simulator_open com a origem (faixa, menu, secao_home, etc.).
 - Menu: linha fina na base do menu, no mesmo estilo da linha acima dos numeros do hero.
+- Soluções (home): painel lateral fixo abaixo do menu com barra (top com --bar-h) e altura mínima estável ao passar o mouse.

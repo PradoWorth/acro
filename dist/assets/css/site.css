@@ -209,3 +209,5 @@ html,body{touch-action:manipulation}
 .annbar__more{margin-left:0}
 .annbar__btn{gap:.25rem}
 .masthead{box-shadow:inset 0 -1px 0 var(--rule-dark)}
+.soldetail{top:calc(6rem + var(--bar-h))}
+@media (min-width:900px){.soldetail{min-height:37rem}}
