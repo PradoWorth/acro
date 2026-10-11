@@ -146,6 +146,25 @@ function haptic(p) {
   hapticLast = n;
   try { navigator.vibrate(p || 8); } catch (_) {}
 }
+/* Campos: nada por tecla. Um toque firme quando um erro aparece e um toque leve
+   quando o WhatsApp chega nos 11 digitos (uma vez por foco). */
+if (HAPTIC_OK && window.MutationObserver) {
+  new MutationObserver((list) => {
+    for (const m of list) {
+      const el = m.target;
+      if (el.classList && el.classList.contains('has-error') && !(m.oldValue || '').split(' ').includes('has-error')) {
+        hapticLast = 0; haptic([40, 40, 40]); break;
+      }
+    }
+  }).observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ['class'], attributeOldValue: true });
+  let phoneDone = false;
+  document.addEventListener('focusin', () => { phoneDone = false; }, true);
+  document.addEventListener('input', (e) => {
+    const t = e.target;
+    if (!t || t.tagName !== 'INPUT' || phoneDone) return;
+    if (t.getAttribute('inputmode') === 'numeric' && /\(\d{2}\) \d{5}-\d{4}/.test(t.value)) { phoneDone = true; haptic(10); }
+  }, true);
+}
 document.addEventListener('click', (e) => {
   const t = e.target && e.target.closest && e.target.closest('button, [role="button"], .option-card, .choice, label.option, a.btn');
   if (t && !t.disabled) haptic(8);

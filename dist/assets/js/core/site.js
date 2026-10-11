@@ -49,6 +49,23 @@
     if(!t||t.disabled||t.getAttribute("aria-disabled")==="true")return;
     buzz(8);
   },true);
+  /* Campos: nada por tecla. Ao sair do campo: valido = toque leve, invalido = toque firme duplo.
+     Mascara de telefone completa (11 digitos) = toque leve, uma vez por foco. Maximo um por campo. */
+  var fdone=false;
+  document.addEventListener("focusin",function(e){if(e.target&&e.target.closest&&e.target.closest("form"))fdone=false},true);
+  document.addEventListener("input",function(e){
+    var t=e.target;if(fdone||!t||t.tagName!=="INPUT"||!t.closest("form"))return;
+    if(t.getAttribute("data-mask")==="phone"&&t.value.replace(/\D/g,"").length===11){fdone=true;buzz(10)}
+  },true);
+  document.addEventListener("focusout",function(e){
+    var t=e.target;if(!t||!/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||!t.closest("form"))return;
+    var done=fdone;fdone=true;
+    setTimeout(function(){
+      var f=t.closest(".field");if(!f||!t.value)return;
+      if(f.getAttribute("data-invalid")==="true"){last=0;buzz([40,40,40])}
+      else if(!done&&f.getAttribute("data-valid")==="true")buzz(6);
+    },80);
+  },true);
   /* Resultado de formulários: sucesso (dois toques curtos) e erro (dois toques firmes). */
   if(window.MutationObserver)new MutationObserver(function(list){
     for(var k=0;k<list.length;k++){
