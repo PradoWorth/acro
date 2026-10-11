@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Menu superior mais baixo: altura de 80px para 68px (variavel --mast-h), com hero, cabecalhos de pagina, gaveta e colunas fixas ajustados juntos.
 - Faixa verde do topo (e do menu mobile) com vinheta: bordas laterais mais escuras, centro no verde original.
 - Faixa verde e menu mobile: duas mensagens novas para o empresario no inicio da rotacao ("Onde empresarios do Brasil estruturam o proximo passo" e "Credito pensado para empresarios do Brasil").
 - Simuladores: botao do formulario alinhado ao botao do cartao de resultado (mesma altura no fim da rolagem).
