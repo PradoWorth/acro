@@ -125,3 +125,19 @@
     src.onended=function(){try{src.disconnect();f.disconnect();g.disconnect()}catch(e){}};
   };
 })();
+
+;(function(){
+  /* Soluções: o desenho de cada card volta a animar toda vez que o painel fica ativo.
+     (Sem isso, a animacao de entrada rodava uma vez so, na primeira revelacao da pagina.) */
+  if(!window.MutationObserver)return;
+  function replay(p){
+    var ds=p.querySelectorAll(".diagram");
+    for(var i=0;i<ds.length;i++){var d=ds[i];if(!d.classList.contains("is-revealed"))continue;d.classList.remove("is-revealed");void d.getBoundingClientRect();d.classList.add("is-revealed")}
+  }
+  function bind(){
+    var ps=document.querySelectorAll(".solpanel");if(!ps.length)return;
+    var mo=new MutationObserver(function(l){for(var i=0;i<l.length;i++){var t=l[i].target;if(t.getAttribute("data-active")==="true"&&l[i].oldValue!=="true")replay(t)}});
+    for(var j=0;j<ps.length;j++)mo.observe(ps[j],{attributes:true,attributeFilter:["data-active"],attributeOldValue:true});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind);else bind();
+})();
