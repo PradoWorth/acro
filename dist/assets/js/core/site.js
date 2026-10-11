@@ -61,10 +61,9 @@
 })();
 
 ;(function(){
-  /* Tique de relógio bem baixinho na lista de Soluções em loop (computador): um tique por item que passa,
-     só enquanto o mouse está sobre a lista. Sintetizado no navegador, sem arquivo de áudio.
+  /* Tique de relógio bem baixinho na lista de Soluções: no computador (loop), um tique por item que passa com o mouse
+     sobre a lista; no celular e no tablet, um tique a cada toque em um item. Sintetizado no navegador, sem arquivo de áudio.
      O navegador só libera som depois de um clique ou tecla do visitante na página. */
-  if(!(window.matchMedia&&matchMedia("(hover: hover) and (pointer: fine)").matches))return;
   var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
   var ctx=null,noise=null,toggle=false,last=0,cur=null,moved=0,lastHover=0,GAIN=.045;document.addEventListener("pointermove",function(){moved=performance.now()},{capture:true,passive:true});
   function init(){
@@ -80,9 +79,18 @@
   function wake(){var c=init();if(c&&c.state==="suspended"&&c.resume)c.resume().catch(function(){})}
   ["pointerdown","keydown","touchend"].forEach(function(t){document.addEventListener(t,wake,{capture:true,passive:true})});
   window.acTickWake=wake;
+  document.addEventListener("click",function(e){
+    var r=e.target&&e.target.closest&&e.target.closest(".solrow");
+    if(!r)return;
+    var box=r.closest(".solindex");
+    if(box&&box.classList.contains("solloop"))return;   /* no loop, o tique vem da troca de item */
+    window.acTick("tap");
+  },true);
   window.acTick=function(kind){
     if(document.hidden)return;
-    var c=init();if(!c||c.state!=="running")return;
+    var c=init();if(!c)return;
+    if(c.state==="suspended"){if(c.resume)c.resume().then(function(){window.acTick(kind)}).catch(function(){});return}
+    if(c.state!=="running")return;
     var t=c.currentTime,n=performance.now();if(kind==="hover"){if(n-moved>100)return;lastHover=n}else if(kind==="step"&&n-lastHover<350)return;if(n-last<90)return;last=n;if(cur){try{cur.stop()}catch(e){}cur=null}
     toggle=!toggle;
     var src=c.createBufferSource();src.buffer=noise;
