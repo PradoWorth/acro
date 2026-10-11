@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Soluções em loop (computador): tique de relógio bem baixinho, só por interação (passar o mouse nos itens, rolar ou clicar), nunca sozinho.
 - Som discreto de conclusão (1,5 s, 12 KB, volume 30%) ao enviar formulário e ao gerar a simulação, só após toque do visitante.
 - Vibração leve no celular (Android) em toques de botões e nos resultados de formulário e simulador; respeita "reduzir movimento".
 - Soluções: a troca entre itens não pisca mais (painéis empilhados, sem fade a partir do zero).
