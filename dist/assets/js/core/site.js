@@ -21,3 +21,41 @@
     }
   }).observe(box,{childList:true});
 })();
+;(function(){
+  /* Vibração leve em toques de botões e nos resultados de formulário, só em celular.
+     Android (Chrome): navigator.vibrate. iPhone (Safari 17.4+): toque de interruptor nativo, melhor esforço.
+     Respeita "reduzir movimento" e nunca vibra sem toque do usuário. */
+  var coarse=window.matchMedia&&matchMedia("(pointer: coarse)").matches;
+  if(!coarse)return;
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  var canVibrate=typeof navigator.vibrate==="function",ios=null,last=0;
+  function iosTap(){
+    if(!ios){
+      var l=document.createElement("label");l.setAttribute("aria-hidden","true");
+      l.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden";
+      var i=document.createElement("input");i.type="checkbox";i.setAttribute("switch","");i.tabIndex=-1;
+      l.appendChild(i);document.body.appendChild(l);ios=l;
+    }
+    ios.click();
+  }
+  function buzz(p){
+    var n=Date.now();if(n-last<60)return;last=n;
+    try{if(canVibrate)navigator.vibrate(p||8);else if(document.body)iosTap()}catch(e){}
+  }
+  window.acHaptic=buzz;
+  var SEL="button,.btn,[data-sim-open],[data-lead-modal],[data-event-modal],.acc__btn,.solrow,.drawer__sim,.burger,.tag--btn,input[type=submit],summary";
+  document.addEventListener("click",function(e){
+    var t=e.target&&e.target.closest&&e.target.closest(SEL);
+    if(!t||t.disabled||t.getAttribute("aria-disabled")==="true")return;
+    buzz(8);
+  },true);
+  /* Resultado de formulários: sucesso (dois toques curtos) e erro (dois toques firmes). */
+  if(window.MutationObserver)new MutationObserver(function(list){
+    for(var k=0;k<list.length;k++){
+      var el=list[k].target;
+      if(!el.classList||el.getAttribute("data-show")!=="true")continue;
+      if(el.classList.contains("formstate--ok"))buzz([14,50,14]);
+      else if(el.classList.contains("formstate--err"))buzz([40,40,40]);
+    }
+  }).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:["data-show"]});
+})();

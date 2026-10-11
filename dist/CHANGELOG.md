@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Vibração leve no celular (Android) em toques de botões e nos resultados de formulário e simulador; respeita "reduzir movimento".
 - Soluções: a troca entre itens não pisca mais (painéis empilhados, sem fade a partir do zero).
 - Meteoros do hero não se acumulam mais com a aba em segundo plano ou o hero fora da tela (limite de 2 simultâneos e limpeza ao voltar).
 - Rodapé: começa no azul-escuro #030b12 (igual à seção de cima) e escurece aos poucos até o preto, sem quebra.

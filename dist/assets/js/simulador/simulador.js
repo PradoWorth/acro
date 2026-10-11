@@ -130,7 +130,30 @@ const FUNNEL_ALIAS = {
 };
 const FUNNEL_SEEN = {};
 
+/* Vibração leve em celular: toques nas opções e botões; padrão duplo ao gerar a simulação. */
+const HAPTIC_OK = (() => {
+  try {
+    return typeof navigator.vibrate === 'function' &&
+      window.matchMedia('(pointer: coarse)').matches &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch (_) { return false; }
+})();
+let hapticLast = 0;
+function haptic(p) {
+  if (!HAPTIC_OK) return;
+  const n = Date.now();
+  if (n - hapticLast < 60) return;
+  hapticLast = n;
+  try { navigator.vibrate(p || 8); } catch (_) {}
+}
+document.addEventListener('click', (e) => {
+  const t = e.target && e.target.closest && e.target.closest('button, [role="button"], .option-card, .choice, label.option, a.btn');
+  if (t && !t.disabled) haptic(8);
+}, true);
+
 function dispatch(eventName, payload = {}) {
+  if (eventName === 'simulation_generated') haptic([14, 50, 14]);
+  if (eventName === 'location_disqualified' || eventName === 'financing_disqualified') haptic([40, 40, 40]);
   const alias = FUNNEL_ALIAS[eventName];
   if (alias && !FUNNEL_SEEN[alias + (window.__HE_LEAD__ || '')]) {
     FUNNEL_SEEN[alias + (window.__HE_LEAD__ || '')] = 1;
