@@ -288,3 +288,4 @@ html{background-color:var(--obsidian)}
 
 html.is-typing .masthead,html.is-typing .annbar{transition:none!important;animation:none!important;will-change:auto}
 html.is-typing .annbar__txt .arot{transition:none!important}
+@media (max-width:47.99rem){html.is-typing .masthead{visibility:hidden;opacity:0;pointer-events:none}}
