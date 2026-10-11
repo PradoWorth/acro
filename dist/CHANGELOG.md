@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Hover dos botoes principais em degrade cobre (antes verde claro).
 - Chamada da faixa do topo e do menu lateral em dourado cobre, como na referencia.
 - Faixa do topo e card do menu lateral em azul petroleo escuro com centro mais claro (cores da referencia), no lugar do verde.
 - Faixa verde desce com a mesma animacao elastica pequena com que sobe, e o fundo verde foi esticado para nunca aparecer transparente.
