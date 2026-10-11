@@ -77,3 +77,9 @@
   var mqf=function(){if(!mq.matches)root.classList.remove("annbar-hide")};
   if(mq.addEventListener)mq.addEventListener("change",mqf);
 })();
+
+/* Abrir o simulador a partir do menu lateral: fecha o menu antes. */
+document.addEventListener("click",function(e){
+  var t=e.target.closest&&e.target.closest(".drawer [data-sim-open]");if(!t)return;
+  var c=document.querySelector(".drawer [data-drawer-close]");if(c)c.click();
+},true);
