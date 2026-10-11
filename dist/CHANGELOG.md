@@ -80,3 +80,4 @@ Primeira versão numerada do site.
 - Soluções (desktop): colunas equilibradas; diagrama do painel preenche o quadro (recorte leve) e o painel cabe na tela.
 - Barra de anúncio: botão removido, ação 'Simular agora →' em texto e barra mais baixa (2,25rem), no card do menu mobile também.
 - Soluções: cantos do quadro do diagrama alinhados e foco da lista sem linhas azuis cortadas.
+- Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.

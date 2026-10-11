@@ -259,3 +259,5 @@ html::-webkit-scrollbar-thumb:hover{background:var(--iris)}
 .annbar:hover .annbar__btn,.annbar:focus-visible .annbar__btn,.drawer__sim:hover .drawer__sim__btn,.drawer__sim:focus-visible .drawer__sim__btn{background:none!important;color:var(--white);border:0}
 .annbar,.drawer__sim{font-size:var(--t-micro);gap:.5rem 1.25rem}
 .solloop .solrow:focus-visible{outline:0;border-radius:var(--r-input);box-shadow:inset 0 0 0 1px rgba(138,206,196,.55)}
+.hesteps li+li{border-top:1px solid var(--rule);padding-top:.75rem}
+@media (min-width:48rem){.hesteps{column-gap:1.25rem}.hesteps li+li{border-top:0;padding-top:0;border-left:1px solid var(--rule);padding-left:1.25rem}}
