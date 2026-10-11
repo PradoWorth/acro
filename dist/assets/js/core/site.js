@@ -82,7 +82,7 @@
      sobre a lista; no celular e no tablet, um tique a cada toque em um item. Sintetizado no navegador, sem arquivo de áudio.
      O navegador só libera som depois de um clique ou tecla do visitante na página. */
   var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
-  var ctx=null,noise=null,toggle=false,last=0,cur=null,moved=0,lastHover=0,GAIN=.045;document.addEventListener("pointermove",function(){moved=performance.now()},{capture:true,passive:true});
+  var ctx=null,noise=null,toggle=false,last=0,cur=null,moved=0,lastHover=0,GAIN=.09;document.addEventListener("pointermove",function(){moved=performance.now()},{capture:true,passive:true});
   function init(){
     if(ctx)return ctx;
     try{
