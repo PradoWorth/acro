@@ -208,3 +208,4 @@ html,body{touch-action:manipulation}
 .annbar__btn{gap:.35rem;background:rgba(138,206,196,.2);color:var(--white);border:1px solid rgba(138,206,196,.55);transition:background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease)}.annbar__arrow{display:inline-block;transition:transform var(--dur-fast) var(--ease-out)}.annbar:hover .annbar__btn{background:rgba(138,206,196,.34);color:var(--white);border-color:rgba(255,255,255,.7);transform:none}.annbar:hover .annbar__arrow{transform:translateX(3px)}
 .annbar__more{margin-left:0}
 .annbar__btn{gap:.25rem}
+.masthead{box-shadow:inset 0 -1px 0 var(--rule-dark)}
