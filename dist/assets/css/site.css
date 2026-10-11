@@ -357,3 +357,10 @@ html.is-tv,html.is-tv *{cursor:none!important}
 
 .foot{background:linear-gradient(180deg,#030b12 0,#02080d 8rem,#010305 16rem,#000 26rem) #000}
 .foot{position:relative}
+
+/* Soluções: troca de painel sem piscar. Todos os painéis ficam empilhados e já desenhados;
+   só alterna qual está visível, sem fade a partir do zero e sem refazer o desenho do SVG. */
+.soldetail{display:grid}
+.solpanel,.solpanel[data-active=true]{display:block;grid-area:1/1;min-width:0;animation:none!important;transition:none!important}
+.solpanel{opacity:0;visibility:hidden;pointer-events:none}
+.solpanel[data-active=true]{opacity:1;visibility:visible;pointer-events:auto}
