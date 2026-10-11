@@ -373,3 +373,7 @@ html.is-tv,html.is-tv *{cursor:none!important}
 .cols--stick>.callout{margin-bottom:0}
 /* Faixa verde com vinheta: bordas laterais mais escuras, centro no verde original */
 .annbar,.drawer__sim{background:linear-gradient(90deg,rgba(0,0,0,.5) 0,rgba(0,0,0,0) 24%,rgba(0,0,0,0) 76%,rgba(0,0,0,.5) 100%),var(--petrol-deep)}
+
+/* Faixa verde: some depois da primeira dobra em qualquer tela (celular, tablet e computador) */
+@media (min-width:48rem){.masthead{will-change:transform}html.annbar-hide .masthead{transform:translate3d(0,calc(var(--bar-h) * -1),0);transition:transform .6s cubic-bezier(.22,.61,.36,1)}}
+@media (min-width:48rem) and (prefers-reduced-motion:reduce){html.annbar-hide .masthead{transition-duration:.01s}}

@@ -72,12 +72,10 @@
   function upd(){
     tick=false;
     if(root.classList.contains("is-typing"))return;
-    if(mq.matches&&past()){root.classList.add("annbar-hide")}else{root.classList.remove("annbar-hide")}
+    if(past()){root.classList.add("annbar-hide")}else{root.classList.remove("annbar-hide")}
   }
   window.addEventListener("scroll",function(){if(!tick){tick=true;window.requestAnimationFrame(upd)}},{passive:true});
   window.addEventListener("resize",upd,{passive:true});
-  var mqf=function(){if(!mq.matches)root.classList.remove("annbar-hide")};
-  if(mq.addEventListener)mq.addEventListener("change",mqf);
 })();
 
 /* Abrir o simulador a partir do menu lateral: fecha o menu antes. */
