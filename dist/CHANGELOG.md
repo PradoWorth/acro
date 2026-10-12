@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Faixa azul some e o menu acompanha ate o topo da tela sem passar dele (sem elastico na subida); o elastico pequeno fica so na descida.
 - Card azul do menu lateral nao vira mais verde ao tocar ou passar o mouse; fica um pouco mais claro.
 - Hover dos botoes: verde da identidade um tom mais escuro (substitui o cobre).
 - Textos de conversao: tom de merecimento e seguranca (sem promessa de credito) no subtitulo da home, bloco Home Equity, contato, simulador, modal de lead, faixa do topo e CTA "Solicitar minha analise" nas paginas.
