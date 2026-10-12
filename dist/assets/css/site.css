@@ -394,3 +394,6 @@ html.annbar-hide .masthead{transition:transform .5s cubic-bezier(.22,.61,.36,1),
 /* Card do menu lateral: no toque ou hover continua azul (um pouco mais claro), nunca verde */
 .drawer__sim{-webkit-tap-highlight-color:transparent}
 .drawer__sim:hover,.drawer__sim:focus-visible,.drawer__sim:active{background:linear-gradient(90deg,#0c2338 0,#113452 25%,#16405f 50%,#113452 75%,#0c2338 100%);border-color:rgba(255,255,255,.14)}
+
+/* Menu fixo: acompanha a area visivel (ver site.js) */
+.masthead{top:var(--vv-y,0px)}
