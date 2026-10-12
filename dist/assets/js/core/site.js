@@ -147,6 +147,3 @@ else if(!n&&__was){document.removeEventListener("touchmove",window.__acG,{passiv
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind);else bind();
 })();
-
-/* Menu sempre fixo no celular: se o navegador deslocar a area visivel (teclado, foco em campo, zoom, fechar menu ou modal), o menu acompanha a area visivel em vez de ficar para tras. */
-!function(){"use strict";var v=window.visualViewport;if(!v)return;var r=document.documentElement,f=0,l=-1;function u(){f=0;var y=Math.max(0,Math.round(v.offsetTop));if(y!==l){l=y;r.style.setProperty("--vv-y",y+"px")}}function s(){f||(f=window.requestAnimationFrame(u))}v.addEventListener("scroll",s,{passive:true});v.addEventListener("resize",s,{passive:true});window.addEventListener("pageshow",s);document.addEventListener("focusout",function(){window.setTimeout(s,120)},true)}();
