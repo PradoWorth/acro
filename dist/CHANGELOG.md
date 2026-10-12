@@ -39,6 +39,7 @@ Barra de anúncio, seção Soluções com trava e loop, hero que cabe na primeir
 - Regra de leitura: grupos de itens lado a lado ganham linha fina de separação (passos do Home Equity); empilhados, linha horizontal.
 - Menu: linha do item ativo/hover alinhada ao início e fim do texto.
 - Barra de anúncio mais baixa (1,875rem), menu e posições acompanham.
+- Menu Solucoes (desktop): clicar no gatilho com o painel ja aberto por hover nao fecha mais o painel (antes alternava e fechava na hora).
 - Menu: faixa azul e menu fixos juntos ate o fim da primeira secao; ai a faixa sobe, o menu sobe junto e fica fixo no topo. So a rolagem altera esse estado (botoes, menu lateral, modal, foco e teclado nao).
 - Menu fixo no celular: acompanha a area visivel do navegador (teclado, foco, zoom) e reajusta a posicao ao fechar menu ou modal.
 - Menu lateral no iPhone: trava de rolagem sem position:fixed (evita a faixa branca no topo e o painel deslocado); posicao da pagina preservada.
