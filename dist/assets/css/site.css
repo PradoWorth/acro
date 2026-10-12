@@ -374,11 +374,12 @@ html.is-tv,html.is-tv *{cursor:none!important}
 /* Faixa verde com vinheta: bordas laterais mais escuras, centro no verde original */
 .annbar,.drawer__sim{background:linear-gradient(90deg,rgba(0,0,0,.5) 0,rgba(0,0,0,0) 24%,rgba(0,0,0,0) 76%,rgba(0,0,0,.5) 100%),var(--petrol-deep)}
 
-/* Menu: a faixa azul rola com a pagina e o menu encosta no topo e fica fixo (sticky nativo, sem JS e sem animacao propria) */
-.masthead{position:sticky;top:calc(var(--bar-h) * -1);inset-inline:0}
+/* Faixa do topo: ao sumir, o menu acompanha sem passar do topo da tela (sem elastico, nunca sai da tela); ao voltar, desce com elastico pequeno */
 .masthead::before{height:20rem}
-body{padding-top:0}
-html.annbar-hide:not(.is-typing) .masthead{transform:none}
+.masthead{will-change:transform;transition:transform .7s cubic-bezier(.34,1.6,.64,1),visibility 0s;transition-timing-function:cubic-bezier(.34,1.6,.64,1)}
+html.annbar-hide .masthead{transition:transform .5s cubic-bezier(.22,.61,.36,1),visibility 0s;transition-timing-function:cubic-bezier(.22,.61,.36,1)}
+@media (min-width:48rem){html.annbar-hide .masthead{transform:translate3d(0,calc(var(--bar-h) * -1),0)}}
+@media (prefers-reduced-motion:reduce){.masthead,html.annbar-hide .masthead{transition-duration:.01s}}
 
 /* Faixa do topo e card do menu lateral: azul petroleo escuro, mais claro no centro */
 .annbar,.drawer__sim,.masthead::before{background:linear-gradient(90deg,#0a1c2e 0,#0e2941 25%,#123553 50%,#0e2941 75%,#0a1c2e 100%)}

@@ -62,20 +62,23 @@
     var o={event:"announcement_click"},k;for(k in d)o[k]=d[k];dl.push(o);
     if(typeof window.gtag==="function")window.gtag("event","announcement_click",d);
   },true);
-  var mq=window.matchMedia("(max-width: 47.99rem)"),tick=false,pt=document.querySelector(".partners");
-  function past(){
-    if(bar.classList.contains("annbar--static"))return false;
-    var y=window.pageYOffset||0;
-    if(pt){return pt.getBoundingClientRect().top<=window.innerHeight*.75}
-    return y>window.innerHeight*.9;
-  }
+  var tick=false;
+  /* Regra: faixa azul e menu ficam fixos juntos ate o fim da primeira secao; ai a faixa sobe, o menu sobe junto e passa a ficar fixo no topo.
+     So a rolagem muda esse estado (botoes, menu lateral, modal, foco e teclado nao mexem). */
+  var hidden=false;
+  function first(){return document.querySelector("main > .hero, main > .pagehead, .hero, .pagehead")||document.querySelector("main > *")}
   function upd(){
     tick=false;
-    if(root.classList.contains("is-typing"))return;
-    if(past()){root.classList.add("annbar-hide")}else{root.classList.remove("annbar-hide")}
+    if(root.classList.contains("is-typing")||document.body.classList.contains("is-locked")||root.classList.contains("sim-open"))return;
+    if(bar.classList.contains("annbar--static")){root.classList.remove("annbar-hide");hidden=false;return}
+    var f=first(),b=f?f.getBoundingClientRect().bottom:(window.pageYOffset||0)<window.innerHeight*.9?9999:0;
+    if(!hidden&&b<=90)hidden=true;else if(hidden&&b>140)hidden=false;
+    root.classList.toggle("annbar-hide",hidden);
   }
   window.addEventListener("scroll",function(){if(!tick){tick=true;window.requestAnimationFrame(upd)}},{passive:true});
   window.addEventListener("resize",upd,{passive:true});
+  window.addEventListener("load",upd);
+  upd();
 })();
 
 /* Abrir o simulador a partir do menu lateral: fecha o menu antes. */
