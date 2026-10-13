@@ -79,6 +79,27 @@
   window.addEventListener("resize",upd,{passive:true});
   window.addEventListener("load",upd);
   upd();
+  /* Guarda do menu: depois de qualquer interacao (clique, toque, foco, secao Solucoes, botoes), confere se o menu esta no lugar certo e corrige sozinho.
+     Nunca age com campo em foco no celular, menu lateral ou modal abertos, nem durante a animacao. */
+  var gq=0;
+  function guard(){
+    gq=0;
+    var m=document.querySelector(".masthead");if(!m)return;
+    var a=document.activeElement,inp=!!a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName);
+    if(root.classList.contains("is-typing")&&!inp)root.classList.remove("is-typing");
+    if(root.classList.contains("is-typing")||document.body.classList.contains("is-locked")||root.classList.contains("sim-open"))return;
+    upd();
+    if(m.getAnimations&&m.getAnimations().length)return;
+    var cs=getComputedStyle(m);
+    if(cs.visibility==="hidden"||cs.display==="none"||cs.opacity==="0"){m.style.setProperty("visibility","visible","important");m.style.setProperty("display","block","important");m.style.setProperty("opacity","1","important")}
+    var top=m.getBoundingClientRect().top,exp=root.classList.contains("annbar-hide")?-bar.offsetHeight:0;
+    if(Math.abs(top-exp)>2){m.style.transition="none";m.style.transform="";void m.offsetHeight;m.style.transition=""}
+  }
+  function gs(){if(!gq)gq=window.requestAnimationFrame(function(){window.setTimeout(guard,60)})}
+  ["pointerup","click","focusin","focusout","touchend","keyup","transitionend"].forEach(function(n){document.addEventListener(n,gs,true)});
+  document.addEventListener("visibilitychange",gs);
+  window.addEventListener("pageshow",gs);
+  window.setInterval(function(){if(!document.hidden)gs()},1200);
 })();
 
 /* Abrir o simulador a partir do menu lateral: fecha o menu antes. */
