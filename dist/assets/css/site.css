@@ -399,3 +399,76 @@ html.annbar-hide .masthead{transition:transform .5s cubic-bezier(.22,.61,.36,1),
 .annbar{column-gap:.6rem}
 .annbar__txt{justify-items:end}
 .arot{justify-self:end;text-align:right}
+.masthead{will-change:auto;transform:none}
+html.annbar-hide:not(.is-typing) .masthead{transform:none;transition:none}
+.annbar{margin-top:0;transition:margin-top .7s cubic-bezier(.34,1.5,.64,1)}
+html.annbar-hide .annbar{margin-top:calc(var(--bar-h) * -1);transition:margin-top .5s cubic-bezier(.22,.61,.36,1)}
+@media (prefers-reduced-motion:reduce){.annbar,html.annbar-hide .annbar{transition-duration:.01s}}
+
+/* Fontes (antes inline) e estilos de atributo convertidos em classes: permite style-src sem unsafe-inline */
+@font-face{font-family:"Inter";font-style:normal;font-weight:100 900;font-display:swap;src:url("../fonts/inter-var.woff2") format("woff2")}@font-face{font-family:"Manrope";font-style:normal;font-weight:700;font-display:swap;src:url("../fonts/manrope-700.woff2") format("woff2")}
+.u01{margin:0 !important}
+.u02{color:var(--slate-1) !important}
+.u03{margin:0 !important;max-width:34ch !important}
+.u04{flex-wrap:wrap !important}
+.u05{max-width:44ch !important}
+.u06{color:var(--paper) !important}
+.u07{margin-left:auto !important}
+.u08{position:absolute !important}
+.u09{display:block !important;margin-top:1.5rem !important;color:var(--iris-on-dark) !important}
+.u10{scroll-margin-top:6rem !important}
+.u11{margin-top:1.25rem !important}
+.u12{margin-top:0 !important}
+.u13{margin-top:1rem !important}
+.u14{font-family:system-ui,sans-serif !important;padding:2rem !important}
+.u15{margin-bottom:0 !important}
+.u16{border-top:0 !important;padding-top:0 !important;margin-top:1.5rem !important}
+.u17{animation-delay:0.00s !important}
+.u18{column-count:1 !important}
+.u19{animation-delay:0.20s !important}
+.u20{animation-delay:0.30s !important}
+.u21{color:var(--slate-2) !important;margin-top:.5rem !important}
+.u22{margin-top:2.5rem !important}
+.u23{max-width:38ch !important}
+.u24{animation-delay:0.10s !important}
+.u25{animation-delay:0.40s !important}
+.u26{animation-delay:0.50s !important}
+.u27{margin-top:2rem !important}
+.u28{animation-delay:0.36s !important}
+.u29{animation-delay:0.48s !important}
+.u30{animation-delay:0.60s !important}
+.u31{margin-top:1.5rem !important}
+.u32{align-items:start !important}
+.u33{animation-delay:0.12s !important}
+.u34{animation-delay:0.16s !important}
+.u35{animation-delay:0.24s !important}
+.u36{animation-delay:0.32s !important}
+.u37{animation-delay:0.62s !important}
+.u38{animation-delay:0.64s !important}
+.u39{animation-delay:0.74s !important}
+.u40{animation-delay:0.86s !important}
+.u41{animation-delay:0.90s !important}
+.u42{animation-delay:0.98s !important}
+.u43{animation-delay:1.10s !important}
+.u44{border-top:0 !important}
+.u45{border-top:1px solid var(--rule) !important;padding-top:2rem !important}
+.u46{border:1px solid var(--mist) !important;border-radius:16px !important;overflow:hidden !important;background:var(--cloud) !important;box-shadow:0 12px 24px rgba(0,0,0,.08) !important}
+.u47{display:block !important;color:var(--iris-on-dark) !important}
+.u48{display:block !important;font-weight:600 !important;margin-bottom:.4rem !important}
+.u49{display:block !important;width:100% !important;height:min(780px,calc(100vh - 9rem)) !important;height:min(780px,calc(100svh - 9rem)) !important;min-height:480px !important;border:0 !important}
+.u51{font-size:var(--fs-h3,1.5rem) !important;margin:0 0 .75rem !important}
+.u52{gap:1rem !important}
+.u53{margin-bottom:1rem !important}
+.u54{margin-top:.5rem !important}
+.u55{margin:.5rem 0 0 !important}
+.u56{margin:0 0 1rem !important}
+.u57{margin:0 !important;max-width:32ch !important}
+.u58{margin:2rem 0 .5rem !important}
+.u59{max-width:48rem !important}
+.u60{max-width:none !important}
+.u61{object-position:31% 50% !important}
+.u62{padding-block:clamp(2.5rem,5vw,4.5rem) !important;scroll-margin-top:calc(1rem - clamp(2.5rem,5vw,4.5rem)) !important}
+.u63{padding-top:.5rem !important}
+.u65{width:100% !important}
+.artlist__empty{display:none}
+#progress-fill{width:0%}

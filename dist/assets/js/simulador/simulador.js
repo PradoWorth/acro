@@ -62,7 +62,8 @@ const CONFIG = {
   CRM: {
     // Mesmo webhook (n8n) usado no Diagnóstico 360, o outro formulário da
     // Acrópole — recebe leads qualificados de várias origens.
-    webhookUrl: 'https://n8n.srv1800205.hstgr.cloud/webhook/recebimento-de-leads',
+    // Um só endereço para o site inteiro: vem de config.js (assets/js/core/config.js).
+    webhookUrl: (window.ACROPOLE_CONFIG && window.ACROPOLE_CONFIG.endpoint) || 'https://n8n.srv1800205.hstgr.cloud/webhook/recebimento-de-leads',
     apiKey: '', // NÃO preencher no frontend em produção; usar backend proxy
     pipeline: 'home-equity',
     stage: 'novo-lead',
@@ -1135,6 +1136,10 @@ async function sendLeadToCrm(leadPayload) {
     stage: CONFIG.CRM.stage,
     campaignId: CONFIG.CRM.campaignId,
   };
+  try {
+    const ts = window.__acTsToken && window.__acTsToken();
+    if (ts) enrichedPayload.cf_turnstile = ts;
+  } catch (_) { /* sem token: segue sem ele */ }
 
   if (!CONFIG.CRM.webhookUrl) {
     storePendingLocally(enrichedPayload);
@@ -1169,25 +1174,48 @@ async function sendLeadToCrm(leadPayload) {
   }
 }
 
-function storePendingLocally(payload) {
+// Leads que falharam ficam no navegador só pelo tempo necessário para o reenvio:
+// validade de 48 h e no máximo 10 itens. Depois disso são apagados.
+const PENDING_TTL_MS = 48 * 60 * 60 * 1000;
+const PENDING_MAX = 10;
+
+function readPending() {
   try {
     const raw = localStorage.getItem(PENDING_KEY);
     const list = raw ? JSON.parse(raw) : [];
-    list.push(payload);
-    localStorage.setItem(PENDING_KEY, JSON.stringify(list));
+    if (!Array.isArray(list)) return [];
+    const now = Date.now();
+    return list.filter((p) => p && typeof p === 'object' && now - (p.__ts || 0) < PENDING_TTL_MS).slice(-PENDING_MAX);
+  } catch (_) {
+    return [];
+  }
+}
+
+function storePendingLocally(payload) {
+  try {
+    const list = readPending();
+    list.push(Object.assign({}, payload, { __ts: Date.now() }));
+    localStorage.setItem(PENDING_KEY, JSON.stringify(list.slice(-PENDING_MAX)));
   } catch (_) {
     /* localStorage indisponível: melhor esforço, não bloqueia o funil */
   }
 }
 
+function stripControl(payload) {
+  const c = Object.assign({}, payload);
+  delete c.__ts;
+  delete c.cf_turnstile; // token antigo não vale mais: um novo é pedido no reenvio
+  return c;
+}
+
 /** Utilitário para reenviar leads que ficaram pendentes localmente. */
 function getPendingLeads() {
+  const list = readPending();
   try {
-    const raw = localStorage.getItem(PENDING_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (_) {
-    return [];
-  }
+    if (list.length) localStorage.setItem(PENDING_KEY, JSON.stringify(list));
+    else localStorage.removeItem(PENDING_KEY);
+  } catch (_) { /* ok */ }
+  return list;
 }
 
 function clearPendingLeads() {
@@ -1215,7 +1243,12 @@ async function flushPendingLeads() {
   if (pending.length === 0) return;
 
   const stillPending = [];
-  for (const payload of pending) {
+  for (const original of pending) {
+    let payload = stripControl(original);
+    if (window.__acTsWait) {
+      const t = await window.__acTsWait();
+      if (t) payload.cf_turnstile = t;
+    }
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), CRM_REQUEST_TIMEOUT_MS);
     try {
@@ -1225,9 +1258,9 @@ async function flushPendingLeads() {
         body: JSON.stringify(payload),
         signal: controller.signal,
       });
-      if (!response.ok) stillPending.push(payload);
+      if (!response.ok) stillPending.push(original);
     } catch (_) {
-      stillPending.push(payload);
+      stillPending.push(original);
     } finally {
       window.clearTimeout(timeoutId);
     }
