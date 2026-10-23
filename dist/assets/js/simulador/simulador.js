@@ -205,7 +205,8 @@ function dispatchRaw(eventName, payload = {}) {
   } catch (_) {}
 
   try {
-    if (typeof window.fbq === 'function') {
+    // Meta só com aceite de cookies (LGPD): o GTM respeita o Consent Mode, esta chamada direta não.
+    if (typeof window.fbq === 'function' && hasTrackingConsent()) {
       window.fbq('trackCustom', eventName, payload);
     }
   } catch (_) {}
@@ -295,18 +296,45 @@ function setCookie(name, value, days) {
   } catch (_) {}
 }
 
+// Mesma regra do site.js: sem aceite, a atribuição fica só nesta aba (sessionStorage) e sem
+// os identificadores do Meta; com aceite, vira o cookie de 30 dias descrito na Política.
+function hasTrackingConsent() {
+  try {
+    if (window.AcropoleConsent && typeof window.AcropoleConsent.get === 'function') {
+      return window.AcropoleConsent.get() === 'accepted';
+    }
+    return localStorage.getItem('cookieconsent:v1') === 'accepted';
+  } catch (_) {
+    return false;
+  }
+}
+
 function readStoredAttribution() {
   try {
-    const existing = getCookie(COOKIE_NAME);
+    const existing = getCookie(COOKIE_NAME) || sessionStorage.getItem(COOKIE_NAME);
     return existing ? JSON.parse(decodeURIComponent(existing)) : {};
   } catch (_) {
     return {};
   }
 }
 
-function persist(data) {
-  setCookie(COOKIE_NAME, encodeURIComponent(JSON.stringify(data)), COOKIE_DAYS);
+// Nome próprio: o leadStore abaixo também declara persist(), e a última declaração vencia,
+// então até a v1.4 a atribuição nunca era gravada.
+function persistAttribution(data) {
+  if (hasTrackingConsent()) {
+    setCookie(COOKIE_NAME, encodeURIComponent(JSON.stringify(data)), COOKIE_DAYS);
+    return;
+  }
+  const safe = { ...data };
+  delete safe.fbp;
+  delete safe.fbc;
+  try { sessionStorage.setItem(COOKIE_NAME, encodeURIComponent(JSON.stringify(safe))); } catch (_) {}
+  if (getCookie(COOKIE_NAME)) setCookie(COOKIE_NAME, '', -1);
 }
+
+window.addEventListener('acropole:consent', () => {
+  try { persistAttribution(readStoredAttribution()); } catch (_) {}
+});
 
 /**
  * Mescla os parâmetros de tracking da URL atual com o que já estava
@@ -336,7 +364,7 @@ function updateAttribution() {
   if (fbp) data.fbp = fbp;
   if (fbc) data.fbc = fbc;
 
-  persist(data);
+  persistAttribution(data);
   return data;
 }
 
@@ -1519,7 +1547,7 @@ const QUESTION_STEPS = [
 const CALCULATING_DURATION_MS = 4000;
 const CALCULATING_MESSAGES = [
   'Validando suas informações...',
-  'Consultando condições disponíveis...',
+  'Comparando com as faixas de mercado...',
   'Calculando sua estimativa...',
 ];
 
@@ -1745,10 +1773,22 @@ function cacheElements() {
 
 // ---------- Navegação entre telas ----------
 
+let screenChanges = 0;
+
 function goToScreen(screenId) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.remove('is-active'));
   const target = document.getElementById(screenId);
   target.classList.add('is-active');
+
+  // Leva o foco para a pergunta nova (teclado e leitor de tela); a tela anterior
+  // some com display:none e o foco cairia no <body>. Não rouba o foco na carga.
+  if (screenChanges++ > 0) {
+    const heading = target.querySelector('h1, h2');
+    if (heading) {
+      heading.setAttribute('tabindex', '-1');
+      heading.focus({ preventScroll: true });
+    }
+  }
   window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
 
   // As subtelas de localização (rua/condomínio) não fazem parte de
@@ -2510,7 +2550,7 @@ function runCalculationAndShowResult() {
     }
     if (el.resultInstallmentLabel) {
       const termYears = Math.round(CONFIG.FINANCING_TERM_MONTHS / 12);
-      el.resultInstallmentLabel.textContent = `Parcela estimada (até ${termYears} anos)`;
+      el.resultInstallmentLabel.textContent = `Parcela inicial estimada (até ${termYears} anos, + IPCA)`;
     }
     if (el.resultRate) {
       const rateLabel = (CONFIG.MONTHLY_INTEREST_RATE * 100).toLocaleString('pt-BR', {

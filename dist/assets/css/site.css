@@ -472,3 +472,11 @@ html.annbar-hide .annbar{margin-top:calc(var(--bar-h) * -1);transition:margin-to
 .u65{width:100% !important}
 .artlist__empty{display:none}
 #progress-fill{width:0%}
+
+/* v1.4 a11y: escondidos só por opacidade continuavam focáveis pelo Tab. visibility sai depois do fade. */
+.rail{visibility:hidden;transition:opacity var(--dur-slow) var(--ease),transform var(--dur-slow) var(--ease),box-shadow var(--dur-default) var(--ease),visibility 0s linear var(--dur-slow)}
+.rail[data-show=true]{visibility:visible;transition-delay:0s}
+.cookiebar:not([data-show=true]){visibility:hidden}
+@media (prefers-reduced-motion:no-preference){.cookiebar{transition:opacity var(--dur) var(--ease-out),transform var(--dur) var(--ease-out),visibility 0s linear var(--dur)}.cookiebar[data-show=true]{transition-delay:0s}}
+/* O aviso de cookies fixo embaixo não pode cobrir o campo em foco (WCAG 2.4.11). */
+html{scroll-padding-bottom:var(--cookiebar-h,0px)}

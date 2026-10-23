@@ -1,1 +1,1 @@
-window.ACROPOLE_CONFIG={version:"1.3",endpoint:"https://n8n.srv1800205.hstgr.cloud/webhook/recebimento-de-leads",analytics:{provider:"ga4",id:"G-RZEN0FRQGB"},turnstile:{siteKey:"",action:"lead"}};
+window.ACROPOLE_CONFIG={version:"1.4.1",endpoint:"https://n8n.srv1800205.hstgr.cloud/webhook/recebimento-de-leads",analytics:{provider:"ga4",id:"G-RZEN0FRQGB"},turnstile:{siteKey:"",action:"lead"}};

@@ -19,7 +19,7 @@
     },
     {
      "key": "Permissions-Policy",
-     "value": "geolocation=(), microphone=(), camera=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()"
+     "value": "geolocation=(), microphone=(), camera=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=(), idle-detection=(), screen-wake-lock=(), xr-spatial-tracking=(), publickey-credentials-get=(), browsing-topics=()"
     },
     {
      "key": "Strict-Transport-Security",
@@ -38,8 +38,26 @@
      "value": "none"
     },
     {
+     "key": "Origin-Agent-Cluster",
+     "value": "?1"
+    }
+   ]
+  },
+  {
+   "source": "/((?!simulador-home-equity).*)",
+   "headers": [
+    {
      "key": "Content-Security-Policy",
-     "value": "default-src 'self'; img-src 'self' data: https://i.ytimg.com https://www.google-analytics.com https://*.google-analytics.com https://*.googletagmanager.com; style-src 'self'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-FgN0V7C0sUmuQcNsjFOiD7yKxwbTjxdHWucUxwkfpEs=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s=' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-src 'self'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+     "value": "default-src 'self'; img-src 'self' data: https://i.ytimg.com https://www.google-analytics.com https://*.google-analytics.com https://*.googletagmanager.com; style-src 'self'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-aKPWQbyTFeVhbJ4LxNLu0oxvnBmiEYcZ13UcU0Asg2w=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-gcy29gtgxiA5TPzvgXSKMLotG5wS6Mo9RB/ex8s3vkI=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-src 'self'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; script-src-attr 'none'; upgrade-insecure-requests"
+    }
+   ]
+  },
+  {
+   "source": "/simulador-home-equity",
+   "headers": [
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; img-src 'self' data: https://load.sst.acropolecapital.com.br https://sst.acropolecapital.com.br; style-src 'self'; font-src 'self'; script-src 'self' https://load.sst.acropolecapital.com.br; connect-src 'self' https://n8n.srv1800205.hstgr.cloud https://load.sst.acropolecapital.com.br https://sst.acropolecapital.com.br; form-action 'self'; frame-src https://sst.acropolecapital.com.br; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; script-src-attr 'none'; upgrade-insecure-requests"
     }
    ]
   },
@@ -62,11 +80,20 @@
    ]
   },
   {
+   "source": "/assets/js/(.*).json",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "public, max-age=86400"
+    }
+   ]
+  },
+  {
    "source": "/assets/(img|art|icons)/(.*)",
    "headers": [
     {
      "key": "Cache-Control",
-     "value": "public, max-age=604800, must-revalidate"
+     "value": "public, max-age=604800, stale-while-revalidate=86400"
     }
    ]
   }

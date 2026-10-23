@@ -43,7 +43,7 @@ DirectorySlash Off
 
 # Nunca servir arquivos ocultos (exceto /.well-known), backups, mapas, código-fonte
 # e arquivos de projeto que não fazem parte do site.
-<FilesMatch "^\.(?!well-known)|\.(bak|old|orig|swp|sql|map|py|sh|lock|ya?ml|toml|ini|md)$|^(package(-lock)?\.json|composer\.(json|lock)|Dockerfile|Makefile|vercel\.json|_redirects|_headers)$">
+<FilesMatch "(?i)^\.(?!well-known)|\.(bak|bkp|old|orig|save|dist|inc|tmp|swp|swo|sql|map|py|sh|mjs|lock|ya?ml|toml|ini|md|zip|tar|t?gz|bz2|xz|7z|rar)$|~$|^(package(-lock)?\.json|composer\.(json|lock)|Dockerfile|Makefile|vercel\.json|_redirects|_headers)$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
@@ -74,18 +74,23 @@ ServerSignature Off
   Header always set "X-Content-Type-Options" "nosniff"
   Header always set "X-Frame-Options" "SAMEORIGIN"
   Header always set "Referrer-Policy" "strict-origin-when-cross-origin"
-  Header always set "Permissions-Policy" "geolocation=(), microphone=(), camera=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()"
+  Header always set "Permissions-Policy" "geolocation=(), microphone=(), camera=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=(), idle-detection=(), screen-wake-lock=(), xr-spatial-tracking=(), publickey-credentials-get=(), browsing-topics=()"
   Header always set "Strict-Transport-Security" "max-age=31536000; includeSubDomains"
   Header always set "Cross-Origin-Opener-Policy" "same-origin"
   Header always set "Cross-Origin-Resource-Policy" "same-origin"
   Header always set "X-Permitted-Cross-Domain-Policies" "none"
-  Header always set "Content-Security-Policy" "default-src 'self'; img-src 'self' data: https://i.ytimg.com https://www.google-analytics.com https://*.google-analytics.com https://*.googletagmanager.com; style-src 'self'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-FgN0V7C0sUmuQcNsjFOiD7yKxwbTjxdHWucUxwkfpEs=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s=' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-src 'self'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+  Header always set "Origin-Agent-Cluster" "?1"
+  Header always set "Content-Security-Policy" "default-src 'self'; img-src 'self' data: https://i.ytimg.com https://www.google-analytics.com https://*.google-analytics.com https://*.googletagmanager.com; style-src 'self'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-aKPWQbyTFeVhbJ4LxNLu0oxvnBmiEYcZ13UcU0Asg2w=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-gcy29gtgxiA5TPzvgXSKMLotG5wS6Mo9RB/ex8s3vkI=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-src 'self'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; script-src-attr 'none'; upgrade-insecure-requests"
 </IfModule>
 
 # Simulador Home Equity: página própria com CSP ajustada (GTM do servidor de tags da Acrópole e envio ao n8n).
+# O GTM carrega de load.sst.… mas envia os eventos a sst.… (GA4): sem sst.… aqui, nenhum evento do
+# funil chegava ao GA4. Meta Pixel e a tag de HTML personalizado do GTM (grava app_attribution) ficam
+# BLOQUEADOS de propósito: em 23/10/2026 os dois rodavam mesmo com "Recusar" (LGPD). Libere só
+# depois de exigir consentimento (ad_storage) nessas tags do GTM; veja o LEIA-ME para a linha pronta.
 <IfModule mod_headers.c>
   <FilesMatch "^simulador-home-equity\.html$">
-    Header always set "Content-Security-Policy" "default-src 'self'; img-src 'self' data: https://load.sst.acropolecapital.com.br; style-src 'self'; font-src 'self'; script-src 'self' https://load.sst.acropolecapital.com.br; connect-src 'self' https://n8n.srv1800205.hstgr.cloud https://load.sst.acropolecapital.com.br; form-action 'self'; frame-src 'none'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+    Header always set "Content-Security-Policy" "default-src 'self'; img-src 'self' data: https://load.sst.acropolecapital.com.br https://sst.acropolecapital.com.br; style-src 'self'; font-src 'self'; script-src 'self' https://load.sst.acropolecapital.com.br; connect-src 'self' https://n8n.srv1800205.hstgr.cloud https://load.sst.acropolecapital.com.br https://sst.acropolecapital.com.br; form-action 'self'; frame-src https://sst.acropolecapital.com.br; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; script-src-attr 'none'; upgrade-insecure-requests"
   </FilesMatch>
 </IfModule>
 
@@ -99,6 +104,8 @@ ErrorDocument 403 /404.html
   # Pastas e arquivos ocultos (.git, .svn, .env, .DS_Store...) nunca são servidos,
   # nem dentro de subpastas. Só /.well-known/ é público (security.txt, validações).
   RewriteRule (^|/)\.(?!well-known(/|$)) - [R=404,L]
+  # Ferramentas e código de servidor, caso sejam enviados por engano junto com o site.
+  RewriteRule ^(manutencao|_dev|servidor|_servidor)(/|$) - [R=404,L]
 
   # Métodos HTTP que um site estático nunca usa.
   RewriteCond %{REQUEST_METHOD} ^(POST|TRACE|TRACK|DELETE|PUT|PATCH|CONNECT)$ [NC]
@@ -107,14 +114,14 @@ ErrorDocument 403 /404.html
   RewriteCond %{QUERY_STRING} (<|%3C)([^s]*s)+cript.*(>|%3E) [NC,OR]
   RewriteCond %{QUERY_STRING} (GLOBALS|_REQUEST)(=|\[|%[0-9A-Z]{0,2}) [NC]
   RewriteRule ^ - [F,L]
+  # Domínio único: todas as tags canônicas, o sitemap e o robots usam o www.
+  # Ativado na v1.4: em 23/10/2026 o www respondia 200 com SSL nesta hospedagem, e o domínio
+  # sem www servia o site inteiro em duplicata (as 199 páginas em 2 endereços).
+  # http://dominio e http(s)://sem-www vão direto para https://www em um único redirecionamento.
+  RewriteCond %{HTTP_HOST} ^acropolecapital\.com\.br$ [NC]
+  RewriteRule ^ https://www.acropolecapital.com.br%{REQUEST_URI} [L,R=301]
   RewriteCond %{HTTPS} off
   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-  # Domínio único: todas as tags canônicas, o sitemap e o robots usam o www.
-  # Ative as 2 linhas abaixo (tire o #) DEPOIS de confirmar que
-  # www.acropolecapital.com.br aponta para esta mesma hospedagem, com SSL.
-  # RewriteCond %{HTTP_HOST} ^acropolecapital\.com\.br$ [NC]
-  # RewriteRule ^ https://www.acropolecapital.com.br%{REQUEST_URI} [L,R=301]
 
   # URLs limpas: o visitante nunca vê ".html".
   # -1) /pg-programas e /pg-programas/ -> /programas
@@ -166,11 +173,15 @@ ErrorDocument 403 /404.html
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
   <FilesMatch "\.(avif|webp|png|jpe?g|gif|svg|ico)$">
-    Header set Cache-Control "public, max-age=604800, must-revalidate"
+    Header set Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
   </FilesMatch>
 </IfModule>
 
-# Compressão de texto (JSON da lista de municípios, HTML, CSS e JS).
+# Compressão de texto (JSON da lista de municípios, HTML, CSS e JS). Brotli primeiro
+# (15 a 22% menor que gzip nestes arquivos) quando o servidor tiver o módulo.
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css application/javascript text/javascript application/json image/svg+xml application/xml text/xml text/plain application/manifest+json image/x-icon
+</IfModule>
 <IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/json image/svg+xml application/xml
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/json image/svg+xml application/xml text/xml text/plain application/manifest+json image/x-icon
 </IfModule>

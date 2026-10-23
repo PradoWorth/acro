@@ -4,8 +4,9 @@
    antes do GTM carregar; mudanças posteriores chegam pelo evento do aviso ou,
    dentro da janela do site, pelo evento "storage" do navegador. */
 (function(w,d){
-  /* Aberto dentro da janela do site (?embed=1): o aviso de cookies fica com o site. */
-  if(/[?&]embed=1\b/.test(location.search))d.documentElement.classList.add("is-embed");
+  /* Aberto dentro da janela do site (?embed=1 e de fato num iframe): o aviso de cookies fica com o site.
+     Fora de iframe o aviso aparece sempre, para o ?embed=1 num link não tirar a escolha do visitante. */
+  if(/[?&]embed=1\b/.test(location.search)&&w.top!==w.self)d.documentElement.classList.add("is-embed");
   var KEY="cookieconsent:v1";
   w.dataLayer=w.dataLayer||[];
   function gtag(){w.dataLayer.push(arguments)}

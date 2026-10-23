@@ -2,12 +2,13 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=(), idle-detection=(), screen-wake-lock=(), xr-spatial-tracking=(), publickey-credentials-get=(), browsing-topics=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
   X-Permitted-Cross-Domain-Policies: none
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://i.ytimg.com https://www.google-analytics.com https://*.google-analytics.com https://*.googletagmanager.com; style-src 'self'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-FgN0V7C0sUmuQcNsjFOiD7yKxwbTjxdHWucUxwkfpEs=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' 'sha256-srtd7IEu4YMLTL+VSqBWqstwqelMBUFo46tqrgOdF+s=' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-src 'self'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+  Origin-Agent-Cluster: ?1
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://i.ytimg.com https://www.google-analytics.com https://*.google-analytics.com https://*.googletagmanager.com; style-src 'self'; font-src 'self'; script-src 'self' 'sha256-+2gvOfkqpojUlp341SDq4uzQf/TZNh8VpiJF1PUZpUg=' 'sha256-GE2avRUjIm0Z7+G2Sg99Kcg34MBychYE1mCURIAFRk4=' 'sha256-Ka9WqRNm4IQ6u3zd3cppUYQMtr+G+/B2R/PvX7WZ5ug=' 'sha256-aKPWQbyTFeVhbJ4LxNLu0oxvnBmiEYcZ13UcU0Asg2w=' 'sha256-cqAhAzgiD0FhUL0R2H6BWD2ce8cS8FevS4oL063Dpak=' 'sha256-gcy29gtgxiA5TPzvgXSKMLotG5wS6Mo9RB/ex8s3vkI=' 'sha256-jOF0c+1w7pzNR7dFUwoyl+Pl6jXtDQ9CrSD35V+tvQ0=' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://brasilapi.com.br https://n8n.srv1800205.hstgr.cloud; form-action 'self'; frame-src 'self'; worker-src 'none'; media-src 'self'; manifest-src 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; script-src-attr 'none'; upgrade-insecure-requests
 
 # Espelho do .htaccess (a hospedagem oficial é a Hostinger/Apache; este arquivo só
 # vale para Netlify/Cloudflare Pages). CSS e JS são referenciados com ?v=<hash do
@@ -23,8 +24,8 @@
 /assets/js/*.json
   Cache-Control: public, max-age=86400
 /assets/img/*
-  Cache-Control: public, max-age=604800, must-revalidate
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
 /assets/art/*
-  Cache-Control: public, max-age=604800, must-revalidate
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
 /assets/icons/*
-  Cache-Control: public, max-age=604800, must-revalidate
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400

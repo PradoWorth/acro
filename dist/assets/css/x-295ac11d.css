@@ -1823,3 +1823,5 @@ html.is-embed .cookiebar { display: none !important; }
 #screen-landing .benefit-card{padding-block:clamp(5px,1.5vh,14px)}
 #screen-landing .benefit-card+.benefit-card{border-top:1px solid var(--border)}
 #screen-landing .benefit-title{font-size:clamp(14px,2.6vh,16px)}
+
+.screen h1[tabindex="-1"]:focus,.screen h2[tabindex="-1"]:focus{outline:none}
