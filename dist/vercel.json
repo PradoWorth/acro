@@ -140,6 +140,10 @@
    "destination": "/pg-credito-alto-valor/:slug"
   },
   {
+   "source": "/agronegocio/:slug",
+   "destination": "/pg-agronegocio/:slug"
+  },
+  {
    "source": "/finalidades/:slug",
    "destination": "/pg-finalidades/:slug"
   },
