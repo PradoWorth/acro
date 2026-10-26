@@ -557,3 +557,9 @@ html{scroll-padding-bottom:var(--cookiebar-h,0px)}
 }
 .cfband__dim{font-size:.6em;line-height:1.25;font-weight:500;letter-spacing:-.01em;margin-top:.75rem}
 .foot__brand p.foot__disclaimer{font-size:.6875rem;line-height:1.55;letter-spacing:.005em}
+/* Dica de rolagem na lista de opções: degradê com seta no rodapé e barra fina visível. */
+.cfband__form .cf-field .cs-menu{scrollbar-width:thin;scrollbar-color:#9aa6ae transparent}
+.cfband__form .cf-field .cs-menu::-webkit-scrollbar{width:6px}
+.cfband__form .cf-field .cs-menu::-webkit-scrollbar-thumb{background:#9aa6ae;border-radius:100px}
+.cfband__form .cf-field .cs-option:last-child{margin-bottom:2.25rem}
+.cfband__form .cf-field .cs-menu::after{content:"";display:block;position:sticky;bottom:0;height:2.25rem;margin:-2.25rem -.375rem 0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23262b31' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center 68%/.8rem no-repeat,linear-gradient(to bottom,rgba(255,255,255,0),#fff 70%)}
