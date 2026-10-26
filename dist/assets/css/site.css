@@ -480,3 +480,17 @@ html.annbar-hide .annbar{margin-top:calc(var(--bar-h) * -1);transition:margin-to
 @media (prefers-reduced-motion:no-preference){.cookiebar{transition:opacity var(--dur) var(--ease-out),transform var(--dur) var(--ease-out),visibility 0s linear var(--dur)}.cookiebar[data-show=true]{transition-delay:0s}}
 /* O aviso de cookies fixo embaixo não pode cobrir o campo em foco (WCAG 2.4.11). */
 html{scroll-padding-bottom:var(--cookiebar-h,0px)}
+/* Lista de artigos no celular: card horizontal, imagem à esquerda, mais artigos por tela. */
+@media (max-width:640px){
+.artlist{display:grid;gap:1rem}
+.artrow{grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:0;padding:0;border:1px solid var(--rule);border-radius:var(--r-card);overflow:hidden;background:var(--paper);align-items:stretch}
+.artrow::before,.artrow::after{display:none}
+.artrow:hover>*{transform:none}
+.artrow__meta{display:block;min-height:100%}
+.artrow__img{margin:0;border-radius:0;aspect-ratio:auto;height:100%;min-height:9.5rem}
+.artrow__content{display:flex;flex-direction:column;align-items:flex-start;padding:.875rem 1rem}
+.artrow p.artrow__cat{display:inline-block;margin:0 0 .625rem;padding:.25rem .75rem;border:1px solid var(--rule);border-radius:999px;font-size:var(--t-xs);line-height:1.3}
+.artrow h3{font-size:1rem;line-height:1.3;max-width:none;margin:0 0 .5rem;overflow-wrap:anywhere}
+.artrow__content>p:not(.artrow__cat):not(.artrow__foot){display:none}
+.artrow p.artrow__foot{margin:auto 0 0;padding-top:.5rem;font-size:var(--t-xs)}
+}
